@@ -1,6 +1,6 @@
 #include "core/User.hpp"
 
-User::User(const string &userID, const string &userName, const string &password, Role &role) 
+User::User(const string &userID, const string &userName, const string &password, Role role) 
     : userID(userID), userName(userName), password(password), role(role) {}
 
 string User::getUserID() const { return userID; }

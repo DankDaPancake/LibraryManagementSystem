@@ -17,7 +17,7 @@ private:
     Role role;
 
 public:
-    User(const string &userID, const string &userName, const string &password, Role &role);
+    User(const string &userID, const string &userName, const string &password, Role role);
     virtual ~User() = default;
 
     string getUserID() const;
