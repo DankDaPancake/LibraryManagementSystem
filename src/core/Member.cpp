@@ -1,7 +1,7 @@
 #include "core/Member.hpp"
 
-Member::Member(const string &userID, const string &userName, const string &password, Role role = Role::MEMBER)
-      : User(userID, userName, password, role) {
+Member::Member(const string &userID, const string &userName, const string &password)
+      : User(userID, userName, password, Role::MEMBER) {
     membershipDate = chrono::system_clock::now();    
 }
 

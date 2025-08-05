@@ -15,7 +15,7 @@ private:
     vector<Book *> borrowedBooks;
 
 public:
-    Member(const string &userID, const string &userName, const string &password, Role role = Role::MEMBER);
+    Member(const string &userID, const string &userName, const string &password);
     ~Member();
 
     Date getMembershipDate() const;
