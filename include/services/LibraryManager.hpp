@@ -10,7 +10,7 @@
 using namespace std;
 
 class LibraryManager {
-    // friend class Librarian;
+    friend class Librarian;
     // friend class NotificationService;
 private:
     vector<Book *> books;

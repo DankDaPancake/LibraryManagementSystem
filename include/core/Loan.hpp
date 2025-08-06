@@ -38,7 +38,7 @@ public:
     void setReturnDate(const Date &date);
     void setStatus(LoanStatus newStatus);
 
-    bool isOverDue() const;
-    double calculateFine() const;
+    bool isOverDue();
+    int calculateFine() const;
     static string dateToString(const Date &date);
 };

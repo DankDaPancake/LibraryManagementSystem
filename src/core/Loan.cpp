@@ -18,17 +18,19 @@ void Loan::setDueDate(const Date &date) { dueDate = date; }
 void Loan::setReturnDate(const Date &date) { returnDate = date; }
 void Loan::setStatus(LoanStatus newStatus) { status = newStatus; }
 
-bool Loan::isOverDue() const {
+bool Loan::isOverDue() {
     auto now = chrono::system_clock::now();
-    return (status == LoanStatus::ACTIVE && now > dueDate);
+    if (status == LoanStatus::ACTIVE && now > dueDate)  
+        status = LoanStatus::OVERDUE;
+    return (status == LoanStatus::OVERDUE);
 }
 
-double Loan::calculateFine() const {
+int Loan::calculateFine() const {
     if (status != LoanStatus::OVERDUE)
         return 0;
     
     int daysOverdue = chrono::duration_cast<chrono::hours>(returnDate - dueDate).count() / 24;
-    return double(daysOverdue) * 1.2; // penalty
+    return daysOverdue * 10000; // penalty
 }
 
 string Loan::dateToString(const Date &date) {
