@@ -1,8 +1,10 @@
 #include <iostream>
 #include "core/Author.hpp"
 #include "core/Book.hpp"
-#include "core/User.hpp"
+#include "core/Librarian.hpp"
 #include "core/Loan.hpp"
+#include "core/User.hpp"
+#include "services/LibraryManager.hpp"
 
 using namespace std;
 
@@ -26,12 +28,23 @@ void testUser() {
     usr.viewProfile();
 }
 
-void testLoan() {
+void testLibraryManager() {
+    LibraryManager &libraryManager = LibraryManager::getInstance();
+
+    // Add a book to the library
+    Book *bok = new Book("90032", "If Life Actually Gave You Lemons", "12", vector<string>{"10001"}, 5);
+    libraryManager.addBookToSystem(bok);
+
+    // Add a user to the library
+    Member *mem = new Member("M001", "Phuc", "nightshade");
+    libraryManager.addMemberToSystem(mem);
 }
 
-int main()
-{
+int main() {
     testAuthor();
     testBook();
     testUser();
+    testLibraryManager();
+
+    return 0;
 }
