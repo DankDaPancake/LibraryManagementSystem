@@ -66,9 +66,9 @@ int CSVHandler::librarianCount = 0;
 
 string CSVHandler::generateUserID(const string &prefix) {
     stringstream ss;
-    int countUser;
-    countUser = (prefix == "M"? memberCount: librarianCount);
+    int *countUser;
+    countUser = (prefix == "M"? &memberCount: &librarianCount);
 
-    ss << prefix << setfill('0') << setw(3) << (++countUser);
+    ss << prefix << setfill('0') << setw(3) << ++(*countUser);
     return ss.str();
 }
