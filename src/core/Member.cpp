@@ -1,4 +1,5 @@
 #include "core/Member.hpp"
+#include "services/LibraryManager.hpp"
 
 Member::Member(const string &userID, const string &userName, const string &password)
       : User(userID, userName, password, Role::MEMBER) {
@@ -17,9 +18,11 @@ Date Member::getMembershipDate() const { return membershipDate; }
 vector<Book *> Member::getBorrowedBooks() const { return borrowedBooks; }
 
 bool Member::borrowBook(const string &ISBN) {
-    // Interact with library manager
+    LibraryManager &libraryManager = LibraryManager::getInstance();
+    return libraryManager.borrowBook(getUserID(), ISBN);
 }
 
 bool Member::returnBook(const string &ISBN) {
-    
+    LibraryManager &libraryManager = LibraryManager::getInstance();
+    return libraryManager.returnBook(getUserID(), ISBN);
 }

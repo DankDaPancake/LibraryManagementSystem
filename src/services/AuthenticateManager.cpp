@@ -2,8 +2,8 @@
 
 bool AuthenticateManager::registerUser(const string &userName, const string &password, Role role) {
     string fileName = (role == Role::LIBRARIAN
-                        ? "data/librarians.csv"
-                        : "data/members.csv");
+                        ? "../data/librarians.csv"
+                        : "../data/members.csv");
     string prefix = (role == Role::LIBRARIAN? "L": "M");
 
     string newUserID = CSVHandler::generateUserID(prefix);
@@ -19,12 +19,12 @@ bool AuthenticateManager::registerUser(const string &userName, const string &pas
 }
 
 User* AuthenticateManager::loginUser(const string &userName, const string &password) {
-    string userID = CSVHandler::validateCredentials(userName, password, "data/librarians.csv");
+    string userID = CSVHandler::validateCredentials(userName, password, "../data/librarians.csv");
     if (userID[0] == 'L') {
         return new User(userID, userName, password, Role::LIBRARIAN);
     }
 
-    userID = CSVHandler::validateCredentials(userName, password, "data/members.csv");
+    userID = CSVHandler::validateCredentials(userName, password, "../data/members.csv");
     if (userID[0] == 'M') {
         return new User(userID, userName, password, Role::MEMBER);
     }

@@ -22,7 +22,7 @@ ElectronicLibrary/
 │   ├── services/
 │   └── utils/
 ├── .gitignore              # Ẩn các file build khi compile
-├── build_cmake.bat         # File khởi tạo chương trình
+├── build.bat               # File khởi tạo chương trình
 ├── CMakeLists.txt          # Hoặc Makefile, dùng để build dự án
 ├── main.cpp                # Điểm khởi chạy chương trình, xử lý UI console
 └── README.md               # Note theo đõi dự án

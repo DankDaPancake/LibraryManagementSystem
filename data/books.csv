@@ -1,0 +1,102 @@
+isbn,title,authorIDs,categoryID,status,totalCopies,availableCopies
+9780321765723,The Lord of the Rings,1,1,available,5,5
+9780743273565,The Hitchhiker's Guide to the Galaxy,2,2,borrowed,3,0
+9780451524935,1984,3,3,available,10,7
+9780061122415,To Kill a Mockingbird,4,4,unavailable,2,0
+9780743273589,Pride and Prejudice,5,5,available,7,7
+9780441172719,Dune,6,1,borrowed,4,1
+9780307277671,The Catcher in the Rye,7,3,available,6,3
+9780060837029,Animal Farm,3,3,unavailable,1,0
+9780743273596,Jane Eyre,5,5,available,9,9
+9780062457791,The Book Thief,8,4,borrowed,8,2
+9780321765730,The Hobbit,1,1,available,5,5
+9780743273572,A Short History of Nearly Everything,9,2,borrowed,3,0
+9780451524942,Brave New World,3,3,available,10,7
+9780061122422,Go Set a Watchman,4,4,unavailable,2,0
+9780743273602,Sense and Sensibility,5,5,available,7,7
+9780441172726,Neuromancer,6,1,borrowed,4,1
+9780307277688,Franny and Zooey,7,3,available,6,3
+9780060837036,The Great Gatsby,3,3,unavailable,1,0
+9780743273619,Emma,5,5,available,9,9
+9780062457807,The Nightingale,8,4,borrowed,8,2
+9780321765747,The Two Towers,1,1,available,5,5
+9780743273589,The Restaurant at the End of the Universe,2,2,borrowed,3,0
+9780451524959,Fahrenheit 451,3,3,available,10,7
+9780061122439,The Old Man and the Sea,4,4,unavailable,2,0
+9780743273626,Persuasion,5,5,available,7,7
+9780441172733,Snow Crash,6,1,borrowed,4,1
+9780307277695,Nine Stories,7,3,available,6,3
+9780060837043,Of Mice and Men,3,3,unavailable,1,0
+9780743273633,Northanger Abbey,5,5,available,9,9
+9780062457814,The Girl with the Dragon Tattoo,8,4,borrowed,8,2
+9780321765754,The Return of the King,1,1,available,5,5
+9780743273596,"Life,the Universe and Everything",2,2,borrowed,3,0
+9780451524966,Animal Farm,3,3,available,10,7
+9780061122446,A Farewell to Arms,4,4,unavailable,2,0
+9780743273640,Mansfield Park,5,5,available,7,7
+9780441172740,Foundation,6,1,borrowed,4,1
+9780307277701,"Raise High the Roof Beam, Carpenters",7,3,available,6,3
+9780060837050,The Grapes of Wrath,3,3,unavailable,1,0
+9780743273657,Bleak House,5,5,available,9,9
+9780062457821,Gone Girl,8,4,borrowed,8,2
+9780321765761,The Silmarillion,1,1,available,5,5
+9780743273602,"So Long, and Thanks for All the Fish",2,2,borrowed,3,0
+9780451524973,Lord of the Flies,3,3,available,10,7
+9780061122453,For Whom the Bell Tolls,4,4,unavailable,2,0
+9780743273664,Little Dorrit,5,5,available,7,7
+9780441172757,"I,Robot",6,1,borrowed,4,1
+9780307277718,Seymour: An Introduction,7,3,available,6,3
+9780060837067,The Call of the Wild,3,3,unavailable,1,0
+9780743273671,Great Expectations,5,5,available,9,9
+9780062457838,The Girl on the Train,8,4,borrowed,8,2
+9780321765778,Unfinished Tales,1,1,available,5,5
+9780743273619,Mostly Harmless,2,2,borrowed,3,0
+9780451524980,The Road,3,3,available,10,7
+9780061122460,A Moveable Feast,4,4,unavailable,2,0
+9780743273688,Our Mutual Friend,5,5,available,7,7
+9780441172764,The Caves of Steel,6,1,borrowed,4,1
+9780307277725,"Hapworth 16, 1924",7,3,available,6,3
+9780060837074,White Fang,3,3,unavailable,1,0
+9780743273695,A Tale of Two Cities,5,5,available,9,9
+9780062457845,The Martian,8,4,borrowed,8,2
+9780321765785,Children of Húrin,1,1,available,5,5
+9780743273626,And Another Thing...,2,2,borrowed,3,0
+9780451524997,No Country for Old Men,3,3,available,10,7
+9780061122477,Death Comes for the Archbishop,4,4,unavailable,2,0
+9780743273701,Oliver Twist,5,5,available,7,7
+9780441172771,The Naked Sun,6,1,borrowed,4,1
+9780307277732,Decline and Fall,7,3,available,6,3
+9780060837081,To Build a Fire,3,3,unavailable,1,0
+9780743273718,David Copperfield,5,5,available,9,9
+9780062457852,Before I Go to Sleep,8,4,borrowed,8,2
+9780321765792,Beren and Lúthien,1,1,available,5,5
+9780743273633,Dirk Gently's Holistic Detective Agency,2,2,borrowed,3,0
+9780451525000,Blood Meridian,3,3,available,10,7
+9780061122484,My Ántonia,4,4,unavailable,2,0
+9780743273725,Hard Times,5,5,available,7,7
+9780441172788,The Robots of Dawn,6,1,borrowed,4,1
+9780307277749,Vile Bodies,7,3,available,6,3
+9780060837098,The Sea-Wolf,3,3,unavailable,1,0
+9780743273732,A Christmas Carol,5,5,available,9,9
+9780062457869,The Silent Patient,8,4,borrowed,8,2
+9780321765808,The Fall of Gondolin,1,1,available,5,5
+9780743273640,The Long Dark Tea-Time of the Soul,2,2,borrowed,3,0
+9780451525017,Suttree,3,3,available,10,7
+9780061122491,One of Ours,4,4,unavailable,2,0
+9780743273749,Little Dorrit,5,5,available,7,7
+9780441172795,Robots and Empire,6,1,borrowed,4,1
+9780307277756,Brideshead Revisited,7,3,available,6,3
+9780060837104,Martin Eden,3,3,unavailable,1,0
+9780743273756,Nicholas Nickleby,5,5,available,9,9
+9780062457876,The Guest List,8,4,borrowed,8,2
+9780321765815,Roverandom,1,1,available,5,5
+9780743273657,Last Chance to See,2,2,borrowed,3,0
+9780451525024,Cities of the Plain,3,3,available,10,7
+9780061122507,A Lost Lady,4,4,unavailable,2,0
+9780743273763,The Mystery of Edwin Drood,5,5,available,7,7
+9780441172801,Forward the Foundation,6,1,borrowed,4,1
+9780307277763,Scoop,7,3,available,6,3
+9780060837111,The Iron Heel,3,3,unavailable,1,0
+9780743273770,Our Mutual Friend,5,5,available,9,9
+9780062457883,The Last Thing He Told Me,8,4,borrowed,8,2
+9780321765822,Mr. Bliss,1,1,available,5,5
