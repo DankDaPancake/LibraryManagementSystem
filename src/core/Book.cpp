@@ -1,19 +1,17 @@
 #include "core/Book.hpp"
 
-Book::Book(const string &isbn, const string &title, const string &categoryID,
-           const vector<string> &authorIDs, int totalCopies)
-    : ISBN(isbn), title(title), categoryID(categoryID), authorIDs(authorIDs), 
-      totalCopies(totalCopies), availableCopies(totalCopies) {
-    if (totalCopies > 0)
-        status = BookStatus::AVAILABLE;
-    else 
-        status = BookStatus::UNDER_MAINTENANCE;
-}
+Book::Book(const string &ISBN, const string &title, const string &authorName,
+           const string &authorID, const string &categoryID, BookStatus status,
+           int totalCopies, int availableCopies)
+    : ISBN(ISBN), title(title), author(authorID, authorName, ""),
+      categoryID(categoryID), totalCopies(totalCopies), availableCopies(totalCopies)
+{}
 
 string Book::getISBN() const { return ISBN; }
 string Book::getTitle() const { return title; }
+string Book::getAuthorName() const { return author.getName(); }
+string Book::getAuthorID() const { return author.getAuthorID(); }
 string Book::getCategoryID() const { return categoryID; }
-const vector<string> &Book::getAuthorIDs() const { return authorIDs; }
 BookStatus Book::getStatus() const { return status; }
 int Book::getTotalCopies() const { return totalCopies; }
 int Book::getAvailableCopies() const { return availableCopies; }
@@ -28,7 +26,7 @@ void Book::setTotalCopies(int count) {
         if (availableCopies > totalCopies)
             availableCopies = totalCopies;
         if (availableCopies == 0)
-            status = BookStatus::BORROWED;
+            status = static_cast<BookStatus>(1);
     }
 }
 
@@ -36,52 +34,40 @@ void Book::setAvailableCopies(int count) {
     if (0 <= count && count <= totalCopies) {
         availableCopies = count;
         if (availableCopies == 0)
-            status = BookStatus::BORROWED;
+            status = static_cast<BookStatus>(1);
     }
 }
 
 string Book::bookStatusToString() const {
     switch (status) {
-        case BookStatus::AVAILABLE:
+        case static_cast<BookStatus>(0):
             return "AVAILABLE";
-        case BookStatus::BORROWED:
-            return "BORROWED";
-        case BookStatus::RESERVED:
-            return "RESERVED";
-        case BookStatus::UNDER_MAINTENANCE:
-            return "UNDER_MAINTENANCE";
-        default:
-            return "UNKNOWN";
+        case static_cast<BookStatus>(1):
+            return "UNAVAILABLE";
     }
+    return "UNKNOWN";
 }
 
 bool Book::isAvailable() const {
-    return status == BookStatus::AVAILABLE;
+    return status == static_cast<BookStatus>(0);
 }
 
 void Book::displayBasicInfo() const {
-    cout << "+ ISBN: " << ISBN << endl;
-    cout << "+ Title: " << title << endl;
-    cout << "+ Author IDs: ";
-    for (size_t i = 0; i < authorIDs.size(); ++i)
-        cout << authorIDs[i] << (i == authorIDs.size() - 1 ? "" : ", ");
+    cout << "   + ISBN: " << ISBN << endl;
+    cout << "   + Title: " << title << endl;
+    cout << "   + Author name: " << author.getName() << endl;
+    cout << "   + Author IDs " << author.getAuthorID() << endl;
     cout << endl;
-    cout << "+ Category ID: " << categoryID << endl;
-    cout << "+ Status: " << bookStatusToString() << endl;
-    cout << "+ Copies: " << availableCopies << "/" << totalCopies << " available" << endl;
+    cout << "   + Category ID: " << categoryID << endl;
+    cout << "   + Status: " << bookStatusToString() << endl;
+    cout << "   + Copies: " << availableCopies << "/" << totalCopies << " available" << endl;
 }
 
-string Book::getFullDescription() const {
-    string description = ISBN + ", " + title + ", " + "{";
-    
-    int authorsCount = authorIDs.size();
-    for (int i = 0; i < authorsCount; i++) {
-        description += authorIDs[i];
-        if (i < authorsCount - 1) description += ", ";
-    }
-    description += "}, " + categoryID + ", " + bookStatusToString() +
-                   ", " + to_string(totalCopies) +
-                   ", " + to_string(availableCopies);   
-
-    return description;
+string Book::getCSVDescription() const {
+    string desc = ISBN + "," + title + "," +
+                  author.getName() + "," + author.getAuthorID() + "," +
+                  categoryID + "," + bookStatusToString() + "," +
+                  to_string(totalCopies) + "," +
+                  to_string(availableCopies);
+    return desc;
 }

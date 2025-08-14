@@ -1,36 +1,37 @@
 #pragma once
 
+#include "core/Author.hpp"
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
 enum class BookStatus {
-    AVAILABLE,          
-    BORROWED,           
-    RESERVED,           
-    UNDER_MAINTENANCE
+    AVAILABLE = 0,          
+    UNAVAILABLE = 1
 };
 
 class Book {
 private:
     string ISBN;
     string title;
+    Author author;
     string categoryID;
-    vector<string> authorIDs;
     BookStatus status;
     int totalCopies;
     int availableCopies;
 
 public:
-    Book(const string &isbn, const string &title, const string &categoryID,
-         const vector<string> &authorIDs, int totalCopies);
+    Book(const string &ISBN, const string &title, const string &athorName, 
+         const string &authorID, const string &categoryID, BookStatus status,
+         int totalCopies, int availableCopies);
     virtual ~Book() = default;
 
     string getISBN() const;
     string getTitle() const;
+    string getAuthorName() const;
+    string getAuthorID() const;
     string getCategoryID() const;
-    const vector<string> &getAuthorIDs() const;
     BookStatus getStatus() const;
     int getTotalCopies() const;
     int getAvailableCopies() const;
@@ -43,5 +44,5 @@ public:
     bool isAvailable() const;
 
     void displayBasicInfo() const; // for terminal output
-    string getFullDescription() const; // fetch as CSV - for GUI
+    string getCSVDescription() const; // fetch as CSV - for GUI
 };

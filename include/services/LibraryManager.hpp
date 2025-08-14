@@ -39,4 +39,7 @@ public:
 
     void addBookToSystem(Book *book);
     void addMemberToSystem(Member *member);
+
+    void loadBooksIntoLibrary();
+    void saveBooksNewInfo();
 };  

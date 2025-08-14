@@ -24,7 +24,5 @@ public:
     string getUserName() const;
     Role getRole() const;
 
-    bool login();
-    bool register_();
     void viewProfile() const;
 };

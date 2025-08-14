@@ -61,14 +61,29 @@ bool CSVHandler::addUser(const string &userID, const string &userName, const str
     return true;
 }
 
-int CSVHandler::memberCount = 0;
-int CSVHandler::librarianCount = 0;
-
 string CSVHandler::generateUserID(const string &prefix) {
-    stringstream ss;
-    int *countUser;
-    countUser = (prefix == "M"? &memberCount: &librarianCount);
+    string fileName;
+    if (prefix == "L") fileName = "../data/librarians.csv";
+    else fileName = "../data/members.csv";
 
-    ss << prefix << setfill('0') << setw(3) << ++(*countUser);
+    ifstream file(fileName);
+    string line;
+    int maxID = 0;
+    
+    getline(file, line);
+
+    while (getline(file, line)) {
+        auto items = parseCSVLine(line);
+        if (!items.empty()) {
+            try {
+                int id = stoi(items[0].substr(1));
+                maxID = max(maxID, id);
+            }
+            catch (...) {}
+        }
+    }
+
+    stringstream ss;
+    ss << prefix << setfill('0') << setw(3) << (maxID + 1);
     return ss.str();
 }

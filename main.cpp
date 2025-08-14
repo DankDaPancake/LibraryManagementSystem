@@ -35,28 +35,6 @@ void ensureDataDirectoryExists() {
     }
 }
 
-void loadBooksIntoLibrary() {
-    ifstream file("../data/books.csv");
-    string line;
-    getline(file, line);
-    LibraryManager &libManager = LibraryManager::getInstance();
-
-
-    while (getline(file, line)) {
-        auto items = CSVHandler::parseCSVLine(line);
-
-        string ISBN = items[0], title = items[1], 
-               categoryID = items[3];
-        auto authorIDs = {items[2]};
-
-        stringstream ss(items[4]);
-        int totalCopies;
-        ss >> totalCopies;
-
-        libManager.addBookToSystem(new Book(ISBN, title, categoryID, authorIDs, totalCopies));
-    }
-}
-
 void execRegister(AuthenticateManager &authManager) {
     cout << endl << "=== USER REGISTRATION ===" << endl;
     string userName, password;
@@ -86,13 +64,21 @@ void execBookReturning(Member *member) {
     member->returnBook(ISBN);
 }
 
+void execViewingBorrowed(Member *member) {
+    auto borrowedBooks = member->getBorrowedBooks();
+    cout << "Your borrowed books: " << endl;
+    for (size_t i = 0; i < borrowedBooks.size(); i++) {
+        cout << "== [Book #" << i + 1 << "] ==" << endl;
+        borrowedBooks[i]->displayBasicInfo();
+    }
+}
+
 void memberTests(User *user, string password) {
     cout << endl << "=== [Member Testing section] ===" << endl;
     user->viewProfile();
     cout << "-----------------------------------" << endl;
 
     LibraryManager &libManager = LibraryManager::getInstance();
-    loadBooksIntoLibrary();
     
     Member *member = new Member(user->getUserID(), user->getUserName(), password);
 
@@ -106,6 +92,7 @@ void memberTests(User *user, string password) {
         cout << "1. View profile" << endl;
         cout << "2. Borrow book (ISBN)" << endl;
         cout << "3. Return book (ISBN)" << endl;
+        cout << "4. View borrowed books" << endl;
         cout << "0. Log out" << endl;
         cout << "Enter your option (0-3): ";
         cin >> choice;
@@ -120,9 +107,12 @@ void memberTests(User *user, string password) {
             case 3:
                 execBookReturning(member);
                 break;
+            case 4:
+                execViewingBorrowed(member);
+                break;
         }
     } while (choice != 0);
-    cout << "Successfully logged out." << endl;
+    cout << "~ Successfully logged out." << endl;
 }
 
 void execLogin(AuthenticateManager &authManager) {
@@ -147,17 +137,19 @@ void execLogin(AuthenticateManager &authManager) {
 
 void printMenu() {
     LibraryManager &libManager = LibraryManager::getInstance();
+    libManager.loadBooksIntoLibrary();
+
     AuthenticateManager authManager;
 
     int choice = -1;
     cout << "\"Welcome to Library Management System!\"" << endl;
     cout << "-----------------------------------------" << endl;
-
+    
     do {
         cout << "1. Register" << endl;
         cout << "2. Login" << endl;
         cout << "0. Exit" << endl;
-        cout << "Choose an option (1-2): ";
+        cout << "Choose an option (0-2): ";
         cin >> choice;
 
         switch (choice) {
@@ -175,6 +167,7 @@ void printMenu() {
                 cout << "Invalid option. Exiting..." << endl;
         }
     } while (1 <= choice && choice <= 2);
+    libManager.saveBooksNewInfo();
 }
 
 int main() 
