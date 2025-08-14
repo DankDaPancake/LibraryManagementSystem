@@ -2,5 +2,5 @@
 
 class AuthorSearchStrategy: public ISearchStrategy {
 public:
-    vector<Book *> search(const vector<Book *> &books, const string& query) const;
+    vector<Book *> search(const vector<Book *> &books, string query) const;
 };

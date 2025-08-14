@@ -8,6 +8,6 @@ using namespace std;
 
 class ISearchStrategy {
 public:
-    virtual vector<Book *> search(const vector<Book *> &books, const string& query) const = 0;
+    virtual vector<Book *> search(const vector<Book *> &books, string query) const = 0;
     virtual ~ISearchStrategy() = default;
 };
