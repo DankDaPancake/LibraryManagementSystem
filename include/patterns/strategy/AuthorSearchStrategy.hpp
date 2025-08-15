@@ -1,4 +1,5 @@
 #include "patterns/strategy/ISearchStrategy.hpp"
+#include "core/Book.hpp"
 
 class AuthorSearchStrategy: public ISearchStrategy {
 public:

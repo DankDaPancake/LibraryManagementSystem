@@ -3,88 +3,72 @@
 #include <iostream>
 #include <fstream>
 
-LibraryManager &LibraryManager::getInstance()
-{
+LibraryManager &LibraryManager::getInstance() {
     static LibraryManager instance;
     return instance;
 }
 
-void LibraryManager::setSearchStrategy(ISearchStrategy *strategy)
-{
+void LibraryManager::setSearchStrategy(ISearchStrategy *strategy) {
     searchStrategy = strategy;
 }
 
-void LibraryManager::setPenaltyStrategy(IPenaltyStrategy *strategy)
-{
+void LibraryManager::setPenaltyStrategy(IPenaltyStrategy *strategy) {
     penaltyStrategy = strategy;
 }
 
-vector<Book *> LibraryManager::searchBooks(const string &query) const
-{
+vector<Book *> LibraryManager::searchBooks(const string &query) const {
     if (searchStrategy)
         return searchStrategy->search(books, query);
 
     return {};
 }
 
-Member *LibraryManager::findMember(const string &memberID) const
-{
+Member *LibraryManager::findMember(const string &memberID) const {
     Member *targetMember = nullptr;
-    for (auto &member : members)
-    {
-        if (member->getUserID() == memberID)
-        {
+    for (auto &member : members) {
+        if (member->getUserID() == memberID) {
             targetMember = member;
             break;
         }
     }
 
-    if (!targetMember)
-    {
+    if (!targetMember) {
         cout << "Cannot find member with ID " << memberID << " in system." << endl;
         return nullptr;
     }
     return targetMember;
 }
 
-Book *LibraryManager::findBook(const string &ISBN) const
-{
+Book *LibraryManager::findBook(const string &ISBN) const {
     Book *targetBook = nullptr;
-    for (auto &book : books)
-    {
-        if (book->getISBN() == ISBN)
-        {
+    for (auto &book : books) {
+        if (book->getISBN() == ISBN) {
             targetBook = book;
             break;
         }
     }
 
-    if (!targetBook)
-    {
+    if (!targetBook) {
         cout << "Cannot find book with ISBN " << ISBN << " in library." << endl;
         return nullptr;
     }
     return targetBook;
 }
 
-bool LibraryManager::borrowBook(const string &memberID, const string &ISBN)
-{
+bool LibraryManager::borrowBook(const string &memberID, const string &ISBN) {
     Member *targetMember = findMember(memberID);
     Book *targetBook = findBook(ISBN);
 
     if (targetMember == nullptr || targetBook == nullptr)
         return false;
-    if (!targetBook->isAvailable())
-    {
+    if (!targetBook->isAvailable()) {
         cout << "Book with ISBN " << ISBN << " is not available for borrowing." << endl;
         return false;
     }
 
     auto borrowedBooks = targetMember->getBorrowedBooks();
-    for (auto &book : borrowedBooks)
-    {
-        if (book->getISBN() == ISBN)
-        {
+    for (auto &book : borrowedBooks) {
+        if (book->getISBN() == ISBN) {
             cout << "Member already has this book borrowed." << endl;
             return false;
         }
@@ -107,32 +91,26 @@ bool LibraryManager::borrowBook(const string &memberID, const string &ISBN)
     return true;
 }
 
-bool LibraryManager::returnBook(const string &memberID, const string &ISBN)
-{
+bool LibraryManager::returnBook(const string &memberID, const string &ISBN) {
     Member *targetMember = findMember(memberID);
     Book *targetBook = findBook(ISBN);
 
     bool hasBook = false;
     auto borrowedBooks = targetMember->getBorrowedBooks();
-    for (auto &book : borrowedBooks)
-    {
-        if (book->getISBN() == ISBN)
-        {
+    for (auto &book : borrowedBooks) {
+        if (book->getISBN() == ISBN) {
             hasBook = true;
             break;
         }
     }
 
-    if (!hasBook)
-    {
+    if (!hasBook) {
         cout << "Member does not have this book borrowed." << endl;
         return false;
     }
 
-    for (auto &loan : loans)
-    {
-        if (loan->getMemberID() == memberID && loan->getBookISBN() == ISBN)
-        {
+    for (auto &loan : loans) {
+        if (loan->getMemberID() == memberID && loan->getBookISBN() == ISBN) {
             loan->setReturnDate(chrono::system_clock::now());
             loan->setStatus(LoanStatus::RETURNED);
             break;
@@ -145,59 +123,109 @@ bool LibraryManager::returnBook(const string &memberID, const string &ISBN)
     return true;
 }
 
-void LibraryManager::addBookToSystem(Book *book)
-{
-    if (book)
-    {
+void LibraryManager::addBookToSystem(Book *book) {
+    if (book) {
         books.push_back(book);
         cout << "Added book with ISBN " << book->getISBN() << " to library." << endl;
     }
 }
 
-void LibraryManager::addMemberToSystem(Member *member)
-{
-    if (member)
-    {
+void LibraryManager::addMemberToSystem(Member *member) {
+    if (member) {
         members.push_back(member);
         cout << "Added member with ID " << member->getUserID() << " to system." << endl;
     }
 }
 
-void LibraryManager::loadBooksIntoLibrary()
-{
-    ifstream file("../data/books.csv");
+void LibraryManager::loadBooksIntoLibrary() {
     string line;
-    getline(file, line);
-    LibraryManager &libManager = LibraryManager::getInstance();
+    
+    ifstream authorFile("../data/authors.csv");
+    getline(authorFile, line);
+    
+    int countAuthors = 0;
+    while (getline(authorFile, line)) {
+        auto items = CSVHandler::parseCSVLine(line);
+        string authorName = items[0], biography = items[1];
+        authors.push_back(new Author(to_string(++countAuthors), authorName, biography));
+    }
+    authorFile.close();
 
-    while (getline(file, line))
-    {
+    ifstream categoryFile("../data/categories.csv");
+    getline(categoryFile, line);
+
+    int countCategories = 0;
+    while (getline(categoryFile, line)) {
+        auto items = CSVHandler::parseCSVLine(line);
+        string categoryName = items[0], description = items[1];
+        categories.push_back(new Category(to_string(++countCategories), categoryName, description));
+    }
+    categoryFile.close();
+
+    ifstream file("../data/books.csv");
+    getline(file, line);
+
+    while (getline(file, line)) {
         auto items = CSVHandler::parseCSVLine(line);
 
-        string ISBN = items[0], title = items[1], authorName = items[2],
-               authorID = items[3], categoryID = items[4];
-        BookStatus status = (items[5] == "Available" ? static_cast<BookStatus>(0) : static_cast<BookStatus>(1));
+        string ISBN = items[0], title = items[1];
+        
+        int authorID, categoryID;
+        stringstream ss;
+        ss.str(items[2]);
+        ss >> authorID;
 
-        stringstream ss(items[6]);
+        ss.str(items[3]);
+        ss.clear();
+        ss >> categoryID;
+
+        BookStatus status = (items[4] == "Available"? static_cast<BookStatus>(0): static_cast<BookStatus>(1));
+
         int totalCopies, availableCopies;
+        ss.str(items[5]);
+        ss.clear();
         ss >> totalCopies;
-        stringstream ss2(items[7]);
-        ss2 >> availableCopies;
+        
+        ss.str(items[6]);
+        ss.clear();
+        ss >> availableCopies;
 
-        libManager.addBookToSystem(new Book(ISBN, title, authorName, authorID, categoryID, status, totalCopies, availableCopies));
+        addBookToSystem(new Book(ISBN, title, 
+            to_string(authorID), authors[authorID - 1]->getName(), authors[authorID - 1]->getBiograph(),
+            to_string(categoryID), categories[categoryID - 1]->getName(), categories[categoryID - 1]->getDescription(),
+            status, totalCopies, availableCopies));
     }
+    file.close();
 }
 
-void LibraryManager::saveBooksNewInfo()
-{
+void LibraryManager::saveBooksNewInfo() {
+    ofstream authorFile("../data/authors.csv");
+    authorFile.clear();
+    authorFile << "authorName,biography\n";
+
+    for (auto author: authors) {
+        cout << "Saved author '" << author->getName() << endl;
+        authorFile << author->getName() << "," << author->getBiograph() << '\n';
+    }
+    authorFile.close();
+
+    ofstream categoryFile("../data/categories.csv");
+    categoryFile.clear();
+    categoryFile << "categoryName,description\n";
+
+    for (auto category: categories) {
+        cout << "Saved '" << category->getName() << "' information." << endl;
+        categoryFile << category->getName() << "," << category->getDescription() << '\n';
+    }
+    categoryFile.close();
+
     ofstream file("../data/books.csv");
     file.clear();
-    file << "isbn,title,authorName,authorID,categoryID,status,totalCopies,availableCopies" << '\n';
+    file << "isbn,title,authorID,categoryID,status,totalCopies,availableCopies\n";
 
-    LibraryManager &libManager = LibraryManager::getInstance();
-    for (auto book : libManager.books)
-    {
-        cout << "Saved book with ISBN " << book->getISBN() << " new info." << endl;
+    for (auto book: books) {
+        cout << "Saved '" << book->getTitle() << "' information." << endl;
         file << book->getCSVDescription() << '\n';
     }
+    file.close();
 }

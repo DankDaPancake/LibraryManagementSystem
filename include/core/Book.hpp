@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/Author.hpp"
+#include "core/Category.hpp"
 #include <iostream>
 #include <vector>
 
@@ -16,22 +17,22 @@ private:
     string ISBN;
     string title;
     Author author;
-    string categoryID;
+    Category category;
     BookStatus status;
     int totalCopies;
     int availableCopies;
 
 public:
-    Book(const string &ISBN, const string &title, const string &athorName, 
-         const string &authorID, const string &categoryID, BookStatus status,
-         int totalCopies, int availableCopies);
+    Book(const string &ISBN, const string &title, 
+         const string &authorID, const string &authorName, const string &biography, 
+         const string &categoryID, const string &categoryName, const string &description,
+         BookStatus status, int totalCopies, int availableCopies);
     virtual ~Book() = default;
 
     string getISBN() const;
     string getTitle() const;
-    string getAuthorName() const;
-    string getAuthorID() const;
-    string getCategoryID() const;
+    Author getAuthor() const;
+    Category getCategory() const;
     BookStatus getStatus() const;
     int getTotalCopies() const;
     int getAvailableCopies() const;

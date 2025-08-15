@@ -14,6 +14,8 @@ class LibraryManager {
     // friend class NotificationService;
 private:
     vector<Book *> books;
+    vector<Author *> authors;
+    vector<Category *> categories;
     vector<Member *> members;
     vector<Loan *> loans;
     ISearchStrategy *searchStrategy;
