@@ -1,13 +1,13 @@
 categoryName,description
-Mystery/Thriller,"Books with suspense, mystery, or thriller plots."
-Literary/Contemporary Fiction,Books with fictional narratives that explore human nature and relationships.
-Romance,Books focusing on romantic relationships.
-Fantasy,Books set in fictional worlds with magical elements.
-Science Fiction,"Books with speculative, futuristic concepts."
-Non-Fiction,"Books based on factual information, including biographies and self-help."
-Classics,Books considered to be timeless literary works.
-Historical Fiction,Fictional books set in a historical context.
-Dystopian,"Books exploring futuristic, imagined universes with oppressive societal control."
-Technology,"Books related to computer science, programming, and technology."
-Philosophy,"Books exploring fundamental questions about existence, knowledge, values, reason, mind, and ethics."
-Poetry/Epic,"Books of poetry or epic poems from classical literature."
+1,Mystery/Thriller,"Books with suspense
+2,Literary/Contemporary Fiction,Books with fictional narratives that explore human nature and relationships.
+3,Romance,Books focusing on romantic relationships.
+4,Fantasy,Books set in fictional worlds with magical elements.
+5,Science Fiction,"Books with speculative
+6,Non-Fiction,"Books based on factual information
+7,Classics,Books considered to be timeless literary works.
+8,Historical Fiction,Fictional books set in a historical context.
+9,Dystopian,"Books exploring futuristic
+10,Technology,"Books related to computer science
+11,Philosophy,"Books exploring fundamental questions about existence
+12,Poetry/Epic,"Books of poetry or epic poems from classical literature."

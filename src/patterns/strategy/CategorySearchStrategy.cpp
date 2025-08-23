@@ -7,7 +7,7 @@ vector<Book *> CategorySearchStrategy::search(const vector<Book *> &books, strin
         categories.push_back({book->getCategory().getName(), book});
     }
 
-    auto scores = StringHandler::findTopMatches(categories, query, 10);
+    auto scores = StringHandler::findTopMatches(categories, query, categories.size());
     
     vector<Book *> results;
     for (const auto &[score, book]: scores) 

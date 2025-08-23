@@ -5,8 +5,8 @@
 using namespace std;
 
 enum class Role {
-    LIBRARIAN,
-    MEMBER
+    LIBRARIAN = 0,
+    MEMBER = 1
 };
 
 class User {

@@ -7,7 +7,7 @@ vector<Book *> AuthorSearchStrategy::search(const vector<Book *> &books, string 
         authors.push_back({book->getAuthor().getName(), book});
     }
 
-    auto scores = StringHandler::findTopMatches(authors, query, 10);
+    auto scores = StringHandler::findTopMatches(authors, query, 20);
     
     vector<Book *> results;
     for (const auto &[score, book]: scores) 

@@ -10,9 +10,9 @@ using namespace std;
 using Date = chrono::system_clock::time_point;
 
 enum class LoanStatus {
-    ACTIVE,
-    RETURNED,
-    OVERDUE
+    ACTIVE = 0,
+    RETURNED = 1,
+    OVERDUE = 2
 };
 
 class Loan {
@@ -22,6 +22,10 @@ private:
     LoanStatus status;
 
 public:
+    Loan() = default;
+    Loan(const string &loanId, const string &isbn, const string &memberId,
+         Date borrowDate, Date dueDate, Date returnDate, LoanStatus status);
+
     string getLoanID() const;
     string getBookISBN() const;
     string getMemberID() const;
@@ -40,5 +44,9 @@ public:
 
     bool isOverDue();
     int calculateFine() const;
+    string loanCSVFormat() const;
+    
     static string dateToString(const Date &date);
+    static Date stringToDate(const string &dateStr);
+    static string loanStatusToString(LoanStatus status);
 };
