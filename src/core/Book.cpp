@@ -63,7 +63,7 @@ void Book::displayBasicInfo() const {
     cout << "   + Copies: " << availableCopies << "/" << totalCopies << " available" << endl;
 }
 
-string Book::getCSVDescription() const {
+string Book::getFullDescription() const {
     string desc = ISBN + "," + title + "," + author.getAuthorID() + "," +
                   category.getCategoryID() + "," + bookStatusToString() + "," +
                   to_string(totalCopies) + "," + to_string(availableCopies);

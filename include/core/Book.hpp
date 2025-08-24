@@ -45,5 +45,5 @@ public:
     bool isAvailable() const;
 
     void displayBasicInfo() const; // for terminal output
-    string getCSVDescription() const; // fetch as CSV - for GUI
+    virtual string getFullDescription() const; // fetch as CSV - for GUI
 };

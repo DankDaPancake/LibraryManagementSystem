@@ -247,7 +247,7 @@ void LibraryManager::saveBooksNewInfo() {
 
     for (auto book: books) {
         cout << "Saved '" << book->getTitle() << "' information." << endl;
-        file << book->getCSVDescription() << '\n';
+        file << book->getFullDescription() << '\n';
     }
     file.close();
 
