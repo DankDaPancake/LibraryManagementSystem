@@ -23,7 +23,7 @@ void Loan::setDueDate(const Date &date) { dueDate = date; }
 void Loan::setReturnDate(const Date &date) { returnDate = date; }
 void Loan::setStatus(LoanStatus newStatus) { status = newStatus; }
 
-bool Loan::isOverDue() {
+bool Loan::isOverdue() {
     auto now = chrono::system_clock::now();
     if (status == LoanStatus::ACTIVE && now > dueDate)  
         status = LoanStatus::OVERDUE;

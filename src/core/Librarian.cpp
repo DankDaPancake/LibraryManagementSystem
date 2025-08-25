@@ -172,7 +172,7 @@ void Librarian::manageMemberInfo(Member *member) {
             default:
                 statusStr = "Active";
                 activeLoans++;
-                if (loan->isOverDue()) {
+                if (loan->isOverdue()) {
                     overdueLoans++;
                     statusStr += " (OVERDUE)";
                 }
@@ -222,7 +222,7 @@ vector<Loan *> Librarian::viewAllLoans() {
 
             default:
                 activeLoans++;
-                if (loan->isOverDue()) {
+                if (loan->isOverdue()) {
                     overdueLoans++;
                     totalFines += loan->calculateFine();
                 }
@@ -249,7 +249,7 @@ vector<Loan *> Librarian::viewAllLoans() {
             default:
                 statusStr = "Active";
                 activeLoans++;
-                if (loan->isOverDue()) {
+                if (loan->isOverdue()) {
                     overdueLoans++;
                     statusStr += " (OVERDUE)";
                 }

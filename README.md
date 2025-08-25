@@ -60,7 +60,7 @@ ElectronicLibrary/
       - `virtual void detach(IObserver* observer) = 0;`
       - `virtual void notify() = 0;`
     - **`IObserver` (Interface)**
-      - Phương thức: `virtual void update(const string& message, const Book* bookContext = nullptr, const Loan* loanContext = nullptr) = 0;`
+      - Phương thức: `virtual void update(const string& message, const Book* bookContext = nullptr, Loan* loanContext = nullptr) = 0;`
     - **`BookSubject : public Book, public ISubject`** (Hoặc `Book` có một thành viên `ISubject*`)
       - Quản lý danh sách `vector<IObserver*> observers`.
       - `notify()` khi trạng thái sách thay đổi, sách được đặt trước.

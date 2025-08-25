@@ -8,8 +8,7 @@ private:
     string difficultyLabel;
 
 public:
-    DifficultyLabelDecorator(shared_ptr<Book> book, const string &label)
-        : BookDecorator(book), difficultyLabel(label) {}
+    DifficultyLabelDecorator(shared_ptr<Book> book, const string &label);
     
     string getFullDescription() const override;
 };

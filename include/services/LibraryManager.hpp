@@ -11,7 +11,8 @@ using namespace std;
 
 class LibraryManager {
     friend class Librarian;
-    // friend class NotificationService;
+    friend class NotificationService;
+    
 private:
     vector<Book *> books;
     vector<Author *> authors;

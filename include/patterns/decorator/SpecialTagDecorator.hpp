@@ -8,8 +8,7 @@ private:
     vector<string> tags;
 
 public:
-    SpecialTagDecorator(shared_ptr<Book> book, const vector<string> &tagsList)
-        : BookDecorator(book), tags(tagsList) {}
+    SpecialTagDecorator(shared_ptr<Book> book, const vector<string> &tagsList);
         
     string getFullDescription() const override;
 };
