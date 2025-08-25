@@ -1,24 +1,43 @@
-# Minimum CMake version required
 cmake_minimum_required(VERSION 3.10)
-
-# Project name
 project(LibraryManagementSystem)
 
-# Set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add source files
-file(GLOB_RECURSE SOURCES 
-    "${CMAKE_SOURCE_DIR}/src/*.cpp"
+set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/ui")
+
+file(GLOB_RECURSE PROJECT_SOURCES
+    "${SRC_DIR}/*.cpp"
     "${CMAKE_SOURCE_DIR}/main.cpp"
 )
 
-# Include directories
-include_directories("${CMAKE_SOURCE_DIR}/include")
+set(IMGUI_SOURCES
+    "${IMGUI_DIR}/imgui.cpp"
+    "${IMGUI_DIR}/imgui_draw.cpp"
+    "${IMGUI_DIR}/imgui_tables.cpp"
+    "${IMGUI_DIR}/imgui_widgets.cpp"
+    "${IMGUI_DIR}/imgui_impl_win32.cpp"
+    "${IMGUI_DIR}/imgui_impl_dx9.cpp"
+    "${IMGUI_DIR}/imgui_demo.cpp"   # <- thêm nếu có gọi ShowDemoWindow
+)
 
-# Add executable
-add_executable(LMS ${SOURCES})
+add_executable(LMS
+    ${PROJECT_SOURCES}
+    ${IMGUI_SOURCES}
+)
 
-# Link libraries if needed (uncomment and modify if required)
-# target_link_libraries(${PROJECT_NAME} <library_name>)
+target_include_directories(LMS PRIVATE
+    "${CMAKE_SOURCE_DIR}/include"
+    "${IMGUI_DIR}"
+)
+
+# Link DX9 + Win32 + DWM
+target_link_libraries(LMS PRIVATE
+    d3d9
+    d3dcompiler
+    imm32
+    dwmapi
+)
+
+# set_target_properties(LMS PROPERTIES WIN32_EXECUTABLE YES) # nếu muốn ẩn console
