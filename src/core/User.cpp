@@ -1,6 +1,8 @@
 #include "core/User.hpp"
 #include "services/AuthenticateManager.hpp"
 
+User::User() : userID(""), userName(""), password(""), role() {}
+
 User::User(const string &userID, const string &userName, const string &password, Role role) 
     : userID(userID), userName(userName), password(password), role(role) {}
 
