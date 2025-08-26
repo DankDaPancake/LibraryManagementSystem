@@ -4,8 +4,17 @@
 #include <d3d9.h>
 #include <tchar.h>
 
+#include <algorithm>
+
 #include "include/core/User.hpp"
+#include "include/core/Book.hpp"
+
 #include "include/services/AuthenticateManager.hpp"
+#include "include/services/LibraryManager.hpp"
+
+#include "include/utils/CSVHandler.hpp"
+
+#include "patterns/strategy/TitleSearchStrategy.hpp"
 
 // Data
 static LPDIRECT3D9              g_pD3D = nullptr;
@@ -191,6 +200,90 @@ void LoginUI(AppState &appState) {
     ImGui::End();
 }
 
+void SearchBookUI(AppState &appState) {
+    static char query[128] = "";
+    static std::vector<Book*> results;
+
+    LibraryManager& manager = LibraryManager::getInstance();
+    static TitleSearchStrategy titleStrategy;
+    manager.setSearchStrategy(&titleStrategy);
+
+    ImGui::Begin("Search Book");
+
+    ImGui::InputText("Enter title", query, IM_ARRAYSIZE(query));
+    if (ImGui::Button("Search")) {
+        results = manager.searchBooks(query); 
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Result List");
+
+    if (!results.empty()) {
+        for (Book* book : results) {
+            if (!book) continue;
+            ImGui::Separator();
+
+            ImGui::Text("ISBN: %s", book->getISBN().c_str());
+            ImGui::Text("Title: %s", book->getTitle().c_str());
+
+            const Author& a = book->getAuthor();
+            ImGui::Text("Author: %s (ID: %s)", a.getName().c_str(), a.getAuthorID().c_str());
+
+            const Category& c = book->getCategory();
+            ImGui::Text("Category: %s (ID: %s)", c.getName().c_str(), c.getCategoryID().c_str());
+
+            ImGui::Text("Status: %s", book->bookStatusToString().c_str());
+            ImGui::Text("Available: %d / %d",
+                        book->getAvailableCopies(),
+                        book->getTotalCopies());
+        }
+    } else {
+        ImGui::Text("No matching book found.");
+    }
+
+    ImGui::End();
+}
+
+void BorrowBookUI(AppState& appState) {
+    static char memberID[64] = "";
+    static char isbn[64] = "";
+    static char message[256] = "";
+
+    auto trim = [](std::string& s){
+        auto issp = [](unsigned char c){ return std::isspace(c); };
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
+        s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
+    };
+
+    ImGui::Begin("Borrow Book");
+    ImGui::InputText("Member ID", memberID, IM_ARRAYSIZE(memberID));
+    ImGui::InputText("Book ISBN", isbn, IM_ARRAYSIZE(isbn));
+
+    if (ImGui::Button("Borrow###BorrowBookButton")) {
+        std::string mid = memberID, book = isbn;
+        trim(mid); trim(book);
+
+        if (mid.empty() || book.empty()) {
+            std::snprintf(message, sizeof(message), "Please fill in both Member ID and ISBN.");
+        } else {
+            auto& manager = LibraryManager::getInstance();
+            // borrowBook sẽ: kiểm tra tồn tại member/book, kiểm tra available, kiểm tra đã mượn chưa, tạo loan, giảm available. :contentReference[oaicite:5]{index=5}
+            if (manager.borrowBook(mid, book)) {
+                manager.saveBooksNewInfo();  // ghi lại books/loans ra CSV. :contentReference[oaicite:6]{index=6}
+                std::snprintf(message, sizeof(message), "Book borrowed successfully!");
+                isbn[0] = '\0';
+            } else {
+                std::snprintf(message, sizeof(message), "Borrow failed. Check Member ID / ISBN / Copies.");
+            }
+        }
+    }
+
+    ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
+    ImGui::End();
+}
+
+
 void MainMenuUI(AppState &appState) {
     ImGui::Begin("Main Menu");
 
@@ -244,6 +337,10 @@ void RenderUI() {
         LoginUI(appState);
     } else if (appState == AppState::MainMenu) {
         MainMenuUI(appState);
+    } else if (appState == AppState::SearchBook) {
+        SearchBookUI(appState);
+    } else if (appState == AppState::BorrowBook) {
+        BorrowBookUI(appState);
     }
 }
 
@@ -251,6 +348,8 @@ int main(int, char**)
 {
     ImGui_ImplWin32_EnableDpiAwareness();
     float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
+
+    LibraryManager::getInstance().loadBooksIntoLibrary();
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
@@ -400,14 +499,8 @@ void ResetDevice()
     ImGui_ImplDX9_CreateDeviceObjects();
 }
 
-// Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// Win32 message handler
-// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
