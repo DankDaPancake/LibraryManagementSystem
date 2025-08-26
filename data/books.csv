@@ -1,2 +1,4 @@
 isbn,title,authorID,categoryID,status,totalCopies,availableCopies
-9781250301699,The Silent Patient,1,1,UNAVAILABLE,15,0
+9781250301699,The Silent Patient,1,1,AVAILABLE,15,1
+9781250301699,The Silent Patient,1,1,AVAILABLE,15,3
+9781250301699,The Silent Patient,1,1,AVAILABLE,15,3

@@ -261,3 +261,31 @@ void LibraryManager::saveBooksNewInfo() {
     }
     loanFile.close();
 }
+
+void LibraryManager::loadMembersFromCSV(const std::string& path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        std::cout << "Error opening file: " << path << '\n';
+        return;
+    }
+
+    std::string line;
+    std::getline(file, line); // skip header
+
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+
+        auto items = CSVHandler::parseCSVLine(line); // id, name, password
+        if (items.size() < 3) continue;
+
+        // tránh trùng nếu đã có
+        if (findMember(items[0])) continue;
+
+        auto* m = new Member(items[0], items[1], items[2]);   // <-- chỉ 3 tham số
+        // nếu hệ thống của bạn có setter role, dùng thêm dòng dưới (không bắt buộc):
+        // m->setRole(Role::MEMBER);
+
+        addMemberToSystem(m);
+    }
+    file.close();
+}

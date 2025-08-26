@@ -45,4 +45,6 @@ public:
 
     void loadBooksIntoLibrary();
     void saveBooksNewInfo();
+
+    void loadMembersFromCSV(const std::string& path = "../data/members.csv");
 };  

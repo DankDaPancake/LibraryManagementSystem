@@ -5,6 +5,7 @@
 #include <tchar.h>
 
 #include <algorithm>
+#include <cctype> 
 
 #include "include/core/User.hpp"
 #include "include/core/Book.hpp"
@@ -260,29 +261,33 @@ void BorrowBookUI(AppState& appState) {
     ImGui::InputText("Book ISBN", isbn, IM_ARRAYSIZE(isbn));
 
     if (ImGui::Button("Borrow###BorrowBookButton")) {
-        std::string mid = memberID, book = isbn;
-        trim(mid); trim(book);
+        std::string mid = memberID, code = isbn;
+        trim(mid); trim(code);
 
-        if (mid.empty() || book.empty()) {
+        if (mid.empty() || code.empty()) {
             std::snprintf(message, sizeof(message), "Please fill in both Member ID and ISBN.");
         } else {
             auto& manager = LibraryManager::getInstance();
-            // borrowBook sẽ: kiểm tra tồn tại member/book, kiểm tra available, kiểm tra đã mượn chưa, tạo loan, giảm available. :contentReference[oaicite:5]{index=5}
-            if (manager.borrowBook(mid, book)) {
-                manager.saveBooksNewInfo();  // ghi lại books/loans ra CSV. :contentReference[oaicite:6]{index=6}
+            if (manager.borrowBook(mid, code)) {
+                manager.saveBooksNewInfo();   // Ghi file (đã giảm log & đúng header)
                 std::snprintf(message, sizeof(message), "Book borrowed successfully!");
                 isbn[0] = '\0';
             } else {
-                std::snprintf(message, sizeof(message), "Borrow failed. Check Member ID / ISBN / Copies.");
+                // Phân biệt lý do thất bại (tuỳ chọn)
+                Book* b = manager.findBook(code);
+                if (!b)       std::snprintf(message, sizeof(message), "ISBN not found.");
+                else if (b->getAvailableCopies() <= 0) std::snprintf(message, sizeof(message), "No copies available.");
+                else           std::snprintf(message, sizeof(message), "Not available or already borrowed.");
             }
         }
     }
+
+
 
     ImGui::Spacing();
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
     ImGui::End();
 }
-
 
 void MainMenuUI(AppState &appState) {
     ImGui::Begin("Main Menu");
@@ -349,7 +354,9 @@ int main(int, char**)
     ImGui_ImplWin32_EnableDpiAwareness();
     float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
 
-    LibraryManager::getInstance().loadBooksIntoLibrary();
+    auto& mgr = LibraryManager::getInstance();
+    mgr.loadBooksIntoLibrary();    
+    mgr.loadMembersFromCSV(); 
 
     WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
