@@ -78,7 +78,7 @@ const char* roleToString(Role role) {
     }
 }
 
-AppState appState = AppState::Register;
+AppState appState = AppState::Login;
 User curUser;
 
 void RegisterUI(AppState &appState) {
@@ -140,10 +140,111 @@ void RegisterUI(AppState &appState) {
     ImGui::End();
 }
 
+void LoginUI(AppState &appState) {
+    static char usernameInput[64] = "";
+    static char passwordInput[64] = "";
+    Role roleInput;
+    bool loginSuccess = false;
+    bool loginFailed = false;
+
+    ImGui::Begin("Electronic Library");
+
+    ImGui::InputText("Username", usernameInput, IM_ARRAYSIZE(usernameInput));
+    ImGui::InputText("Password", passwordInput, IM_ARRAYSIZE(passwordInput), ImGuiInputTextFlags_Password);
+
+    if (ImGui::Button("Login")) {
+        AuthenticateManager auth;
+        User* user = auth.loginUser(usernameInput, passwordInput);
+
+        if (user != nullptr) {
+            roleInput = user->getRole();
+            loginSuccess = true;
+            loginFailed = false;
+            appState = AppState::MainMenu;
+        } else {
+            loginSuccess = false;
+            loginFailed = true;
+        }
+    }
+
+    if (loginSuccess) {
+        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Login Successful!");
+        curUser = User(usernameInput, roleInput);
+    } else if (loginFailed){
+        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Login Failed!");
+    }
+
+    ImGui::Text("Don't have an account?");
+    ImGui::SameLine();  
+    ImGui::Spacing();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f)); 
+    ImGui::Text("Register");
+    ImGui::PopStyleColor();
+
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+        if (ImGui::IsItemClicked()) {
+            appState = AppState::Register; 
+        }
+    }
+
+    ImGui::End();
+}
+
+void MainMenuUI(AppState &appState) {
+    ImGui::Begin("Main Menu");
+
+    string curUsername = curUser.getUserName();
+    static char usernameBuf[64];
+    strncpy(usernameBuf, curUsername.c_str(), sizeof(usernameBuf));
+    usernameBuf[sizeof(usernameBuf) - 1] = '\0';
+
+    ImGui::Text("USER: %s", usernameBuf);
+    ImGui::Text("STATUS: %s", roleToString(curUser.getRole()));
+
+    ImGui::SameLine(250); 
+
+    ImGui::BeginGroup();
+    ImGui::TextColored(ImVec4(0.1f, 0.7f, 0.3f, 1.0f), "Welcome to Library!");
+    ImGui::TextWrapped("If u dont know, this is an electronic library belongs to HCMUS. "
+                      "Hope u'll have a good experience using this service :3");
+    ImGui::EndGroup();
+
+    ImGui::Separator();  
+
+    static int selectedItem = 0;
+    const char* items[] = { "Borrow Book", "Return Book", "Search Book" };
+    ImGui::Text("Choose Action:");
+    ImGui::SameLine();
+    ImGui::Combo("##ActionCombo", &selectedItem, items, IM_ARRAYSIZE(items));
+
+    if (ImGui::Button("Confirm")) {
+        if (selectedItem == 0) {
+            appState = AppState::BorrowBook; 
+        } else if (selectedItem == 1) {
+            appState = AppState::ReturnBook; 
+        } else if (selectedItem == 2) {
+            // Search Book
+            appState = AppState::SearchBook;
+        }
+    }
+    
+    if (ImGui::Button("Log out")) {
+        curUser = User();
+        appState = AppState::Login;
+    }
+
+    ImGui::End();
+}
+
 void RenderUI() {
     if (appState == AppState::Register) {
         RegisterUI(appState);
-    } 
+    } else if (appState == AppState::Login) {
+        LoginUI(appState);
+    } else if (appState == AppState::MainMenu) {
+        MainMenuUI(appState);
+    }
 }
 
 int main(int, char**)
