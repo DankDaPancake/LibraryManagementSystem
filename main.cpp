@@ -78,7 +78,8 @@ enum class AppState {
     SearchBook,
     BorrowBook,
     ReturnBook,
-    AddBook
+    AddBook,
+    FindAuthor
 };
 
 const char* roleToString(Role role) {
@@ -187,7 +188,6 @@ void LoginUI(AppState &appState) {
 
     if (loginSuccess) {
         ImGui::TextColored(ImVec4(0, 1, 0, 1), "Login Successful!");
-        curUser = User(usernameInput, roleInput);
     } else if (loginFailed){
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "Login Failed!");
     }
@@ -433,6 +433,78 @@ after:
     ImGui::End();
 }
 
+void FindAuthorUI(AppState& appState) {
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
+
+    static char idBuf[32] = "";
+    static char message[256] = "";
+    static std::string foundID, foundName, foundBio;
+
+    ImGui::Begin("Find Author");
+
+    ImGui::InputText("Author ID", idBuf, IM_ARRAYSIZE(idBuf));
+
+    if (ImGui::Button("Search")) {
+        auto trim = [](std::string& s){
+            auto issp = [](unsigned char c){ return std::isspace(c); };
+            s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
+            s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
+        };
+
+        std::string target = idBuf;
+        trim(target);
+        foundID.clear(); foundName.clear(); foundBio.clear();
+
+        if (target.empty()) {
+            std::snprintf(message, sizeof(message), "Please enter Author ID.");
+        } else {
+            std::ifstream file("../data/authors.csv");   // <- đúng theo yêu cầu của bạn
+            if (!file.is_open()) {
+                std::snprintf(message, sizeof(message), "Cannot open ../data/authors.csv");
+            } else {
+                std::string line;
+                bool ok = false;
+
+                // đọc header (id,name,biography)
+                if (std::getline(file, line)) { /* bỏ qua header */ }
+
+                while (std::getline(file, line)) {
+                    auto cols = CSVHandler::parseCSVLine(line);
+                    if (cols.size() < 3) continue;
+
+                    std::string id  = cols[0];
+                    std::string name= cols[1];
+                    std::string bio = cols[2];
+                    trim(id); trim(name); trim(bio);
+
+                    if (id == target) {
+                        foundID = id; foundName = name; foundBio = bio;
+                        ok = true; break;
+                    }
+                }
+                file.close();
+
+                if (ok) std::snprintf(message, sizeof(message), "Found author.");
+                else    std::snprintf(message, sizeof(message), "Author ID '%s' not found.", target.c_str());
+            }
+        }
+    }
+
+    ImGui::SameLine(0, 12);
+    if (ImGui::Button("Back to Main Menu")) { appState = AppState::MainMenu; ImGui::End(); return; }
+
+    ImGui::Separator();
+    ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
+
+    if (!foundName.empty()) {
+        ImGui::Text("ID:    %s", foundID.c_str());
+        ImGui::Text("Name:  %s", foundName.c_str());
+        ImGui::TextWrapped("Bio:  %s", foundBio.c_str());
+    }
+
+    ImGui::End();
+}
+
 void MainMenuUI(AppState &appState) {
     ImGui::Begin("Main Menu");
 
@@ -457,14 +529,14 @@ void MainMenuUI(AppState &appState) {
     static Role lastRole = curUser.getRole();
     if (curUser.getRole() != lastRole) { selectedItem = 0; lastRole = curUser.getRole(); }
 
-    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book" };
+    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book" , "Find Author"};
     if (curUser.getRole() == Role::LIBRARIAN) actions.push_back("Add Book");
 
     if (actions.empty()) selectedItem = 0;
     else if (selectedItem >= (int)actions.size()) selectedItem = (int)actions.size() - 1;
 
     const int count = (int)actions.size();
-    const char* items[4];
+    const char* items[5];
     for (int i = 0; i < count; ++i) items[i] = actions[i];
 
     ImGui::Text("Choose Action:");
@@ -476,6 +548,7 @@ void MainMenuUI(AppState &appState) {
         if      (strcmp(chosen, "Borrow Book") == 0) appState = AppState::BorrowBook;
         else if (strcmp(chosen, "Return Book") == 0) appState = AppState::ReturnBook;
         else if (strcmp(chosen, "Search Book") == 0) appState = AppState::SearchBook;
+        else if (strcmp(chosen, "Find Author") == 0) appState = AppState::FindAuthor;
         else if (strcmp(chosen, "Add Book") == 0)    appState = AppState::AddBook;
     }
 
@@ -503,6 +576,8 @@ void RenderUI() {
         ReturnBookUI(appState);
     } else if (appState == AppState::AddBook) {
         AddBookUI(appState);
+    } else if (appState == AppState::FindAuthor) {
+        FindAuthorUI(appState);
     }
 }
 
