@@ -55,42 +55,39 @@ Book *LibraryManager::findBook(const string &ISBN) const {
     return targetBook;
 }
 
-bool LibraryManager::borrowBook(const std::string& memberID, const std::string& ISBN) {
-    Member* m = findMember(memberID);
-    Book*   b = findBook(ISBN);
-    if (!m || !b) return false;
-
-    if (b->getAvailableCopies() <= 0) {
-        std::cout << "Book with ISBN " << ISBN << " is not available for borrowing.\n";
+bool LibraryManager::borrowBook(const string &memberID, const string &ISBN) {
+    Member *targetMember = findMember(memberID);
+    Book *targetBook = findBook(ISBN);
+ 
+    if (targetMember == nullptr || targetBook == nullptr)
+        return false;
+    if (!targetBook->isAvailable()) {
+        cout << "Book with ISBN " << ISBN << " is not available for borrowing." << endl;
         return false;
     }
-
-    for (auto* bk : m->getBorrowedBooks()) {
-        if (bk && bk->getISBN() == ISBN) {
-            std::cout << "Member already has this book borrowed.\n";
+ 
+    auto borrowedBooks = targetMember->getBorrowedBooks();
+    for (auto &book : borrowedBooks) {
+        if (book->getISBN() == ISBN) {
+            cout << "Member already has this book borrowed." << endl;
             return false;
         }
     }
-
-    auto* newLoan = new Loan();
-    newLoan->setLoanID("LOAN" + std::to_string(loans.size() + 1));
+ 
+    Loan *newLoan = new Loan();
+    newLoan->setLoanID("LOAN" + to_string(loans.size() + 1));
     newLoan->setBookISBN(ISBN);
     newLoan->setMemberID(memberID);
-
-    auto now = std::chrono::system_clock::now();
-    newLoan->setBorrowDate(now);
-    newLoan->setDueDate(now + std::chrono::hours(24 * 14));
+ 
+    auto borrowDate = chrono::system_clock::now();
+    newLoan->setBorrowDate(borrowDate);
+    newLoan->setDueDate(borrowDate + chrono::hours(24 * 14));
     newLoan->setStatus(LoanStatus::ACTIVE);
-
     loans.push_back(newLoan);
-
-    b->setAvailableCopies(b->getAvailableCopies() - 1);
-    if (b->getAvailableCopies() == 0) {
-        b->setStatus(BookStatus::UNAVAILABLE);
-    }
-    m->returnBook(b->getISBN());
-
-    std::cout << "Successfully borrowed '" << b->getTitle() << "'.\n";
+ 
+    targetBook->setAvailableCopies(targetBook->getAvailableCopies() - 1);
+ 
+    cout << "Successfully borrowed '" << targetBook->getTitle() << "'." << endl;
     return true;
 }
 
