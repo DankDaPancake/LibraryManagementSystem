@@ -92,10 +92,8 @@ AppState appState = AppState::Login;
 User curUser;
 
 void RegisterUI(AppState &appState) {
-
     static string newUsername = "";
     static string newPassword = "";
-    static Role newRole = Role::MEMBER;
 
     static bool registerSuccess = false;
     static bool registerFailed = false;
@@ -103,6 +101,7 @@ void RegisterUI(AppState &appState) {
     static char usernameBuf[64];
     strncpy(usernameBuf, newUsername.c_str(), sizeof(usernameBuf));
     usernameBuf[sizeof(usernameBuf) - 1] = '\0';
+
     static char passwordBuf[64];
     strncpy(passwordBuf, newPassword.c_str(), sizeof(passwordBuf));
     passwordBuf[sizeof(passwordBuf) - 1] = '\0';
@@ -113,21 +112,26 @@ void RegisterUI(AppState &appState) {
     if (ImGui::InputText("New Username", usernameBuf, IM_ARRAYSIZE(usernameBuf))) {
         newUsername = usernameBuf;
     }
-    if(ImGui::InputText("New Password", passwordBuf, IM_ARRAYSIZE(passwordBuf), ImGuiInputTextFlags_Password)) {
+    if (ImGui::InputText("New Password", passwordBuf, IM_ARRAYSIZE(passwordBuf), ImGuiInputTextFlags_Password)) {
         newPassword = passwordBuf;
     }
 
-    const char* roleNames[] = { "ADMIN", "LIBRARIAN", "MEMBER" };
-    static int currentRoleIndex = 2; 
+    struct RoleItem { const char* name; Role value; };
+    static RoleItem roleItems[] = {
+        {"MEMBER",    Role::MEMBER},
+        {"LIBRARIAN", Role::LIBRARIAN},
+    };
+    static int currentRoleIndex = 0;
+    const char* roleNames[] = { roleItems[0].name, roleItems[1].name };
+    int roleCount = 2; 
 
-    if (ImGui::Combo("Role", &currentRoleIndex, roleNames, IM_ARRAYSIZE(roleNames))) {
-        newRole = static_cast<Role>(currentRoleIndex);
-    }
+    ImGui::Combo("Role", &currentRoleIndex, roleNames, roleCount);
+    Role chosenRole = roleItems[currentRoleIndex].value; 
 
     if (ImGui::Button("Register")) {
-        AuthenticateManager newUser;
+        AuthenticateManager auth;
 
-        if (newUser.registerUser(newUsername, newPassword, newRole)) {
+        if (auth.registerUser(newUsername, newPassword, chosenRole)) {
             registerSuccess = true;
             registerFailed = false;
             appState = AppState::Login;
@@ -149,6 +153,7 @@ void RegisterUI(AppState &appState) {
 
     ImGui::End();
 }
+
 
 void LoginUI(AppState &appState) {
     static char usernameInput[64] = "";
@@ -302,6 +307,7 @@ void BorrowBookUI(AppState& appState) {
 
     ImGui::Spacing();
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
+
     if (ImGui::Button("Back to Main Menu")) {
         appState = AppState::MainMenu;
         ImGui::End();
