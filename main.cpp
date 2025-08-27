@@ -7,13 +7,13 @@
 #include <algorithm>
 #include <cctype> 
 
-#include "include/core/User.hpp"
-#include "include/core/Book.hpp"
+#include "core/User.hpp"
+#include "core/Book.hpp"
 
-#include "include/services/AuthenticateManager.hpp"
-#include "include/services/LibraryManager.hpp"
+#include "services/AuthenticateManager.hpp"
+#include "services/LibraryManager.hpp"
 
-#include "include/utils/CSVHandler.hpp"
+#include "utils/CSVHandler.hpp"
 
 #include "patterns/strategy/TitleSearchStrategy.hpp"
 
@@ -209,6 +209,11 @@ void SearchBookUI(AppState &appState) {
     static TitleSearchStrategy titleStrategy;
     manager.setSearchStrategy(&titleStrategy);
 
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+        appState = AppState::MainMenu;
+        return;
+    }
+
     ImGui::Begin("Search Book");
 
     ImGui::InputText("Enter title", query, IM_ARRAYSIZE(query));
@@ -242,6 +247,15 @@ void SearchBookUI(AppState &appState) {
         ImGui::Text("No matching book found.");
     }
 
+    ImGui::Spacing();
+
+    if (ImGui::Button("Back to Main Menu")) {
+        appState = AppState::MainMenu;
+        ImGui::End();
+        return;
+    }
+
+
     ImGui::End();
 }
 
@@ -255,6 +269,11 @@ void BorrowBookUI(AppState& appState) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
         s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
     };
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+        appState = AppState::MainMenu;
+        return;
+    }
 
     ImGui::Begin("Borrow Book");
     ImGui::InputText("Member ID", memberID, IM_ARRAYSIZE(memberID));
@@ -283,6 +302,11 @@ void BorrowBookUI(AppState& appState) {
 
     ImGui::Spacing();
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
+    if (ImGui::Button("Back to Main Menu")) {
+        appState = AppState::MainMenu;
+        ImGui::End();
+        return;
+    }
     ImGui::End();
 }
 
@@ -296,6 +320,11 @@ void ReturnBookUI(AppState& appState) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
         s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
     };
+
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
+        appState = AppState::MainMenu;
+        return;
+    }
 
     ImGui::Begin("Return Book");
 
@@ -328,7 +357,12 @@ void ReturnBookUI(AppState& appState) {
     }
 
     ImGui::Spacing();
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
+    ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);    
+    if (ImGui::Button("Back to Main Menu")) {
+        appState = AppState::MainMenu;
+        ImGui::End();
+        return;
+    }
 
     ImGui::End();
 }

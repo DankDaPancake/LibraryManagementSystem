@@ -1,3 +1,5 @@
+#pragma once
+
 #include "patterns/strategy/ISearchStrategy.hpp"
 
 class TitleSearchStrategy: public ISearchStrategy {
