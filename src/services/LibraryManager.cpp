@@ -55,71 +55,72 @@ Book *LibraryManager::findBook(const string &ISBN) const {
     return targetBook;
 }
 
-bool LibraryManager::borrowBook(const string &memberID, const string &ISBN) {
-    Member *targetMember = findMember(memberID);
-    Book *targetBook = findBook(ISBN);
+bool LibraryManager::borrowBook(const std::string& memberID, const std::string& ISBN) {
+    Member* m = findMember(memberID);
+    Book*   b = findBook(ISBN);
+    if (!m || !b) return false;
 
-    if (targetMember == nullptr || targetBook == nullptr)
-        return false;
-    if (!targetBook->isAvailable()) {
-        cout << "Book with ISBN " << ISBN << " is not available for borrowing." << endl;
+    if (b->getAvailableCopies() <= 0) {
+        std::cout << "Book with ISBN " << ISBN << " is not available for borrowing.\n";
         return false;
     }
 
-    auto borrowedBooks = targetMember->getBorrowedBooks();
-    for (auto &book : borrowedBooks) {
-        if (book->getISBN() == ISBN) {
-            cout << "Member already has this book borrowed." << endl;
+    for (auto* bk : m->getBorrowedBooks()) {
+        if (bk && bk->getISBN() == ISBN) {
+            std::cout << "Member already has this book borrowed.\n";
             return false;
         }
     }
 
-    Loan *newLoan = new Loan();
-    newLoan->setLoanID("LOAN" + to_string(loans.size() + 1));
+    auto* newLoan = new Loan();
+    newLoan->setLoanID("LOAN" + std::to_string(loans.size() + 1));
     newLoan->setBookISBN(ISBN);
     newLoan->setMemberID(memberID);
 
-    auto borrowDate = chrono::system_clock::now();
-    newLoan->setBorrowDate(borrowDate);
-    newLoan->setDueDate(borrowDate + chrono::hours(24 * 14));
+    auto now = std::chrono::system_clock::now();
+    newLoan->setBorrowDate(now);
+    newLoan->setDueDate(now + std::chrono::hours(24 * 14));
     newLoan->setStatus(LoanStatus::ACTIVE);
+
     loans.push_back(newLoan);
 
-    targetBook->setAvailableCopies(targetBook->getAvailableCopies() - 1);
+    b->setAvailableCopies(b->getAvailableCopies() - 1);
+    if (b->getAvailableCopies() == 0) {
+        b->setStatus(BookStatus::UNAVAILABLE);
+    }
+    m->returnBook(b->getISBN());
 
-    cout << "Successfully borrowed '" << targetBook->getTitle() << "'." << endl;
+    std::cout << "Successfully borrowed '" << b->getTitle() << "'.\n";
     return true;
 }
 
-bool LibraryManager::returnBook(const string &memberID, const string &ISBN) {
-    Member *targetMember = findMember(memberID);
-    Book *targetBook = findBook(ISBN);
 
-    bool hasBook = false;
-    auto borrowedBooks = targetMember->getBorrowedBooks();
-    for (auto &book : borrowedBooks) {
-        if (book->getISBN() == ISBN) {
-            hasBook = true;
-            break;
-        }
-    }
+bool LibraryManager::returnBook(const std::string& memberID, const std::string& ISBN) {
+    Member* m = findMember(memberID);
+    Book*   b = findBook(ISBN);
+    if (!m || !b) return false;
 
-    if (!hasBook) {
-        cout << "Member does not have this book borrowed." << endl;
+    auto it = std::find_if(loans.begin(), loans.end(), [&](Loan* L){
+        return L && L->getMemberID() == memberID
+                 && L->getBookISBN() == ISBN
+                 && L->getStatus() == LoanStatus::ACTIVE;
+    });
+    if (it == loans.end()) {
+        std::cout << "No active loan for member " << memberID << " & ISBN " << ISBN << ".\n";
         return false;
     }
 
-    for (auto &loan : loans) {
-        if (loan->getMemberID() == memberID && loan->getBookISBN() == ISBN) {
-            loan->setReturnDate(chrono::system_clock::now());
-            loan->setStatus(LoanStatus::RETURNED);
-            break;
-        }
+    Loan* ln = *it;
+    ln->setReturnDate(std::chrono::system_clock::now());
+    ln->setStatus(LoanStatus::RETURNED);
+
+    b->setAvailableCopies(b->getAvailableCopies() + 1);
+    if (b->getAvailableCopies() > 0) {
+        b->setStatus(BookStatus::AVAILABLE);
     }
+    m->returnBook(b->getISBN());
 
-    targetBook->setAvailableCopies(targetBook->getAvailableCopies() + 1);
-
-    cout << "Successfully returned '" << targetBook->getTitle() << "'." << endl;
+    std::cout << "Successfully returned '" << b->getTitle() << "'.\n";
     return true;
 }
 
@@ -278,14 +279,55 @@ void LibraryManager::loadMembersFromCSV(const std::string& path) {
         auto items = CSVHandler::parseCSVLine(line); // id, name, password
         if (items.size() < 3) continue;
 
-        // tránh trùng nếu đã có
         if (findMember(items[0])) continue;
 
         auto* m = new Member(items[0], items[1], items[2]);   // <-- chỉ 3 tham số
-        // nếu hệ thống của bạn có setter role, dùng thêm dòng dưới (không bắt buộc):
-        // m->setRole(Role::MEMBER);
-
         addMemberToSystem(m);
     }
     file.close();
+}
+
+static inline void trim_inplace(std::string& s) {
+    auto issp = [](unsigned char c){ return std::isspace(c); };
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
+    s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
+}
+static inline LoanStatus parseLoanStatus(std::string s) {
+    trim_inplace(s);
+    for (auto& ch : s) ch = std::toupper((unsigned char)ch);
+    if (s == "ACTIVE")   return LoanStatus::ACTIVE;
+    if (s == "RETURNED") return LoanStatus::RETURNED;
+    if (s == "OVERDUE")  return LoanStatus::OVERDUE;
+    return LoanStatus::ACTIVE;
+}
+
+void LibraryManager::loadLoansFromCSV(const std::string& path) {
+    std::ifstream ifs(path);
+    if (!ifs.is_open()) { std::cout << "Error opening " << path << "\n"; return; }
+
+    std::string line;
+    if (!std::getline(ifs, line)) { return; } // skip header
+
+    while (std::getline(ifs, line)) {
+        if (line.empty()) continue;
+        auto items = CSVHandler::parseCSVLine(line);
+        if (items.size() < 7) continue;
+
+        for (auto& s : items) trim_inplace(s);
+
+        const std::string& loanId   = items[0];
+        const std::string& isbn     = items[1];
+        const std::string& memberId = items[2];
+        Date borrowDate = Loan::stringToDate(items[3]);
+        Date dueDate    = Loan::stringToDate(items[4]);
+        Date returnDate = Loan::stringToDate(items[5]);
+        LoanStatus st   = parseLoanStatus(items[6]);
+
+        // tránh add trùng
+        bool exists = std::any_of(loans.begin(), loans.end(),
+                         [&](Loan* L){ return L && L->getLoanID()==loanId; });
+        if (exists) continue;
+
+        loans.push_back(new Loan(loanId, isbn, memberId, borrowDate, dueDate, returnDate, st));
+    }
 }

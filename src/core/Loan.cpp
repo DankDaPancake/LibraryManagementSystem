@@ -74,6 +74,6 @@ string Loan::loanStatusToString(LoanStatus status) {
 
 string Loan::loanCSVFormat() const {
     string result = loanID + "," + bookISBN + "," + memberID + "," + dateToString(borrowDate) 
-            + "," + dateToString(dueDate) + "," + dateToString(returnDate) + loanStatusToString(status);
+            + "," + dateToString(dueDate) + "," + dateToString(returnDate) + "," + loanStatusToString(status);
     return result;
 }

@@ -1,6 +1,11 @@
 #pragma once
 
-#include <chrono>
+#include <iostream>
+#include <fstream>
+#include <sstream>    
+#include <algorithm>  
+#include <chrono>    
+#include <cctype>
 #include "core/Book.hpp"
 #include "core/Member.hpp"
 #include "core/Loan.hpp"
@@ -47,4 +52,5 @@ public:
     void saveBooksNewInfo();
 
     void loadMembersFromCSV(const std::string& path = "../data/members.csv");
+    void loadLoansFromCSV(const std::string& path = "../data/loans.csv");
 };  
