@@ -443,47 +443,45 @@ void MainMenuUI(AppState &appState) {
 
     ImGui::Text("USER: %s", usernameBuf);
     ImGui::Text("STATUS: %s", roleToString(curUser.getRole()));
-
-    ImGui::SameLine(250); 
+    ImGui::SameLine(250);
 
     ImGui::BeginGroup();
     ImGui::TextColored(ImVec4(0.1f, 0.7f, 0.3f, 1.0f), "Welcome to Library!");
     ImGui::TextWrapped("If u dont know, this is an electronic library belongs to HCMUS. "
-                      "Hope u'll have a good experience using this service :3");
+                       "Hope u'll have a good experience using this service :3");
     ImGui::EndGroup();
 
-    ImGui::Separator();  
+    ImGui::Separator();
 
     static int selectedItem = 0;
-    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book" };
-    if (curUser.getRole() == Role::LIBRARIAN) {
-        actions.push_back("Add Book");                 // <— chỉ Librarian mới có
-    }
+    static Role lastRole = curUser.getRole();
+    if (curUser.getRole() != lastRole) { selectedItem = 0; lastRole = curUser.getRole(); }
 
-    if (actions.empty()) {
-        selectedItem = 0;
-    } else if (selectedItem >= (int)actions.size()) {
-        selectedItem = (int)actions.size() - 1;
-    }
+    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book" };
+    if (curUser.getRole() == Role::LIBRARIAN) actions.push_back("Add Book");
+
+    if (actions.empty()) selectedItem = 0;
+    else if (selectedItem >= (int)actions.size()) selectedItem = (int)actions.size() - 1;
 
     const int count = (int)actions.size();
     const char* items[4];
-    for (size_t i = 0; i < actions.size(); ++i) items[i] = actions[i];
+    for (int i = 0; i < count; ++i) items[i] = actions[i];
 
     ImGui::Text("Choose Action:");
     ImGui::SameLine();
-    ImGui::Combo("##ActionCombo", &selectedItem, items, IM_ARRAYSIZE(items));
+    ImGui::Combo("##ActionCombo", &selectedItem, items, count); // <-- FIX
 
     if (ImGui::Button("Confirm")) {
         const char* chosen = items[selectedItem];
         if      (strcmp(chosen, "Borrow Book") == 0) appState = AppState::BorrowBook;
         else if (strcmp(chosen, "Return Book") == 0) appState = AppState::ReturnBook;
         else if (strcmp(chosen, "Search Book") == 0) appState = AppState::SearchBook;
-        else if (strcmp(chosen, "Add Book") == 0)    appState = AppState::AddBook;  
+        else if (strcmp(chosen, "Add Book") == 0)    appState = AppState::AddBook;
     }
-        
+
     if (ImGui::Button("Log out")) {
         curUser = User();
+        selectedItem = 0;
         appState = AppState::Login;
     }
 
