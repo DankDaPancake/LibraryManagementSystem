@@ -44,6 +44,7 @@ public:
 
     bool borrowBook(const string &memberID, const string &ISBN);
     bool returnBook(const string &memberID, const string &ISBN);
+    bool addBook(const std::string& ISBN, const std::string& title, int authorID, int categoryID, int totalCopies);
 
     void addBookToSystem(Book *book);
     void addMemberToSystem(Member *member);

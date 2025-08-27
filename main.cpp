@@ -77,7 +77,8 @@ enum class AppState {
     Register,
     SearchBook,
     BorrowBook,
-    ReturnBook
+    ReturnBook,
+    AddBook
 };
 
 const char* roleToString(Role role) {
@@ -175,6 +176,8 @@ void LoginUI(AppState &appState) {
             roleInput = user->getRole();
             loginSuccess = true;
             loginFailed = false;
+            curUser = *user;              
+            delete user;
             appState = AppState::MainMenu;
         } else {
             loginSuccess = false;
@@ -373,6 +376,63 @@ void ReturnBookUI(AppState& appState) {
     ImGui::End();
 }
 
+void AddBookUI(AppState& appState) {
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
+    if (curUser.getRole() != Role::LIBRARIAN) { appState = AppState::MainMenu; return; }
+
+    static char isbn[32] = "";
+    static char title[128] = "";
+    static char authorID[16] = "";
+    static char categoryID[16] = "";
+    static int  totalCopies = 1;
+    static char message[256] = "";
+
+    ImGui::Begin("Add Book");
+
+    ImGui::InputText("ISBN", isbn, IM_ARRAYSIZE(isbn));
+    ImGui::InputText("Title", title, IM_ARRAYSIZE(title));
+    ImGui::InputText("Author ID", authorID, IM_ARRAYSIZE(authorID));
+    ImGui::InputText("Category ID", categoryID, IM_ARRAYSIZE(categoryID));
+    ImGui::InputInt("Total Copies", &totalCopies);
+    if (totalCopies < 1) totalCopies = 1;
+
+    if (ImGui::Button("Add Book")) {
+        auto trim = [](std::string& s){
+            auto issp = [](unsigned char c){ return std::isspace(c); };
+            s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
+            s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
+        };
+
+        std::string sISBN = isbn, sTitle = title, sAuth = authorID, sCat = categoryID;
+        trim(sISBN); trim(sTitle); trim(sAuth); trim(sCat);
+
+        if (sISBN.empty() || sTitle.empty() || sAuth.empty() || sCat.empty()) {
+            std::snprintf(message, sizeof(message), "Please fill all fields.");
+        } else {
+            int aID=0, cID=0;
+            try { aID = std::stoi(sAuth); cID = std::stoi(sCat); }
+            catch (...) { std::snprintf(message, sizeof(message), "Author/Category ID must be numbers."); goto after; }
+
+            auto& manager = LibraryManager::getInstance();
+
+            if (manager.addBook(sISBN, sTitle, aID, cID, totalCopies)) {     
+                manager.saveBooksNewInfo();                                   
+                std::snprintf(message, sizeof(message), "Book added!");
+                isbn[0]=title[0]=authorID[0]=categoryID[0]='\0'; totalCopies=1;
+            } else {
+                std::snprintf(message, sizeof(message), "Failed. Check ISBN duplicate or invalid IDs.");
+            }
+        }
+    }
+after:
+    ImGui::SameLine(0, 12);
+    if (ImGui::Button("Back to Main Menu")) { appState = AppState::MainMenu; ImGui::End(); return; }
+
+    ImGui::Spacing();
+    ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
+    ImGui::End();
+}
+
 void MainMenuUI(AppState &appState) {
     ImGui::Begin("Main Menu");
 
@@ -395,22 +455,33 @@ void MainMenuUI(AppState &appState) {
     ImGui::Separator();  
 
     static int selectedItem = 0;
-    const char* items[] = { "Borrow Book", "Return Book", "Search Book" };
+    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book" };
+    if (curUser.getRole() == Role::LIBRARIAN) {
+        actions.push_back("Add Book");                 // <— chỉ Librarian mới có
+    }
+
+    if (actions.empty()) {
+        selectedItem = 0;
+    } else if (selectedItem >= (int)actions.size()) {
+        selectedItem = (int)actions.size() - 1;
+    }
+
+    const int count = (int)actions.size();
+    const char* items[4];
+    for (size_t i = 0; i < actions.size(); ++i) items[i] = actions[i];
+
     ImGui::Text("Choose Action:");
     ImGui::SameLine();
     ImGui::Combo("##ActionCombo", &selectedItem, items, IM_ARRAYSIZE(items));
 
     if (ImGui::Button("Confirm")) {
-        if (selectedItem == 0) {
-            appState = AppState::BorrowBook; 
-        } else if (selectedItem == 1) {
-            appState = AppState::ReturnBook; 
-        } else if (selectedItem == 2) {
-            // Search Book
-            appState = AppState::SearchBook;
-        }
+        const char* chosen = items[selectedItem];
+        if      (strcmp(chosen, "Borrow Book") == 0) appState = AppState::BorrowBook;
+        else if (strcmp(chosen, "Return Book") == 0) appState = AppState::ReturnBook;
+        else if (strcmp(chosen, "Search Book") == 0) appState = AppState::SearchBook;
+        else if (strcmp(chosen, "Add Book") == 0)    appState = AppState::AddBook;  
     }
-    
+        
     if (ImGui::Button("Log out")) {
         curUser = User();
         appState = AppState::Login;
@@ -432,6 +503,8 @@ void RenderUI() {
         BorrowBookUI(appState);
     } else if (appState == AppState::ReturnBook) {
         ReturnBookUI(appState);
+    } else if (appState == AppState::AddBook) {
+        AddBookUI(appState);
     }
 }
 

@@ -328,3 +328,31 @@ void LibraryManager::loadLoansFromCSV(const std::string& path) {
         loans.push_back(new Loan(loanId, isbn, memberId, borrowDate, dueDate, returnDate, st));
     }
 }
+
+bool LibraryManager::addBook(const std::string& ISBN,
+                             const std::string& title,
+                             int authorID,
+                             int categoryID,
+                             int totalCopies)
+{
+    if (findBook(ISBN) != nullptr) return false;
+
+    if (authorID < 1 || (size_t)authorID > authors.size())   return false;
+    if (categoryID < 1 || (size_t)categoryID > categories.size()) return false;
+    if (totalCopies < 1) totalCopies = 1;
+
+    Author*   a = authors[authorID - 1];
+    Category* c = categories[categoryID - 1];
+
+    Book* nb = new Book(
+        ISBN, title,
+        std::to_string(authorID), a->getName(), a->getBiograph(),
+        std::to_string(categoryID), c->getName(), c->getDescription(),
+        BookStatus::AVAILABLE,     
+        totalCopies,
+        totalCopies
+    );
+
+    addBookToSystem(nb);
+    return true;
+}
