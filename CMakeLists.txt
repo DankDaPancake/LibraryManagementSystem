@@ -6,9 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(IMGUI_DIR "${CMAKE_SOURCE_DIR}/ui")
+set(UI_DIR  "${CMAKE_SOURCE_DIR}/MainUI")
 
 file(GLOB_RECURSE PROJECT_SOURCES
     "${SRC_DIR}/*.cpp"
+    "${UI_DIR}/*.cpp"
     "${CMAKE_SOURCE_DIR}/main.cpp"
 )
 
@@ -29,6 +31,7 @@ add_executable(LMS
 
 target_include_directories(LMS PRIVATE
     "${CMAKE_SOURCE_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/MainUI"
     "${IMGUI_DIR}"
 )
 
