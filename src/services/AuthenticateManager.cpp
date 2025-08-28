@@ -1,6 +1,10 @@
 #include "services/AuthenticateManager.hpp"
 
 bool AuthenticateManager::registerUser(const string &userName, const string &password, Role role) {
+    if (password.size() < 8) {
+        cout << "Registration failed. Password must contain at least 8 characters." << endl;
+        return false;
+    }
     string fileName = (role == Role::LIBRARIAN
                         ? "../data/librarians.csv"
                         : "../data/members.csv");

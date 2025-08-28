@@ -58,7 +58,7 @@ void LibrarianObserver::update(const string &message, const Book *book, Loan *lo
 
 void LibrarianObserver::logNotification(const string &message, const Book *book, Loan *loan)
 {
-    ofstream logFile("librarian_system.log", ios::app);
+    ofstream logFile("../librarylog/librarian_system.log", ios::app);
     if (logFile.is_open())
     {
         // Get current time and convert to string

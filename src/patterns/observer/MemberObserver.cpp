@@ -24,8 +24,8 @@ void MemberObserver::update(const string &message, const Book *book, Loan *loan)
         // Notify about the loan
         cout << "Loan Information:" << endl;
         cout << "  - Loan ID: " << loan->getLoanID() << endl;
-        // cout << "  - Due Date: " << loan->getDueDate() << endl;
-        // cout << "  - Status: " << loan->getStatus() << endl;
+        cout << "  - Due Date: " << Loan::dateToString(loan->getDueDate()) << endl;
+        cout << "  - Status: " << Loan::loanStatusToString(loan->getStatus()) << endl;
 
         // Check if loan is overdue and send warning
         if (loan->isOverdue())
@@ -39,11 +39,13 @@ void MemberObserver::update(const string &message, const Book *book, Loan *loan)
     auto time_t = chrono::system_clock::to_time_t(now);
     cout << "Timestamp: " << put_time(localtime(&time_t), "%Y-%m-%d %H:%M:%S") << endl;
     cout << "=========================" << endl;
+
+    logNotification(message, book, loan);
 }
 
 void MemberObserver::logNotification(const string &message, const Book *book, Loan *loan)
 {
-    ofstream logFile("member_notifications.log", ios::app);
+    ofstream logFile("../librarylog/member_notifications.log", ios::app);
     if (logFile.is_open())
     {
         // Get current time and convert to string

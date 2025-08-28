@@ -18,7 +18,7 @@ void MainMenuUI(AppState &appState) {
 
     ImGui::BeginGroup();
     ImGui::TextColored(ImVec4(0.1f, 0.7f, 0.3f, 1.0f), "Welcome to Library!");
-    ImGui::TextWrapped("If u dont know, this is an electronic library belongs to HCMUS. "
+    ImGui::TextWrapped("If u dont know, this is an Library Management System belongs to HCMUS. "
                        "Hope u'll have a good experience using this service :3");
     ImGui::EndGroup();
 

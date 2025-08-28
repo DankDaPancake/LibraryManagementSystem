@@ -12,11 +12,11 @@ void WarningPenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOv
     member->addWarning();
     
     // Create notification message
-    std::string message = "WARNING: Book overdue by " + std::to_string(daysOverdue) + 
-                          " days. This is warning #" + std::to_string(member->getWarningCount());
+    string message = "WARNING: Book overdue by " + to_string(daysOverdue) + 
+                          " days. This is warning #" + to_string(member->getWarningCount());
     
     // Use LoanSubject to notify observers
-    std::shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
+    shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
     LoanSubject loanSubject(sharedLoan);
     
     // Update loan status to OVERDUE if not already
@@ -27,6 +27,6 @@ void WarningPenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOv
         loanSubject.notify();
     }
     
-    std::cout << "Warning penalty applied to member " << member->getUserName()     
-              << "\". Warning count: " << member->getWarningCount() << std::endl;
+    cout << "Warning penalty applied to member " << member->getUserName()     
+              << "\". Warning count: " << member->getWarningCount() << endl;
 }

@@ -14,7 +14,7 @@ void LoginUI(AppState &appState) {
     bool loginSuccess = false;
     bool loginFailed = false;
 
-    ImGui::Begin("Electronic Library");
+    ImGui::Begin("Library Management System");
 
     ImGui::InputText("Username", usernameInput, IM_ARRAYSIZE(usernameInput));
     ImGui::InputText("Password", passwordInput, IM_ARRAYSIZE(passwordInput), ImGuiInputTextFlags_Password);

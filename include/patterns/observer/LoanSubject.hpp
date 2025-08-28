@@ -29,7 +29,7 @@ public:
     void notify() override;
 
     void setLoanStatusAndNotify(LoanStatus newStatus);
-
+    
     // Get the associated loan
     shared_ptr<Loan> getLoan() const;
 };

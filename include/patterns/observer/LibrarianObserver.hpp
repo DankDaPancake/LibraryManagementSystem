@@ -1,7 +1,7 @@
 #pragma once
 
 #include "patterns/observer/IObserver.hpp"
-#include "core/Member.hpp"
+#include "core/Librarian.hpp"
 
 #include <fstream>
 #include <string>
@@ -10,10 +10,10 @@ using namespace std;
 
 class LibrarianObserver: public IObserver {
 private:
-    Member *member;
+    Librarian *librarian;
 
 public:
-    LibrarianObserver(Member *member) : member(member) {}
+    LibrarianObserver(Librarian *librarian) : librarian(librarian) {}
 
     void update(const string &message, const Book *book, Loan *loan) override;
 

@@ -15,16 +15,16 @@ void FinePenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOverd
     member->addFine(fineAmount);
     
     // Format the fine amount with two decimal places
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << fineAmount;
-    std::string fineStr = stream.str();
+    stringstream stream;
+    stream << fixed << setprecision(2) << fineAmount;
+    string fineStr = stream.str();
     
     // Create notification message
-    std::string message = "FINE APPLIED: $" + fineStr + 
-                          " fine for book overdue by " + std::to_string(daysOverdue) + " days.";
+    string message = "FINE APPLIED: $" + fineStr + 
+                          " fine for book overdue by " + to_string(daysOverdue) + " days.";
     
     // Use LoanSubject to notify observers
-    std::shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
+    shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
     LoanSubject loanSubject(sharedLoan);
     
     // Update loan status to OVERDUE if not already
@@ -35,7 +35,7 @@ void FinePenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOverd
         loanSubject.notify();
     }
     
-    std::cout << "Fine penalty applied to member " << member->getUserName() 
+    cout << "Fine penalty applied to member " << member->getUserName() 
               << "\". Fine amount: $" << fineStr 
-              << ". Total outstanding fines: $" << member->getTotalFines() << std::endl;
+              << ". Total outstanding fines: $" << member->getTotalFines() << endl;
 }
