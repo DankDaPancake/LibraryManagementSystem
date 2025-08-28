@@ -356,3 +356,7 @@ bool LibraryManager::addBook(const std::string& ISBN,
     addBookToSystem(nb);
     return true;
 }
+
+const std::vector<Book*>& LibraryManager::getBooks() const {
+    return books;
+}

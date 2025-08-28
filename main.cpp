@@ -4,24 +4,10 @@
 #include <d3d9.h>
 #include <tchar.h>
 
-// #include <algorithm>
-// #include <cctype> 
-
-// #include "core/User.hpp"
-// #include "core/Book.hpp"
-
-// #include "services/AuthenticateManager.hpp"
-// #include "services/LibraryManager.hpp"
-
-// #include "utils/CSVHandler.hpp"
-
-// #include "patterns/strategy/TitleSearchStrategy.hpp"
-
 #include "MainUI/AppState.hpp"
 #include "MainUI/Router.hpp"
 #include "core/User.hpp"
 
-// Data
 static LPDIRECT3D9              g_pD3D = nullptr;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = nullptr;
 static bool                     g_DeviceLost = false;
