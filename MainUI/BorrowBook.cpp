@@ -2,16 +2,27 @@
 #include "AppState.hpp"                   
 #include "services/LibraryManager.hpp"
 #include "patterns/strategy/TitleSearchStrategy.hpp"
-#include <string>
-#include <cstring>
-#include <algorithm>
 
-//extern User curUser;
+#include <string>
+#include <vector>
+#include <cstring>
+#include <algorithm>   
+#include <cstdio> 
+
+extern User curUser;
 
 void BorrowBookUI(AppState& appState) {
+    static string lastUserId;
     static char memberID[64] = "";
     static char isbn[64] = "";
     static char message[256] = "";
+
+    if (lastUserId != curUser.getUserID()) {
+        lastUserId = curUser.getUserID();
+        memberID[0] = '\0';
+        isbn[0] = '\0';
+        message[0] = '\0';
+    }
  
     auto trim = [](std::string& s){
         auto issp = [](unsigned char c){ return std::isspace(c); };
@@ -53,6 +64,7 @@ void BorrowBookUI(AppState& appState) {
     ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);
  
     if (ImGui::Button("Back to Main Menu")) {
+        isbn[0] = '\0'; message[0] = '\0'; memberID[0] = '\0';
         appState = AppState::MainMenu;
         ImGui::End();
         return;

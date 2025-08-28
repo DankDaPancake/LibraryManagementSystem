@@ -10,7 +10,9 @@
 #include <vector>
 #include <cstring>
 #include <algorithm>   
-#include <cstdio>      
+#include <cstdio>  
+
+extern User curUser;
 
 void SearchBookUI(AppState &appState) {
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
@@ -20,6 +22,7 @@ void SearchBookUI(AppState &appState) {
 
     ImGui::Begin("Search Book");
 
+    static string lastUserId;
     static int mode = 0;
     const char* modes[] = { "Title (Name)", "Author Name", "Category Name" };
     ImGui::Combo("Mode", &mode, modes, IM_ARRAYSIZE(modes));
@@ -29,6 +32,14 @@ void SearchBookUI(AppState &appState) {
 
     static std::vector<Book*> results;
     static char message[256] = "";
+
+    if (lastUserId != curUser.getUserID()) {
+        lastUserId = curUser.getUserID();
+        mode = 0;
+        queryBuf[0] = '\0';
+        results.clear();
+        message[0] = '\0';
+    }
 
     auto trim = [](std::string& s){
         auto issp = [](unsigned char c){ return std::isspace(c); };
@@ -58,6 +69,7 @@ void SearchBookUI(AppState &appState) {
 
     ImGui::SameLine();
     if (ImGui::Button("Back to Main Menu")) {
+        mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0';
         appState = AppState::MainMenu;
         ImGui::End();
         return;

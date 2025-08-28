@@ -12,12 +12,23 @@ void AddBookUI(AppState& appState) {
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
     if (curUser.getRole() != Role::LIBRARIAN) { appState = AppState::MainMenu; return; }
  
+    static string lastUserId;
     static char isbn[32] = "";
     static char title[128] = "";
     static char authorID[16] = "";
     static char categoryID[16] = "";
     static int  totalCopies = 1;
     static char message[256] = "";
+
+    if (lastUserId != curUser.getUserID()) {
+        lastUserId = curUser.getUserID();
+        isbn[0] = '\0';
+        message[0] = '\0';
+        categoryID[0] = '\0';
+        title[0] = '\0';
+        authorID[0] = '\0';
+        totalCopies = 1;
+    }
  
     ImGui::Begin("Add Book");
  
@@ -58,7 +69,15 @@ void AddBookUI(AppState& appState) {
     }
 after:
     ImGui::SameLine(0, 12);
-    if (ImGui::Button("Back to Main Menu")) { appState = AppState::MainMenu; ImGui::End(); return; }
+    if (ImGui::Button("Back to Main Menu")) { 
+        isbn[0] = '\0';
+        message[0] = '\0';
+        categoryID[0] = '\0';
+        title[0] = '\0';
+        authorID[0] = '\0';
+        totalCopies = 1;
+        appState = AppState::MainMenu; ImGui::End(); return; 
+    }
  
     ImGui::Spacing();
     ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
