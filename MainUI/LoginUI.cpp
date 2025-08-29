@@ -7,55 +7,64 @@
 
 extern User curUser;
 
-void LoginUI(AppState &appState) {
+void LoginUI(AppState& appState) {
+    ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(vp->WorkPos);  
+    ImGui::SetNextWindowSize(vp->WorkSize);  
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoBringToFrontOnFocus;  
+
     static char usernameInput[64] = "";
     static char passwordInput[64] = "";
     Role roleInput;
     bool loginSuccess = false;
     bool loginFailed = false;
 
-    ImGui::Begin("Library Management System");
+    if (ImGui::Begin("Library Management System", nullptr, flags)) {
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 100); 
 
-    ImGui::InputText("Username", usernameInput, IM_ARRAYSIZE(usernameInput));
-    ImGui::InputText("Password", passwordInput, IM_ARRAYSIZE(passwordInput), ImGuiInputTextFlags_Password);
+        ImGui::InputText("Username", usernameInput, IM_ARRAYSIZE(usernameInput));
+        ImGui::InputText("Password", passwordInput, IM_ARRAYSIZE(passwordInput), ImGuiInputTextFlags_Password);
 
-    if (ImGui::Button("Login")) {
-        AuthenticateManager auth;
-        User* user = auth.loginUser(usernameInput, passwordInput);
+        if (ImGui::Button("Login")) {
+            AuthenticateManager auth;
+            User* user = auth.loginUser(usernameInput, passwordInput);
 
-        if (user != nullptr) {
-            curUser = *user;
-            delete user;
-            appState = AppState::MainMenu;
-            ImGui::End();   
-            return;         
-        } else {
-            loginSuccess = false;
-            loginFailed = true;
+            if (user != nullptr) {
+                curUser = *user;
+                delete user;
+                appState = AppState::MainMenu;
+                ImGui::End();   
+                return;         
+            } else {
+                loginSuccess = false;
+                loginFailed = true;
+            }
         }
-    }
 
-    if (loginSuccess) {
-        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Login Successful!");
-    } else if (loginFailed){
-        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Login Failed!");
-    }
-
-    ImGui::Text("Don't have an account?");
-    ImGui::SameLine();  
-    ImGui::Spacing();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f)); 
-    ImGui::Text("Register");
-    ImGui::PopStyleColor();
-
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
-        if (ImGui::IsItemClicked()) {
-            appState = AppState::Register;
-            ImGui::End();   // <-- thêm
-            return;         // <-- thêm
+        if (loginSuccess) {
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Login Successful!");
+        } else if (loginFailed) {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Login Failed!");
         }
-    }
 
-    ImGui::End();
+        ImGui::Text("Don't have an account?");
+        ImGui::SameLine();  
+        ImGui::Spacing();
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.6f, 1.0f, 1.0f)); 
+        ImGui::Text("Register");
+        ImGui::PopStyleColor();
+
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+            if (ImGui::IsItemClicked()) {
+                appState = AppState::Register;
+                ImGui::End();   
+                return;        
+            }
+        }
+
+        ImGui::End();
+    }
 }

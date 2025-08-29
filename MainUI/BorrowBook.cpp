@@ -21,7 +21,7 @@ void BorrowBookUI(AppState& appState) {
         lastUserId = curUser.getUserID();
         memberID[0] = isbn[0] = message[0] = '\0';
     }
-    auto trim = [](std::string& s){
+    auto trim = [](std::string& s){ 
         auto issp = [](unsigned char c){ return std::isspace(c); };
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
         s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
