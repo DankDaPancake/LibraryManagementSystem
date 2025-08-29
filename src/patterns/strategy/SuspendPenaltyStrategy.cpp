@@ -18,15 +18,14 @@ void SuspendPenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOv
                           to_string(suspensionDays) + " days due to overdue book.";
     
     // Use LoanSubject to notify observers
-    shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
-    LoanSubject loanSubject(sharedLoan);
+    LoanSubject *loanSubject = new LoanSubject(loan);
     
     // Update loan status to OVERDUE if not already
     if (loan->getStatus() != LoanStatus::OVERDUE) {
-        loanSubject.setLoanStatusAndNotify(LoanStatus::OVERDUE);
+        loanSubject->setLoanStatusAndNotify(LoanStatus::OVERDUE);
     } else {
         // Just notify without changing status
-        loanSubject.notify();
+        loanSubject->notify();
     }
     
     cout << "Suspension penalty applied to member " << member->getUserName() 

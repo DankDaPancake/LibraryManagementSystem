@@ -6,11 +6,17 @@
 #include <algorithm>  
 #include <chrono>    
 #include <cctype>
+#include <vector>
+#include <thread> 
+#include <atomic>
+#include <mutex>
 #include "core/Book.hpp"
 #include "core/Member.hpp"
 #include "core/Loan.hpp"
 #include "patterns/strategy/ISearchStrategy.hpp"
 #include "patterns/strategy/IPenaltyStrategy.hpp"
+#include "patterns/observer/LoanSubject.hpp"
+#include "patterns/observer/BookSubject.hpp"
 
 using namespace std;
 
@@ -24,18 +30,28 @@ private:
     vector<Category *> categories;
     vector<Member *> members;
     vector<Loan *> loans;
+    vector<BookSubject *> bookSubjects;
+    vector<LoanSubject *> loanSubjects;
+
     ISearchStrategy *searchStrategy;
     IPenaltyStrategy *penaltyStrategy;
 
-    LibraryManager(): searchStrategy(nullptr), penaltyStrategy(nullptr) {}
+    thread timerThread;
+    atomic<bool> stopTimer;
+    mutex loansMutex;
+
+    LibraryManager(): stopTimer(true), searchStrategy(nullptr), penaltyStrategy(nullptr) {}
     LibraryManager(const LibraryManager &) = delete;
     LibraryManager &operator=(const LibraryManager &) = delete;
+
+    void loanCheckTimer();
+    void checkLoansAndApplyPenalties();
+    IPenaltyStrategy* selectPenaltyStrategy(int daysOverdue);
 
 public:
     static LibraryManager &getInstance();
     
     void setSearchStrategy(ISearchStrategy *strategy);
-    void setPenaltyStrategy(IPenaltyStrategy *strategy);
 
     vector<Book *> searchBooks(const string &query) const;
 
@@ -53,6 +69,14 @@ public:
     void loadBooksIntoLibrary();
     void saveBooksNewInfo();
 
-    void loadMembersFromCSV(const std::string& path = "../data/members.csv");
-    void loadLoansFromCSV(const std::string& path = "../data/loans.csv");
+    void loadMembersFromCSV(const string& path = "../data/members.csv");
+    void loadLoansFromCSV(const string& path = "../data/loans.csv");
+
+    void createSubjects();
+
+    void startLoanCheckTimer();
+    void stopLoanCheckTimer();
+
+    void addObserverToAllBooks(IObserver* observer);
+    void addObserverToAllLoans(IObserver* observer);
 };  

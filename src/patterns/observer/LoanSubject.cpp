@@ -12,38 +12,53 @@ string LoanSubject::loanStatusToString(LoanStatus status) {
     return "UNKNOWN";
 }
 
-LoanSubject::LoanSubject(shared_ptr<Loan> associatedLoan) : loan(associatedLoan) {
-    // Empty constructor body
-}
+LoanSubject::LoanSubject(Loan* associatedLoan) : loan(associatedLoan) {}
 
 LoanSubject::~LoanSubject() {
-    // Destructor for LoanSubject does not need to delete pointers
-    // because they are managed by the observers themselves
+    // No need to delete loan as it's managed by LibraryManager
 }
 
-void LoanSubject::attach(IObserver *observer) {
-    observers.push_back(observer);
+void LoanSubject::attach(IObserver* observer) {
+    if (observer) {
+        observers.push_back(observer);
+    }
 }
 
-void LoanSubject::detach(IObserver *observer) {
-    observers.erase(remove(observers.begin(), observers.end(), observer), observers.end());
+void LoanSubject::detach(IObserver* observer) {
+    if (observer) {
+        observers.erase(
+            std::remove(observers.begin(), observers.end(), observer),
+            observers.end()
+        );
+    }
 }
 
 void LoanSubject::notify() {
-    string message = "Loan status updated: " + loanStatusToString(loan->getStatus());
-    for (IObserver *observer: observers) {
+    string statusMsg = loanStatusToString(loan->getStatus());
+    string message = "Loan status updated: " + statusMsg;
+    
+    // Add more context depending on the status
+    if (loan->getStatus() == LoanStatus::OVERDUE) {
+        int daysOverdue = loan->getDaysOverdue();
+        message += " - Loan is overdue by " + to_string(daysOverdue) + " days";
+    } else if (loan->getStatus() == LoanStatus::RETURNED) {
+        message += " - Book has been successfully returned";
+    }
+    
+    for (auto observer : observers) {
         if (observer) {
-            observer->update(message, nullptr, loan.get());
+            observer->update(message, nullptr, loan);
         }
-        // Example debug log: cout << "Notification sent by LoanSubject for Loan ID: " << loan->getLoanID() << endl;
     }
 }
 
 void LoanSubject::setLoanStatusAndNotify(LoanStatus newStatus) {
-    loan->setStatus(newStatus);
-    notify();
+    if (loan) {
+        loan->setStatus(newStatus);
+        notify();
+    }
 }
 
-shared_ptr<Loan> LoanSubject::getLoan() const {
+Loan* LoanSubject::getLoan() const {
     return loan;
 }

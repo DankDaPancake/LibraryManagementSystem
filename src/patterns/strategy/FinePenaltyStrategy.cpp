@@ -24,15 +24,14 @@ void FinePenaltyStrategy::applyPenalty(Member* member, Loan* loan, int daysOverd
                           " fine for book overdue by " + to_string(daysOverdue) + " days.";
     
     // Use LoanSubject to notify observers
-    shared_ptr<Loan> sharedLoan(loan, [](Loan* l) {}); // Non-owning shared_ptr
-    LoanSubject loanSubject(sharedLoan);
+    LoanSubject* loanSubject = new LoanSubject(loan);
     
     // Update loan status to OVERDUE if not already
     if (loan->getStatus() != LoanStatus::OVERDUE) {
-        loanSubject.setLoanStatusAndNotify(LoanStatus::OVERDUE);
+        loanSubject->setLoanStatusAndNotify(LoanStatus::OVERDUE);
     } else {
         // Just notify without changing status
-        loanSubject.notify();
+        loanSubject->notify();
     }
     
     cout << "Fine penalty applied to member " << member->getUserName() 

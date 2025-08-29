@@ -30,6 +30,21 @@ bool Loan::isOverdue() {
     return (status == LoanStatus::OVERDUE);
 }
 
+int Loan::getDaysOverdue() const {
+    using namespace std::chrono;
+
+    auto now = system_clock::now();
+
+    if (now <= dueDate) {
+        return 0; // Not overdue
+    }
+
+    auto diff = duration_cast<hours>(now - dueDate).count();
+    int days = static_cast<int>(diff / 24);
+
+    return days;
+}
+
 int Loan::calculateFine() const {
     if (status != LoanStatus::OVERDUE)
         return 0;

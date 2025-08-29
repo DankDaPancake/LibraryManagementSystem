@@ -39,6 +39,7 @@ void Librarian::addBook(Book *book) {
     else {
         libraryManager.books.push_back(book);
         cout << "New book '" << book->getTitle() << "' added successfully." << endl;
+        libraryManager.bookSubjects.push_back(new BookSubject(book));
     }
 }
 
@@ -128,6 +129,13 @@ void Librarian::updateBookInfo(Book *book) {
     cout << "Title: " << existingBook->getTitle() << endl;
     cout << "Total copies: " << existingBook->getTotalCopies() << endl;
     cout << "Available copies: " << existingBook->getAvailableCopies() << endl;
+
+    for (auto& bookSubject : libraryManager.bookSubjects) {
+        if (bookSubject->getBook()->getISBN() == existingBook->getISBN()) {
+            bookSubject->setBookStatusStatusAndNotify(existingBook->getStatus());
+            break;
+        }
+    }
 }
 
 void Librarian::manageMemberInfo(Member *member) {

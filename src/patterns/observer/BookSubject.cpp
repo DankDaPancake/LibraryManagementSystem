@@ -10,44 +10,45 @@ string BookSubject::bookStatusToString(BookStatus status) {
     return "UNKNOWN";
 }
 
-BookSubject::BookSubject(shared_ptr<Book> associatedBook) 
-    : book(associatedBook) {}
+BookSubject::BookSubject(Book* associatedBook) : book(associatedBook) {}
 
 BookSubject::~BookSubject() {
-    // destructor for BookSubject no needed delete pointers
-    // because they are managed by the observers themselves
+    // No need to delete book as it's managed by LibraryManager
 }
 
-void BookSubject::attach(IObserver *observer)
-{
-    observers.push_back(observer);
-}
-
-void BookSubject::detach(IObserver *observer)
-{
-    observers.erase(remove(observers.begin(), observers.end(), observer), observers.end());
-}
-
-void BookSubject::notify()
-{
-    string message = "Book status updated: " + bookStatusToString(book->getStatus());
-    for (IObserver *observer : observers)
-    {
-        if (observer)
-        {
-            observer->update(message, book.get(), nullptr);
-        }
-        // Example debug log: cout << "Notification sent by BookSubject for Book: " << book->getTitle() << endl;
+void BookSubject::attach(IObserver* observer) {
+    if (observer) {
+        observers.push_back(observer);
     }
 }
 
-void BookSubject::setBookStatusStatusAndNotify(BookStatus newStatus)
-{
-    book->setStatus(newStatus);
-    notify();
+void BookSubject::detach(IObserver* observer) {
+    if (observer) {
+        observers.erase(
+            std::remove(observers.begin(), observers.end(), observer),
+            observers.end()
+        );
+    }
 }
 
-shared_ptr<Book> BookSubject::getBook() const
-{
+void BookSubject::notify() {
+    string statusMsg = bookStatusToString(book->getStatus());
+    string message = "Book status updated: " + statusMsg;
+    
+    for (auto observer : observers) {
+        if (observer) {
+            observer->update(message, book, nullptr);
+        }
+    }
+}
+
+void BookSubject::setBookStatusStatusAndNotify(BookStatus newStatus) {
+    if (book) {
+        book->setStatus(newStatus);
+        notify();
+    }
+}
+
+Book* BookSubject::getBook() const {
     return book;
 }

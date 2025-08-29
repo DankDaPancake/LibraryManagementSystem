@@ -6,6 +6,6 @@
 
 class IPenaltyStrategy {
 public:
-    virtual void applyPenalty(Member* member, Loan* loan, int daysOverdue) const = 0;
+    virtual void applyPenalty(Member* member, Loan* loan, int daysOverdue) = 0;
     virtual ~IPenaltyStrategy() = default;
 };

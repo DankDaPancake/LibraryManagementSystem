@@ -1,5 +1,9 @@
 #include "services/LibraryManager.hpp"
 #include "utils/CSVHandler.hpp"
+#include "patterns/strategy/WarningPenaltyStrategy.hpp"
+#include "patterns/strategy/FinePenaltyStrategy.hpp"
+#include "patterns/strategy/SuspendPenaltyStrategy.hpp"
+
 #include <iostream>
 #include <fstream>
 
@@ -10,10 +14,6 @@ LibraryManager &LibraryManager::getInstance() {
 
 void LibraryManager::setSearchStrategy(ISearchStrategy *strategy) {
     searchStrategy = strategy;
-}
-
-void LibraryManager::setPenaltyStrategy(IPenaltyStrategy *strategy) {
-    penaltyStrategy = strategy;
 }
 
 vector<Book *> LibraryManager::searchBooks(const string &query) const {
@@ -84,6 +84,8 @@ bool LibraryManager::borrowBook(const string &memberID, const string &ISBN) {
     newLoan->setDueDate(borrowDate + chrono::hours(24 * 14));
     newLoan->setStatus(LoanStatus::ACTIVE);
     loans.push_back(newLoan);
+
+    loanSubjects.push_back(new LoanSubject(newLoan));
  
     targetBook->setAvailableCopies(targetBook->getAvailableCopies() - 1);
  
@@ -124,6 +126,7 @@ bool LibraryManager::returnBook(const std::string& memberID, const std::string& 
 void LibraryManager::addBookToSystem(Book *book) {
     if (book) {
         books.push_back(book);
+        bookSubjects.push_back(new BookSubject(book));
         cout << "Added book '" << book->getTitle() << "' (ISBN " << book->getISBN() << ") to library." << endl;
     }
 }
@@ -189,7 +192,6 @@ void LibraryManager::loadBooksIntoLibrary() {
         ss.str(items[6]);
         ss.clear();
         ss >> availableCopies;
-
         addBookToSystem(new Book(ISBN, title, 
             to_string(authorID), authors[authorID - 1]->getName(), authors[authorID - 1]->getBiograph(),
             to_string(categoryID), categories[categoryID - 1]->getName(), categories[categoryID - 1]->getDescription(),
@@ -249,15 +251,15 @@ void LibraryManager::saveBooksNewInfo() {
     }
     file.close();
 
-    ofstream loanFile("../data/loans.csv");
-    loanFile.clear();
-    loanFile << "loanID,isbn,memberID,borrowDate,dueDate,returnDate,loanstatus\n";
+    // ofstream loanFile("../data/loans.csv");
+    // loanFile.clear();
+    // loanFile << "loanID,isbn,memberID,borrowDate,dueDate,returnDate,loanstatus\n";
 
-    for (auto loan: loans) {
-        cout << "Saved '" << loan->getLoanID() << "' information." << endl;
-        loanFile << loan->loanCSVFormat() << '\n';
-    }
-    loanFile.close();
+    // for (auto loan: loans) {
+    //     cout << "Saved '" << loan->getLoanID() << "' information." << endl;
+    //     loanFile << loan->loanCSVFormat() << '\n';
+    // }
+    // loanFile.close();
 }
 
 void LibraryManager::loadMembersFromCSV(const std::string& path) {
@@ -289,6 +291,7 @@ static inline void trim_inplace(std::string& s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
     s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
 }
+
 static inline LoanStatus parseLoanStatus(std::string s) {
     trim_inplace(s);
     for (auto& ch : s) ch = std::toupper((unsigned char)ch);
@@ -325,7 +328,10 @@ void LibraryManager::loadLoansFromCSV(const std::string& path) {
                          [&](Loan* L){ return L && L->getLoanID()==loanId; });
         if (exists) continue;
 
-        loans.push_back(new Loan(loanId, isbn, memberId, borrowDate, dueDate, returnDate, st));
+        Loan *newLoan = new Loan(loanId, isbn, memberId, borrowDate, dueDate, returnDate, st);
+
+        loanSubjects.push_back(new LoanSubject(newLoan));
+        loans.push_back(newLoan);
     }
 }
 
@@ -359,4 +365,97 @@ bool LibraryManager::addBook(const std::string& ISBN,
 
 const std::vector<Book*>& LibraryManager::getBooks() const {
     return books;
+}
+
+void LibraryManager::startLoanCheckTimer() {
+    if (stopTimer) {
+        stopTimer = false;
+        timerThread = std::thread(&LibraryManager::loanCheckTimer, this);
+    }
+}
+
+void LibraryManager::stopLoanCheckTimer() {
+    if (!stopTimer) {
+        stopTimer = true;
+        if (timerThread.joinable()) {
+            timerThread.join();
+        }
+    }
+}
+
+void LibraryManager::loanCheckTimer() {
+    while (!stopTimer) {
+        checkLoansAndApplyPenalties();
+        
+        // Sleep for 60 seconds before checking again
+        std::this_thread::sleep_for(std::chrono::seconds(60));
+    }
+}
+
+IPenaltyStrategy* LibraryManager::selectPenaltyStrategy(int daysOverdue) {
+    // Delete the old strategy if it exists
+    if (penaltyStrategy) {
+        delete penaltyStrategy;
+    }
+    
+    // Create new strategy based on severity
+    if (daysOverdue > 30) {
+        return new SuspendPenaltyStrategy();
+    }
+    else if (daysOverdue > 14) {
+        return new FinePenaltyStrategy();
+    }
+    else {
+        return new WarningPenaltyStrategy();
+    }
+}
+
+void LibraryManager::checkLoansAndApplyPenalties() {
+    std::lock_guard<std::mutex> lock(loansMutex);
+    
+    for (auto& loan : loans) {
+        if (loan->isOverdue()) {
+            int daysOverdue = loan->getDaysOverdue();
+            Member* member = nullptr;
+            
+            // Find the associated member
+            for (auto& mem : members) {
+                if (mem->getUserID() == loan->getMemberID()) {
+                    member = mem;
+                    break;
+                }
+            }
+            
+            if (!member) continue;
+            
+            // Select and apply the appropriate penalty
+            penaltyStrategy = selectPenaltyStrategy(daysOverdue);
+            penaltyStrategy->applyPenalty(member, loan, daysOverdue);
+            
+            // Update loan status and notify if needed
+            if (loan->getStatus() != LoanStatus::OVERDUE) {
+                // Find corresponding subject in your existing structure
+                // This assumes you have a way to access loan subjects
+                // or you need to add code to create and manage them
+                for (auto& loanSubject : loanSubjects) {
+                    if (loanSubject->getLoan()->getLoanID() == loan->getLoanID()) {
+                        loanSubject->setLoanStatusAndNotify(LoanStatus::OVERDUE);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void LibraryManager::addObserverToAllBooks(IObserver* observer) {
+    for (auto& bookSubject : bookSubjects) {
+        bookSubject->attach(observer);
+    }
+}
+
+void LibraryManager::addObserverToAllLoans(IObserver* observer) {
+    for (auto& loanSubject : loanSubjects) {
+        loanSubject->attach(observer);
+    }
 }

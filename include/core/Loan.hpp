@@ -43,6 +43,7 @@ public:
     void setStatus(LoanStatus newStatus);
 
     bool isOverdue();
+    int getDaysOverdue() const;
     int calculateFine() const;
     string loanCSVFormat() const;
     
