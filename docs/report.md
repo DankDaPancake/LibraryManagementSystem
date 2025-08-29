@@ -20,7 +20,6 @@
   - **Member 2**: [Name] - [Student ID] - Design Patterns Specialist
   - **Member 3**: [Name] - [Student ID] - Backend Developer
   - **Member 4**: [Name] - [Student ID] - UI/UX Developer
-  - **Member 5**: [Name] - [Student ID] - Quality Assurance & Documentation
 
 ### Individual Contributions
 
@@ -51,12 +50,6 @@
 - **Input Validation**: Implemented comprehensive form validation and error handling
 - **Visual Design**: Applied consistent styling and layout across all interface components
 - **Responsive Interface**: Ensured smooth navigation and user-friendly interaction patterns
-
-#### Member 5 - Quality Assurance & Documentation
-- **Quality Assurance**: Performed manual testing and code review
-- **Documentation**: Created detailed technical documentation, user manuals, and system reports
-- **Code Review**: Performed systematic code review and quality assurance across all modules
-- **Performance Optimization**: Identified and resolved performance bottlenecks in the system
 
 ### Self-Evaluation
 
