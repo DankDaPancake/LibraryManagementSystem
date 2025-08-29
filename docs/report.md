@@ -148,7 +148,7 @@ The Library Management System addresses the growing complexity of modern library
   - Basic availability status updates
   - Simple book status management
 
-##### 3. Sophisticated Loan Management
+##### 3. Basic Loan Management
 - **Borrowing Process**
   - Basic eligibility verification
   - Due date calculation
@@ -439,15 +439,31 @@ classDiagram
 **Concrete Subscribers**:
 - **MemberObserver**: Provides notifications to library members
 - **LibrarianObserver**: Delivers alerts to library staff
+- **NotificationService**: Basic console and file logging
 
 **Key Implementation Features**:
 - **Basic observer management**: Simple registration/deregistration of observers
 - **Event notification**: Subjects notify all registered observers of state changes
-- **Message delivery**: Observers receive and process notifications based on their role
+- **Simple message delivery**: Console logging and basic file output
 
 **Usage Examples**:
 - **Book status notifications**: When a book status changes, relevant observers are notified
 - **Loan status updates**: Members and librarians receive updates about loan changes
+
+#### Singleton Pattern (Centralized Management)
+
+The Singleton Pattern ensures single-instance coordination for all library operations through the LibraryManager class.
+
+**Implementation Components**:
+- **LibraryManager Class**: Central coordinator for all library operations
+- **Static getInstance() Method**: Returns single shared instance
+- **Private Constructor**: Prevents direct instantiation
+- **Deleted Copy Operations**: Ensures single instance guarantee
+
+**Benefits**:
+- **Global Access**: Single point of access for library functionality
+- **Resource Management**: Centralized control of library state
+- **Consistency**: Ensures single source of truth for library operations
 
 #### Strategy Pattern (Algorithm Family Management)
 
@@ -765,7 +781,7 @@ classDiagram
 
 #### Service Layer Architecture
 
-##### Library Manager (Singleton + Facade Pattern)
+##### Library Manager (Singleton Pattern)
 
 ```mermaid
 classDiagram
@@ -1577,46 +1593,11 @@ classDiagram
 **Generic Data Abstraction:**
 ```mermaid
 classDiagram
-    class SearchResult~T~ {
-        <<template>>
-        -vector~T*~ results
-        -string searchQuery
-        -string searchType
-        -double executionTime
-        +addResult(item : T*) void
-        +getCount() size_t
-        +getResult(index : size_t) T*
-        +begin() iterator
-        +end() iterator
-        +getQuery() string
-        +getExecutionTime() double
-    }
-    
-    class Book {
-        -string ISBN
-        -string title
-        +getISBN() string
-        +getTitle() string
-    }
-    
-    class Member {
-        -string memberID
-        -string name
-        +getMemberID() string
-        +getName() string
-    }
-    
-    %% Template relationships
-    SearchResult ..> Book : can contain
-    SearchResult ..> Member : can contain
-```
-
 **Benefits Achieved:**
 - **Complexity Management**: Complex implementations hidden behind simple interfaces
 - **Modularity**: Clear separation between interface and implementation
 - **Flexibility**: Multiple implementations possible for same abstraction
 - **Maintainability**: Changes to implementation don't affect client code
-- **Testability**: Abstract interfaces enable easy unit testing with mock objects
 
 #### OOP Principles Integration Example
 
@@ -1722,7 +1703,6 @@ classDiagram
         +update(message : string, book : Book*, loan : Loan*) void
         +logNotification(message : string, book : Book*, loan : Loan*) void
         +showUserFriendlyMessage(book : Book*) void
-        +sendEmailNotification(member : Member*, message : string) void
     }
     
     class LibrarianObserver {
@@ -2165,67 +2145,44 @@ flowchart TD
 **Purpose**: Comprehensive user identity and access management system
 
 **Components and Functionality**:
-- **AuthenticateManager Class**: Central authentication coordinator
-  - User credential verification using secure password hashing
-  - Session management with timeout and renewal capabilities
-  - Multi-factor authentication support (extensible architecture)
-  - Account lockout protection against brute-force attacks
-  - Password policy enforcement (complexity, expiration, history)
+- **AuthenticateManager Class**: Basic authentication coordinator
+  - Simple user credential verification using plain text passwords
+  - Basic user registration and login functionality
+  - CSV-based user storage
+  - Basic password length validation (minimum 8 characters)
 
 **Security Features**:
 - **Password Security**: 
-  - Salted hash storage (SHA-256 with random salt)
-  - Minimum complexity requirements (8+ characters, mixed case, numbers)
-  - Password expiration and change enforcement
-  - Prevention of password reuse (maintains history)
+  - Plain text password storage in CSV files
+  - Basic password length requirement (8+ characters)
   
 - **Session Management**:
-  - Secure session token generation and validation
-  - Automatic timeout for inactive sessions
-  - Concurrent session limiting per user
-  - Session activity logging for security audits
+  - Simple login/logout functionality
+  - Observer pattern integration for user context
 
 **Role-Based Access Control**:
 ```mermaid
 classDiagram
     class UserRole {
         <<enumeration>>
-        GUEST = 0
+        LIBRARIAN = 0
         MEMBER = 1
-        LIBRARIAN = 2
-        ADMIN = 3
-    }
-    
-    class AccessControl {
-        <<utility>>
-        +hasPermission(userRole : UserRole, operation : Operation)$ bool
-        +getRequiredRole(operation : Operation)$ UserRole
-        +checkAccess(user : User*, operation : Operation)$ bool
-        +logAccessAttempt(user : User*, operation : Operation, granted : bool)$ void
-    }
-    
-    class Operation {
-        <<enumeration>>
-        READ_BOOK
-        BORROW_BOOK
-        RETURN_BOOK
-        ADD_BOOK
-        REMOVE_BOOK
-        MANAGE_USERS
-        SYSTEM_CONFIG
     }
     
     class User {
         <<abstract>>
         #UserRole role
-        #bool isActive
         +getRole() UserRole
-        +hasPermission(operation : Operation) bool
     }
     
-    class Guest {
-        +Guest()
-        +hasPermission(operation : Operation) bool
+    class Member {
+        +Member(userID, userName, password)
+        +getUserType() string
+    }
+    
+    class Librarian {
+        +Librarian(userID, userName, password)
+        +getUserType() string
     }
     
     class Member {
@@ -2277,7 +2234,7 @@ classDiagram
   - Book condition tracking and maintenance scheduling
 
 - **Loan Processing Engine**:
-  - Sophisticated eligibility checking (member status, fine limits, loan limits)
+  - Basic eligibility checking (member existence, book availability, no duplicate loans)
   - Dynamic due date calculation based on book type and member status
   - Reservation system with priority queuing
   - Automated renewal with configurable limits
@@ -2354,63 +2311,38 @@ classDiagram
 ```
 
 #### 3. User Interface Module
-**Purpose**: Rich, responsive GUI using ImGui framework with advanced state management
+**Purpose**: ImGui-based GUI using simple state management
 
 **UI Architecture**:
-- **Router Pattern**: Centralized navigation management
-- **State Machine**: Complex UI state transitions
-- **Component-Based Design**: Reusable UI components
-- **Reactive Updates**: Automatic UI synchronization with data changes
+- **Simple State Management**: AppState enum for screen navigation
+- **Screen Components**: Individual UI functions for different screens  
+- **Basic Navigation**: Router handles screen transitions
 
-**Advanced UI Features**:
-- **Context-Sensitive Menus**: Different options based on user role and current state
-- **Real-Time Validation**: Immediate feedback for user inputs
-- **Progressive Disclosure**: Complex forms broken into manageable steps
-- **Accessibility Support**: Keyboard navigation and screen reader compatibility
-- **Theme Management**: Customizable color schemes and layouts
+**UI Features**:
+- **Menu System**: Simple screen-based navigation
+- **Form Handling**: Basic input validation and processing
+- **Error Display**: Simple error messages and status updates
 
 **State Management Implementation**:
 ```mermaid
 classDiagram
-    class UIState {
+    class AppState {
         <<enumeration>>
-        LOGIN
-        MAIN_MENU
-        SEARCH_BOOKS
-        BORROW_BOOK
-        RETURN_BOOK
-        MEMBER_PROFILE
-        ADMIN_PANEL
-        SETTINGS
+        Login
+        Register  
+        MainMenu
+        SearchBook
+        BorrowBook
+        ReturnBook
+        AddBook
+        FindAuthor
+        FindCategory
     }
     
-    class AppStateManager {
-        -UIState currentState
-        -stack~UIState~ stateHistory
-        -map~UIState, unique_ptr~UIComponent~~ components
-        +transitionTo(newState : UIState) void
-        +goBack() void
-        +getCurrentComponent() UIComponent*
-        +registerComponent(state : UIState, component : unique_ptr~UIComponent~) void
-        +validateStateTransition(from : UIState, to : UIState) bool
-        +logStateTransition(from : UIState, to : UIState) void
+    class Router {
+        <<utility>>
+        +handleStateTransition(newState : AppState) void
     }
-    
-    class UIComponent {
-        <<abstract>>
-        #UIState associatedState
-        +render() void
-        +handleInput(input : InputEvent) bool
-        +onEnter() void
-        +onExit() void
-        +isValidTransition(targetState : UIState) bool
-    }
-    
-    class LoginUI {
-        -string username
-        -string password
-        -bool isValidating
-        +render() void
         +handleInput(input : InputEvent) bool
         +validateCredentials() bool
     }
@@ -2444,108 +2376,22 @@ classDiagram
 ```
 
 #### 4. Notification and Messaging Module
-**Purpose**: Comprehensive event-driven communication system
+**Purpose**: Basic event-driven communication system
 
-**Observer Pattern Enhancement**:
-- **Event Types**: Categorized notification system
-- **Priority Levels**: Critical, warning, info, debug message levels
-- **Delivery Channels**: Multiple output channels (console, file, future: email/SMS)
-- **Message Filtering**: User preferences for notification types
-- **Batch Processing**: Efficient handling of multiple notifications
+**Observer Pattern Implementation**:
+- **Event Types**: Basic notification system for book and loan events
+- **Delivery Channels**: Console output and file logging
+- **Simple Processing**: Direct notification handling
 
 **Notification Categories**:
-```mermaid
-classDiagram
-    class NotificationType {
-        <<enumeration>>
-        BOOK_AVAILABLE
-        DUE_DATE_REMINDER
-        OVERDUE_NOTICE
-        FINE_APPLIED
-        ACCOUNT_SUSPENDED
-        NEW_BOOK_ARRIVAL
-        SYSTEM_MAINTENANCE
-        PASSWORD_EXPIRY
-    }
-    
-    class NotificationMessage {
-        -NotificationType type
-        -string title
-        -string content
-        -string recipientId
-        -DateTime timestamp
-        -Priority priority
-        -map~string, string~ metadata
-        +getType() NotificationType
-        +getTitle() string
-        +getContent() string
-        +getRecipientId() string
-        +getTimestamp() DateTime
-        +getPriority() Priority
-        +getMetadata() map~string, string~
-    }
-    
-    class NotificationManager {
-        -map~NotificationType, vector~IObserver*~~ subscribers
-        -queue~NotificationMessage~ messageQueue
-        -vector~INotificationChannel*~ deliveryChannels
-        -ThreadPool messageProcessor
-        +subscribe(type : NotificationType, observer : IObserver*) void
-        +unsubscribe(type : NotificationType, observer : IObserver*) void
-        +publishNotification(type : NotificationType, message : NotificationMessage) void
-        +processMessageQueue() void
-        +addDeliveryChannel(channel : INotificationChannel*) void
-        +setProcessingThreads(count : int) void
-        +getQueueSize() int
-        +clearQueue() void
-    }
-    
-    class INotificationChannel {
-        <<interface>>
-        +deliver(message : NotificationMessage) bool
-        +isAvailable() bool
-        +getSupportedTypes() vector~NotificationType~
-        +getChannelName() string
-    }
-    
-    class ConsoleChannel {
-        -bool colored_output
-        -LogLevel min_level
-        +deliver(message : NotificationMessage) bool
-        +formatConsoleMessage(message : NotificationMessage) string
-        +setColoredOutput(enabled : bool) void
-    }
-    
-    class FileChannel {
-        -string logFilePath
-        -ofstream logFile
-        -mutex fileMutex
-        +deliver(message : NotificationMessage) bool
-        +rotateLogFile() void
-        +setMaxFileSize(size : size_t) void
-    }
-    
-    class EmailChannel {
-        -string smtpServer
-        -string username
-        -string password
-        +deliver(message : NotificationMessage) bool
-        +formatEmailBody(message : NotificationMessage) string
-    }
-    
-    %% Relationships
-    NotificationManager --> NotificationMessage : processes
-    NotificationManager --> INotificationChannel : uses
-    NotificationManager --> NotificationType : categorizes by
-    NotificationMessage --> NotificationType : typed as
-    INotificationChannel <|.. ConsoleChannel : implements
-    INotificationChannel <|.. FileChannel : implements
-    INotificationChannel <|.. EmailChannel : implements
-    NotificationManager --> IObserver : notifies
-    
-    note for NotificationManager "Publisher-Subscriber pattern with\nmulti-channel delivery support\nand asynchronous processing"
-    note for NotificationMessage "Structured notification data\nwith metadata and priority\nlevels for flexible delivery"
-```
+- Book status changes
+- Loan status updates  
+- Due date and overdue notifications
+
+**Basic Implementation**:
+- **MemberObserver**: Console notifications and member log file
+- **LibrarianObserver**: System alerts and librarian log file
+- **NotificationService**: Simple due date checking and availability notifications
 
 #### 5. Data Persistence and Management Module
 **Purpose**: Robust data storage with integrity and performance optimization
@@ -2797,13 +2643,13 @@ This notification has been logged to member_notifications.log
 **Benefit**: Data corruption prevention and recovery capabilities
 
 #### 4. UI State Management
-**Challenge**: Managing complex UI state transitions and context switching
+**Challenge**: Managing simple UI state transitions with AppState enum navigation
 **Solution**: Implemented Router pattern with AppState management
 **Result**: Clean separation of UI logic and improved maintainability
 
 #### 5. Strategy Pattern Runtime Selection
 **Challenge**: Dynamic strategy switching without performance impact
-**Solution**: Factory pattern for strategy creation and caching mechanisms
+**Solution**: Simple strategy selection and basic caching mechanisms
 **Outcome**: Efficient runtime strategy selection
 
 ### Technical Debt and Refactoring Opportunities
@@ -2812,6 +2658,7 @@ This notification has been logged to member_notifications.log
 **Current State**: CSV-based storage system
 **Improvement**: Migration to SQLite or MySQL database
 **Benefits**: ACID compliance, better query performance, concurrent access
+**Note**: Current system uses simple CSV files with CSVHandler utility class
 
 #### 2. Async Operations
 **Current State**: Synchronous I/O operations
@@ -2842,7 +2689,7 @@ This notification has been logged to member_notifications.log
 - **Library Network**: Connect with other library systems for resource sharing
 - **External APIs**: Integration with book databases (Google Books, OpenLibrary)
 - **Payment Systems**: Online fine payment and membership fee collection
-- **Email/SMS Notifications**: Automated communication system
+- **Console Notifications**: Real-time display system
 - **Calendar Integration**: Due date synchronization with personal calendars
 
 #### 4. Potential Future Enhancements
@@ -2861,7 +2708,7 @@ This notification has been logged to member_notifications.log
 
 ### Conclusion
 
-The Library Management System successfully demonstrates advanced object-oriented programming concepts and design patterns in C++. The system provides a solid foundation for library operations while maintaining extensibility for future enhancements. The implementation showcases clean architecture principles, proper separation of concerns, and robust error handling.
+The Library Management System successfully demonstrates basic object-oriented programming concepts and design patterns in C++. The system provides a functional foundation for library operations with room for future enhancements. The implementation showcases fundamental OOP principles, proper pattern usage, and simple error handling.
 
 The project has been a valuable learning experience in:
 - **Software Architecture**: Understanding how to structure large applications
