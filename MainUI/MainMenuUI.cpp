@@ -14,18 +14,16 @@ static int AppStateToIndex(AppState s, bool isLibrarian) {
         case AppState::BorrowBook:   return 0;
         case AppState::ReturnBook:   return 1;
         case AppState::SearchBook:   return 2;
-        case AppState::FindAuthor:   return 3;
-        case AppState::FindCategory: return 4;
-        case AppState::AddBook:      return isLibrarian ? 5 : 0;
+        case AppState::AddBook:      return isLibrarian ? 3 : 0;
         default:                     return 0;
     }
 }
+
 static AppState IndexToAppState(int idx, bool isLibrarian) {
-    static AppState mapCommon[5] = {
-        AppState::BorrowBook, AppState::ReturnBook, AppState::SearchBook,
-        AppState::FindAuthor, AppState::FindCategory
+    static AppState mapCommon[3] = {
+        AppState::BorrowBook, AppState::ReturnBook, AppState::SearchBook
     };
-    if (idx < 5) return mapCommon[idx];
+    if (idx < 3) return mapCommon[idx];
     return isLibrarian ? AppState::AddBook : AppState::BorrowBook;
 }
 
@@ -55,7 +53,7 @@ inline void LmsShellUI(AppState& appState) {
 
     bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
 
-    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book", "Find Author", "Find Category" };
+    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book"};
     if (isLibrarian) actions.push_back("Add Book");
 
     static int selected = AppStateToIndex(appState, isLibrarian);
@@ -69,21 +67,21 @@ inline void LmsShellUI(AppState& appState) {
         ImGui::BeginChild("sidebar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoScrollbar);
         {
             ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextColored(ImVec4(0.20f,0.60f,1.0f,1.0f), "📚  LMS");
+            ImGui::TextColored(ImVec4(0.20f,0.60f,1.0f,1.0f), "LMS");
             ImGui::TextDisabled("HCMUS Electronic Library");
             ImGui::Dummy(ImVec2(0, 6)); ImGui::Separator(); ImGui::Dummy(ImVec2(0, 6));
 
             for (int i = 0; i < (int)actions.size(); ++i) {
                 if (NavButton(actions[i], selected == i, sidebarWidth - 24)) {
-                    selected = i; 
+                    selected = i;
                 }
                 ImGui::Dummy(ImVec2(0, 4));
             }
 
             ImGui::Dummy(ImVec2(0, 8)); ImGui::Separator(); ImGui::Dummy(ImVec2(0, 8));
             if (ImGui::Button("Log out", ImVec2(sidebarWidth - 24, 0))) {
-                curUser = User();               
-                appState = AppState::Login;     
+                curUser = User();
+                appState = AppState::Login;
                 ImGui::EndChild();
                 ImGui::End();
                 return;
@@ -100,23 +98,23 @@ inline void LmsShellUI(AppState& appState) {
         ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_None);
         {
             ImGui::BeginChild("topbar", ImVec2(0, 44), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-                {
-                    const std::string user  = curUser.getUserName();
-                    const char* roleCStr    = roleToString(curUser.getRole());
-                    const std::string label = user + "  (" + roleCStr + ")";
+            {
+                const std::string user  = curUser.getUserName();
+                const char* roleCStr    = roleToString(curUser.getRole());
+                const std::string label = user + "  (" + roleCStr + ")";
 
-                    const float textW   = ImGui::CalcTextSize(label.c_str()).x;
-                    const float availW  = ImGui::GetContentRegionAvail().x;
-                    const float barH    = 44.0f;
-                    const float textH   = ImGui::GetTextLineHeight();
-                    const float topPadY = (barH - textH) * 0.5f;
+                const float textW   = ImGui::CalcTextSize(label.c_str()).x;
+                const float availW  = ImGui::GetContentRegionAvail().x;
+                const float barH    = 44.0f;
+                const float textH   = ImGui::GetTextLineHeight();
+                const float topPadY = (barH - textH) * 0.5f;
 
-                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + topPadY);
-                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availW - textW);
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + topPadY);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availW - textW);
 
-                    ImGui::AlignTextToFramePadding();  
-                    ImGui::TextUnformatted(label.c_str());
-                }
+                ImGui::AlignTextToFramePadding();  
+                ImGui::TextUnformatted(label.c_str());
+            }
             ImGui::EndChild();
             ImGui::Separator();
 
@@ -128,8 +126,6 @@ inline void LmsShellUI(AppState& appState) {
                 case AppState::BorrowBook:   BorrowBookUI(appState);   break;
                 case AppState::ReturnBook:   ReturnBookUI(appState);   break;
                 case AppState::SearchBook:   SearchBookUI(appState);   break;
-                case AppState::FindAuthor:   FindAuthorUI(appState);   break;
-                case AppState::FindCategory: FindCategoryUI(appState); break;
                 case AppState::AddBook:      AddBookUI(appState);      break;
                 default:
                     ImGui::TextDisabled("Select a feature from the left sidebar.");

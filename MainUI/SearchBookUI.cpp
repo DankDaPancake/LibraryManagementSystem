@@ -20,7 +20,9 @@ void SearchBookUI(AppState &appState) {
         return;
     }
 
-    ImGui::Begin("Search Book");
+    ImGui::Text("Search Book");
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0, 6));  
 
     static string lastUserId;
     static int mode = 0;
@@ -68,15 +70,14 @@ void SearchBookUI(AppState &appState) {
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Back to Main Menu")) {
-        mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0';
-        appState = AppState::MainMenu;
-        ImGui::End();
-        return;
+    if (ImGui::Button("Clear")) { 
+        mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0'; 
     }
 
-    ImGui::Separator();
-    if (message[0]) ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
+    if (message[0]) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
+    }
 
     for (Book* book : results) {
         ImGui::Text("ISBN: %s",  book->getISBN().c_str());
@@ -92,6 +93,4 @@ void SearchBookUI(AppState &appState) {
         ImGui::Text("Available: %d / %d", book->getAvailableCopies(), book->getTotalCopies());
         ImGui::Separator();
     }
-
-    ImGui::End();
 }

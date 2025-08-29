@@ -31,7 +31,9 @@ void ReturnBookUI(AppState& appState) {
         return;
     }
  
-    ImGui::Begin("Return Book");
+    ImGui::Text("Search Book");
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0, 6));
  
     ImGui::InputText("Member ID", memberID, IM_ARRAYSIZE(memberID));
     ImGui::InputText("Book ISBN",  isbn,     IM_ARRAYSIZE(isbn));
@@ -60,15 +62,11 @@ void ReturnBookUI(AppState& appState) {
             }
         }
     }
- 
-    ImGui::Spacing();
-    ImGui::TextColored(ImVec4(1, 1, 0, 1), "%s", message);    
-    if (ImGui::Button("Back to Main Menu")) {
-        isbn[0] = '\0'; message[0] = '\0'; memberID[0] = '\0';
-        appState = AppState::MainMenu;
-        ImGui::End();
-        return;
+
+    ImGui::SameLine();
+    if (ImGui::Button("Clear")) {
+        memberID[0] = '\0'; 
+        isbn[0] = '\0'; 
+        message[0] = '\0'; 
     }
- 
-    ImGui::End();
 }
