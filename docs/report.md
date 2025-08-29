@@ -40,7 +40,7 @@
 
 #### Member 3 - Backend Systems Developer
 - **Library Management Services**: Implemented LibraryManager class with singleton pattern for centralized operations
-- **Authentication System**: Developed secure login/logout functionality with password hashing and session management
+- **Authentication System**: Developed basic login/logout functionality with simple password validation
 - **Loan Management**: Created comprehensive borrowing and returning system with automatic fine calculation
 - **Business Logic**: Implemented core library operations including book availability tracking and member status management
 - **Notification Service**: Developed automated notification system for overdue books and member alerts
@@ -53,10 +53,9 @@
 - **Responsive Interface**: Ensured smooth navigation and user-friendly interaction patterns
 
 #### Member 5 - Quality Assurance & Documentation
-- **Testing Framework**: Designed and executed comprehensive testing procedures for all system components
+- **Quality Assurance**: Performed manual testing and code review
 - **Documentation**: Created detailed technical documentation, user manuals, and system reports
 - **Code Review**: Performed systematic code review and quality assurance across all modules
-- **Integration Testing**: Ensured seamless integration between different system components
 - **Performance Optimization**: Identified and resolved performance bottlenecks in the system
 
 ### Self-Evaluation
@@ -83,11 +82,11 @@
 | - Code Quality | ✅ Excellent | 10/10 | Clean architecture, proper memory management, RAII principles |
 | - Modularity | ✅ Excellent | 10/10 | Clear separation of concerns with layered architecture |
 | - Data Persistence | ✅ Implemented | 9/10 | CSV-based storage with automatic loading/saving |
-| **Documentation & Testing** | ✅ Good | 9/10 | |
+| **Documentation & Testing** | ✅ Good | 7/10 | |
 | - Code Documentation | ✅ Good | 8/10 | Comprehensive comments and class documentation |
-| - System Testing | ✅ Implemented | 9/10 | Thorough testing of core functionalities |
+| - System Testing | ✅ Basic | 6/10 | Manual testing performed, no automated test framework |
 | - User Manual | ✅ Implemented | 9/10 | Clear usage instructions and examples |
-| **Overall Project Completion** | ✅ Excellent | **95/100** | **All requirements met with high quality implementation** |
+| **Overall Project Completion** | ✅ Good | **88/100** | **Core requirements met with solid implementation** |
 
 ---
 
@@ -196,11 +195,8 @@ The Library Management System addresses the growing complexity of modern library
   - Combined search criteria support
 
 - **Advanced Search Features**
-  - Boolean operators (AND, OR, NOT)
-  - Wildcard and partial matching
+  - Fuzzy matching using Levenshtein distance
   - Search result ranking by relevance
-  - Search history and saved queries
-  - Auto-completion and suggestions
 
 - **Dynamic Strategy Selection**
   - Runtime strategy switching
@@ -216,36 +212,23 @@ The Library Management System addresses the growing complexity of modern library
   - Notification filtering and personalization
 
 - **Notification Types**
-  - Book availability alerts for reserved items
-  - Due date reminders and overdue notices
-  - New book arrival notifications
-  - System maintenance and downtime alerts
-  - Fine payment reminders and account updates
+  - Book status change notifications
+  - Loan status updates
+  - Overdue loan alerts
 
 - **Delivery Mechanisms**
-  - In-application notifications
-  - Console-based alerts for testing
-  - File-based logging for audit purposes
-  - Extensible architecture for email/SMS integration
+  - Console-based notifications
+  - File-based logging
 
-##### 6. Robust Data Persistence
+##### 6. Data Persistence
 - **CSV-Based Storage System**
-  - Human-readable data format for easy maintenance
+  - Human-readable data format
   - Cross-platform compatibility
-  - Version control friendly format
-  - Easy backup and migration capabilities
+  - Easy backup and migration
 
-- **Data Integrity Features**
-  - Automatic data validation and sanitization
-  - Transaction-like save operations
-  - Backup creation before modifications
-  - Corruption detection and recovery mechanisms
-
-- **Performance Optimizations**
-  - Lazy loading for large datasets
-  - Efficient search indexing
-  - Memory-conscious data structures
-  - Batch processing for bulk operations
+- **Data Management**
+  - Basic data loading and saving
+  - File-based storage for all entities
 
 ### UML Class Diagrams
 
@@ -257,59 +240,50 @@ The Library Management System follows a well-structured object-oriented design w
 ```mermaid
 classDiagram
     class User {
-        <<abstract>>
-        #string userID
-        #string name
-        #string email
-        #string phoneNumber
-        #string hashedPassword
-        +User(userID, userName, password)
+        -string userID
+        -string userName
+        -string password
+        -Role role
+        +User()
+        +User(name, role)
+        +User(userID, userName, password, role)
         +virtual ~User()
         +getUserID() string
-        +getName() string
-        +getEmail() string
-        +getPhoneNumber() string
-        +setEmail(email) void
-        +setPhoneNumber(phone) void
-        +changePassword(oldPass, newPass) bool
-        +authenticate(password) bool
-        +virtual getUserType() string*
+        +getUserName() string
+        +getRole() Role
+        +viewProfile() void
     }
 
     class Member {
-        -vector~Loan*~ currentLoans
-        -vector~Loan*~ loanHistory
+        -Date membershipDate
+        -vector~Book*~ borrowedBooks
+        -int warningCount
         -bool suspended
-        -double fineAmount
+        -time_t suspensionEndDate
+        -double totalFines
         +Member(userID, userName, password)
-        +getUserType() string
-        +canBorrowBooks() bool
-        +addLoan(loan) void
-        +returnBook(ISBN) void
-        +addFine(amount) void
-        +payFine(amount) void
-        +suspendMember() void
-        +reactivateMember() void
-        +getCurrentLoans() vector~Loan*~
-        +getLoanHistory() vector~Loan*~
+        +getMembershipDate() Date
+        +getBorrowedBooks() vector~Book*~
+        +borrowBook(ISBN) bool
+        +returnBook(ISBN) bool
+        +addWarning() void
+        +getWarningCount() int
+        +resetWarnings() void
+        +suspendAccount(days) void
         +isSuspended() bool
-        +getFineAmount() double
+        +removeSuspension() void
+        +addFine(amount) void
+        +getTotalFines() double
+        +payFine(amount) void
     }
 
     class Librarian {
-        -string employeeID
-        -string department
-        -string position
         +Librarian(userID, userName, password)
-        +getUserType() string
         +addBook(book) void
         +removeBook(ISBN) void
         +updateBookInfo(book) void
         +manageMemberInfo(member) void
         +viewAllLoans() vector~Loan*~
-        +getEmployeeID() string
-        +getDepartment() string
-        +getPosition() string
     }
 
     class Book {
@@ -317,34 +291,34 @@ classDiagram
         -string title
         -Author author
         -Category category
-        -string publicationYear
-        -bool available
-        +Book(isbn, title, author, category, year)
+        -BookStatus status
+        -int totalCopies
+        -int availableCopies
+        +Book(ISBN, title, authorID, authorName, biography, categoryID, categoryName, description, status, totalCopies, availableCopies)
         +getISBN() string
         +getTitle() string
         +getAuthor() Author
         +getCategory() Category
-        +getPublicationYear() string
+        +getStatus() BookStatus
+        +getTotalCopies() int
+        +getAvailableCopies() int
+        +setStatus(newStatus) void
+        +setTotalCopies(count) void
+        +setAvailableCopies(count) void
+        +bookStatusToString() string
         +isAvailable() bool
-        +setAvailability(available) void
-        +setTitle(title) void
-        +setAuthor(author) void
-        +setCategory(category) void
+        +displayBasicInfo() void
         +virtual getFullDescription() string
     }
 
     class Author {
         -string authorID
-        -string name
-        -string nationality
-        -string birthYear
-        +Author(id, name, nationality, birth)
+        -string authorName
+        -string biography
+        +Author(id, name, bio)
         +getAuthorID() string
         +getName() string
-        +getNationality() string
-        +getBirthYear() string
-        +getAge() int
-        +getFullInfo() string
+        +getBiograph() string
     }
 
     class Category {
@@ -665,59 +639,16 @@ classDiagram
 
     class AdditionalInfoDecorator {
         -string additionalInfo
-        -string infoType
-        +AdditionalInfoDecorator(book, info, type)
-        +getDecoratorEnhancement() string
-        +updateInfo(newInfo) void
-    }
-
-    class InteractiveFeaturesDecorator {
-        -BookMetrics metrics
-        +InteractiveFeaturesDecorator(book, bookMetrics)
-        +getDecoratorEnhancement() string
-        +getMetrics() BookMetrics
-        -formatPopularityIndicator() string
-        -formatStatistics() string
-    }
-
-    class PersonalizationDecorator {
-        -string memberID
-        -PersonalizedInfo personalInfo
-        +PersonalizationDecorator(book, member, info)
-        +getDecoratorEnhancement() string
-        -formatPersonalizedContent() string
-        -generateRecommendations() vector~string~
-    }
-
-    class AdminInfoDecorator {
-        -AdminMetrics adminData
-        +AdminInfoDecorator(book, adminMetrics)
-        +getDecoratorEnhancement() string
-        +getAdminMetrics() AdminMetrics
-        -formatAdminStatistics() string
-    }
-
-    class SmartDecoratorFactory {
-        -LibraryManager* libraryManager
-        +createContextualBook(baseBook, userID, preferences) shared_ptr~Book~
-        +createDecoratorChain(book, decorators) shared_ptr~Book~
-        -assessBookDifficulty(book) string
-        -gatherBookMetrics(book) BookMetrics
-        -gatherPersonalizedInfo(book, userID) PersonalizedInfo
-        -gatherAdminInfo(book) AdminMetrics
+        +AdditionalInfoDecorator(book, info)
+        +getFullDescription() string
     }
 
     Book <|-- BookDecorator : extends
     BookDecorator <|-- DifficultyLabelDecorator : extends
     BookDecorator <|-- SpecialTagDecorator : extends
     BookDecorator <|-- AdditionalInfoDecorator : extends
-    BookDecorator <|-- InteractiveFeaturesDecorator : extends
-    BookDecorator <|-- PersonalizationDecorator : extends
-    BookDecorator <|-- AdminInfoDecorator : extends
     
     BookDecorator o-- Book : decorates
-    SmartDecoratorFactory ..> BookDecorator : creates
-    SmartDecoratorFactory --> LibraryManager : uses
 ```
 
 ### Pattern Integration Benefits
@@ -2989,23 +2920,11 @@ This notification has been logged to member_notifications.log
 - **Email/SMS Notifications**: Automated communication system
 - **Calendar Integration**: Due date synchronization with personal calendars
 
-#### 4. Security and Compliance
-- **User Authentication**: Multi-factor authentication and OAuth integration
-- **Data Encryption**: Sensitive data encryption at rest and in transit
-- **Audit Logging**: Comprehensive audit trail for compliance requirements
-- **Privacy Protection**: GDPR compliance and data protection measures
-
-#### 5. Performance Optimizations
-- **Caching System**: Redis-based caching for frequently accessed data
-- **Search Optimization**: Full-text search with indexing capabilities
-- **Load Balancing**: Horizontal scaling for high availability
-- **Database Optimization**: Query optimization and indexing strategies
-
-#### 6. User Experience Improvements
-- **Dark Mode**: Alternative UI themes for user preference
-- **Accessibility**: Screen reader support and keyboard navigation
-- **Internationalization**: Multi-language support for diverse user bases
-- **Responsive Design**: Adaptive UI for different screen sizes
+#### 4. Potential Future Enhancements
+- **Database Integration**: Migrate from CSV to proper database system
+- **Web Interface**: Develop web-based user interface
+- **Enhanced Security**: Implement password hashing and user authentication improvements
+- **Mobile Support**: Create mobile-friendly interface
 - **Voice Commands**: Speech recognition for hands-free operation
 
 #### 7. Administrative Tools
