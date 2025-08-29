@@ -16,6 +16,10 @@ void LibraryManager::setSearchStrategy(ISearchStrategy *strategy) {
     searchStrategy = strategy;
 }
 
+void LibraryManager::setObserver(IObserver *newObserver) {
+    observer = newObserver;
+}
+
 vector<Book *> LibraryManager::searchBooks(const string &query) const {
     if (searchStrategy)
         return searchStrategy->search(books, query);
@@ -448,14 +452,43 @@ void LibraryManager::checkLoansAndApplyPenalties() {
     }
 }
 
-void LibraryManager::addObserverToAllBooks(IObserver* observer) {
+void LibraryManager::addObserverToAllBooks() {
     for (auto& bookSubject : bookSubjects) {
         bookSubject->attach(observer);
     }
 }
 
-void LibraryManager::addObserverToAllLoans(IObserver* observer) {
+void LibraryManager::addObserverToAllLoans() {
     for (auto& loanSubject : loanSubjects) {
         loanSubject->attach(observer);
     }
+}
+
+void LibraryManager::removeObserverBooks() {
+    for (auto bookSubject: bookSubjects) {
+        bookSubject->detach(observer);
+    }
+}
+
+void LibraryManager::removeObserverLoans() {
+    for (auto loanSubject: loanSubjects) {
+        loanSubject->detach(observer);
+    }
+}
+
+void LibraryManager::systemLogout() {
+    for (auto book: books) delete book;
+    for (auto author: authors) delete author;
+    for (auto category: categories) delete category;
+
+    for (auto loan: loans) delete loan;
+    for (auto member: members) delete member;
+    
+    for (auto bookSubject: bookSubjects) delete bookSubject;
+    for (auto loanSubject: loanSubjects) delete loanSubject;
+    
+    delete searchStrategy;
+    delete penaltyStrategy;
+
+    stopLoanCheckTimer();
 }

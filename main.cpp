@@ -182,6 +182,7 @@ int main(int, char**)
     ::DestroyWindow(hwnd);
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
+    LibraryManager::getInstance().systemLogout(); // Logging out
     return 0;
 }
 

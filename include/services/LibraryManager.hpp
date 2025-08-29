@@ -35,6 +35,7 @@ private:
 
     ISearchStrategy *searchStrategy;
     IPenaltyStrategy *penaltyStrategy;
+    IObserver *observer;
 
     thread timerThread;
     atomic<bool> stopTimer;
@@ -52,6 +53,7 @@ public:
     static LibraryManager &getInstance();
     
     void setSearchStrategy(ISearchStrategy *strategy);
+    void setObserver(IObserver *observer);
 
     vector<Book *> searchBooks(const string &query) const;
 
@@ -72,11 +74,13 @@ public:
     void loadMembersFromCSV(const string& path = "../data/members.csv");
     void loadLoansFromCSV(const string& path = "../data/loans.csv");
 
-    void createSubjects();
-
     void startLoanCheckTimer();
     void stopLoanCheckTimer();
 
-    void addObserverToAllBooks(IObserver* observer);
-    void addObserverToAllLoans(IObserver* observer);
+    void addObserverToAllBooks();
+    void addObserverToAllLoans();
+    void removeObserverBooks();
+    void removeObserverLoans();
+
+    void systemLogout();
 };  
