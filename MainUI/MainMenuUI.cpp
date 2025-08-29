@@ -1,62 +1,147 @@
 #include "imgui.h"
-#include "Screens.hpp"
 #include "AppState.hpp"
-#include "core/User.hpp"          
+#include "core/User.hpp"
+#include "Screens.hpp"
 #include <vector>
 #include <cstring>
 #include <string>
 
-extern User curUser;              
+extern User curUser;
+const char* roleToString(Role);  
 
-void MainMenuUI(AppState &appState) {
-    ImGui::Begin("Main Menu");
+static int AppStateToIndex(AppState s, bool isLibrarian) {
+    switch (s) {
+        case AppState::BorrowBook:   return 0;
+        case AppState::ReturnBook:   return 1;
+        case AppState::SearchBook:   return 2;
+        case AppState::FindAuthor:   return 3;
+        case AppState::FindCategory: return 4;
+        case AppState::AddBook:      return isLibrarian ? 5 : 0;
+        default:                     return 0;
+    }
+}
+static AppState IndexToAppState(int idx, bool isLibrarian) {
+    static AppState mapCommon[5] = {
+        AppState::BorrowBook, AppState::ReturnBook, AppState::SearchBook,
+        AppState::FindAuthor, AppState::FindCategory
+    };
+    if (idx < 5) return mapCommon[idx];
+    return isLibrarian ? AppState::AddBook : AppState::BorrowBook;
+}
 
-    const std::string curUsername = curUser.getUserName();
-    ImGui::Text("USER: %s", curUsername.c_str());
-    ImGui::Text("STATUS: %s", roleToString(curUser.getRole()));
-    ImGui::SameLine(250);
+static bool NavButton(const char* label, bool selected, float width) {
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(12, 10));
+    if (selected) {
+        ImGui::PushStyleColor(ImGuiCol_Button,        ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+    }
+    bool clicked = ImGui::Button(label, ImVec2(width, 0));
+    if (selected) ImGui::PopStyleColor(2);
+    ImGui::PopStyleVar(2);
+    return clicked;
+}
 
-    ImGui::BeginGroup();
-    ImGui::TextColored(ImVec4(0.1f, 0.7f, 0.3f, 1.0f), "Welcome to Library!");
-    ImGui::TextWrapped("If u dont know, this is an Library Management System belongs to HCMUS. "
-                       "Hope u'll have a good experience using this service :3");
-    ImGui::EndGroup();
+inline void LmsShellUI(AppState& appState) {
+    ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(vp->WorkPos);
+    ImGui::SetNextWindowSize(vp->WorkSize);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoMove     | ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-    ImGui::Separator();
+    static float sidebarWidth = 260.0f;
+    static Role lastRole = curUser.getRole();
 
-    static int  selectedItem = 0;
-    static Role lastRole     = curUser.getRole();
-    if (curUser.getRole() != lastRole) { selectedItem = 0; lastRole = curUser.getRole(); }
+    bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
 
     std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book", "Find Author", "Find Category" };
-    if (curUser.getRole() == Role::LIBRARIAN) actions.push_back("Add Book");
+    if (isLibrarian) actions.push_back("Add Book");
 
-    if (selectedItem >= (int)actions.size()) selectedItem = (int)actions.size() - 1;
-
-    const int count = (int)actions.size();
-    std::vector<const char*> items = actions;  // tránh overflow khi thêm mục
-    ImGui::Text("Choose Action:"); ImGui::SameLine();
-    ImGui::Combo("##ActionCombo", &selectedItem, items.data(), count);
-
-    if (ImGui::Button("Confirm")) {
-        const char* chosen = items[selectedItem];
-        if      (std::strcmp(chosen, "Borrow Book")   == 0) appState = AppState::BorrowBook;
-        else if (std::strcmp(chosen, "Return Book")   == 0) appState = AppState::ReturnBook;
-        else if (std::strcmp(chosen, "Search Book")   == 0) appState = AppState::SearchBook;
-        else if (std::strcmp(chosen, "Find Author")   == 0) appState = AppState::FindAuthor;
-        else if (std::strcmp(chosen, "Find Category") == 0) appState = AppState::FindCategory;
-        else if (std::strcmp(chosen, "Add Book")      == 0) appState = AppState::AddBook;
-        ImGui::End();
-        return;  // kết thúc frame hiện tại
+    static int selected = AppStateToIndex(appState, isLibrarian);
+    if (curUser.getRole() != lastRole) {
+        lastRole = curUser.getRole();
+        selected = AppStateToIndex(appState, isLibrarian);
     }
+    if (selected >= (int)actions.size()) selected = (int)actions.size() - 1;
 
-    if (ImGui::Button("Log out")) {
-        curUser = User();
-        selectedItem = 0;
-        appState = AppState::Login;
-        ImGui::End();
-        return;  
+    if (ImGui::Begin("LMS - Shell", nullptr, flags)) {
+        ImGui::BeginChild("sidebar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoScrollbar);
+        {
+            ImGui::Dummy(ImVec2(0, 6));
+            ImGui::TextColored(ImVec4(0.20f,0.60f,1.0f,1.0f), "📚  LMS");
+            ImGui::TextDisabled("HCMUS Electronic Library");
+            ImGui::Dummy(ImVec2(0, 6)); ImGui::Separator(); ImGui::Dummy(ImVec2(0, 6));
+
+            for (int i = 0; i < (int)actions.size(); ++i) {
+                if (NavButton(actions[i], selected == i, sidebarWidth - 24)) {
+                    selected = i; 
+                }
+                ImGui::Dummy(ImVec2(0, 4));
+            }
+
+            ImGui::Dummy(ImVec2(0, 8)); ImGui::Separator(); ImGui::Dummy(ImVec2(0, 8));
+            if (ImGui::Button("Log out", ImVec2(sidebarWidth - 24, 0))) {
+                curUser = User();               
+                appState = AppState::Login;     
+                ImGui::EndChild();
+                ImGui::End();
+                return;
+            }
+
+            ImGui::Dummy(ImVec2(0, 6));
+            ImGui::TextDisabled("Sidebar width"); ImGui::SameLine();
+            ImGui::SliderFloat("##sbw", &sidebarWidth, 220.0f, 380.0f, "%.0f px");
+        }
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+
+        ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+        {
+            ImGui::BeginChild("topbar", ImVec2(0, 44), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+                {
+                    const std::string user  = curUser.getUserName();
+                    const char* roleCStr    = roleToString(curUser.getRole());
+                    const std::string label = user + "  (" + roleCStr + ")";
+
+                    const float textW   = ImGui::CalcTextSize(label.c_str()).x;
+                    const float availW  = ImGui::GetContentRegionAvail().x;
+                    const float barH    = 44.0f;
+                    const float textH   = ImGui::GetTextLineHeight();
+                    const float topPadY = (barH - textH) * 0.5f;
+
+                    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + topPadY);
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availW - textW);
+
+                    ImGui::AlignTextToFramePadding();  
+                    ImGui::TextUnformatted(label.c_str());
+                }
+            ImGui::EndChild();
+            ImGui::Separator();
+
+            ImGui::BeginChild("content_body", ImVec2(0, 0), false, ImGuiWindowFlags_None);
+
+            AppState inner = IndexToAppState(selected, isLibrarian);
+
+            switch (inner) {
+                case AppState::BorrowBook:   BorrowBookUI(appState);   break;
+                case AppState::ReturnBook:   ReturnBookUI(appState);   break;
+                case AppState::SearchBook:   SearchBookUI(appState);   break;
+                case AppState::FindAuthor:   FindAuthorUI(appState);   break;
+                case AppState::FindCategory: FindCategoryUI(appState); break;
+                case AppState::AddBook:      AddBookUI(appState);      break;
+                default:
+                    ImGui::TextDisabled("Select a feature from the left sidebar.");
+                    break;
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndChild();
     }
+    ImGui::End(); 
+}
 
-    ImGui::End();
+void MainMenuUI(AppState& appState) {
+    LmsShellUI(appState);
 }
