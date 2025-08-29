@@ -79,18 +79,43 @@ void SearchBookUI(AppState &appState) {
         ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
     }
 
-    for (Book* book : results) {
-        ImGui::Text("ISBN: %s",  book->getISBN().c_str());
-        ImGui::Text("Title: %s", book->getTitle().c_str());
+    if (ImGui::BeginTable("Book Table", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+        ImGui::TableSetupColumn("ISBN", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Author", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Author ID", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Category ID", ImGuiTableColumnFlags_None);
+        ImGui::TableSetupColumn("Available / Total", ImGuiTableColumnFlags_None);
+        ImGui::TableHeadersRow(); 
 
-        const Author& a = book->getAuthor();
-        ImGui::Text("Author: %s (ID: %d)", a.getName().c_str(), a.getAuthorID());
+        for (Book* book : results) {
+            ImGui::TableNextRow();
 
-        const Category& c = book->getCategory();
-        ImGui::Text("Category: %s (ID: %d)", c.getName().c_str(), c.getCategoryID());
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%s", book->getISBN().c_str());
 
-        ImGui::Text("Status: %s",  book->bookStatusToString().c_str());
-        ImGui::Text("Available: %d / %d", book->getAvailableCopies(), book->getTotalCopies());
-        ImGui::Separator();
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s", book->getTitle().c_str());
+
+            ImGui::TableSetColumnIndex(2);
+            const Author& a = book->getAuthor();
+            ImGui::Text("%s", a.getName().c_str());
+
+            ImGui::TableSetColumnIndex(3);
+            ImGui::Text("%d", a.getAuthorID());
+
+            ImGui::TableSetColumnIndex(4);
+            const Category& c = book->getCategory();
+            ImGui::Text("%s", c.getName().c_str());
+
+            ImGui::TableSetColumnIndex(5);
+            ImGui::Text("%d", c.getCategoryID());
+
+            ImGui::TableSetColumnIndex(6);
+            ImGui::Text("%d / %d", book->getAvailableCopies(), book->getTotalCopies());
+        }
+
+        ImGui::EndTable(); 
     }
 }
