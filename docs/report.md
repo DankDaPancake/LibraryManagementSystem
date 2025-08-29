@@ -116,23 +116,19 @@ The Library Management System addresses the growing complexity of modern library
 
 ##### 1. User Management System
 - **Member Registration and Authentication**
-  - Secure user account creation with validation
-  - Password-based authentication system
+  - Basic user account creation with validation
+  - Simple password-based authentication system
   - Profile management and contact information updates
   - Loan history tracking and fine management
-  - Account suspension and reinstatement capabilities
 
 - **Librarian Account Management**
   - Administrative account creation and management
   - Role-based permissions and access control
-  - Employee ID tracking and department assignments
-  - Activity logging and audit trails
+  - Employee ID tracking
 
 - **Role-Based Access Control**
-  - Hierarchical permission system (Member < Librarian < Admin)
+  - Basic permission system (Member vs Librarian)
   - Feature restriction based on user roles
-  - Secure access to sensitive operations
-  - Session management and timeout handling
 
 ##### 2. Advanced Book Catalog Management
 - **Comprehensive Book Information**
@@ -143,66 +139,50 @@ The Library Management System addresses the growing complexity of modern library
   - Custom tags and difficulty labels
 
 - **Author and Category Management**
-  - Detailed author profiles with nationality and birth year
-  - Hierarchical category system with descriptions
+  - Basic author profiles
+  - Category system with descriptions
   - Author-book relationship mapping
   - Category-based browsing and filtering
 
 - **Inventory Tracking**
-  - Real-time availability status updates
-  - Book location tracking within library
-  - Condition monitoring and maintenance records
-  - Automated inventory reports and statistics
+  - Basic availability status updates
+  - Simple book status management
 
 ##### 3. Sophisticated Loan Management
 - **Borrowing Process**
-  - Automated eligibility verification
-  - Due date calculation based on book type
+  - Basic eligibility verification
+  - Due date calculation
   - Loan limit enforcement per member
-  - Real-time availability checking
-  - Transaction logging and confirmation
+  - Availability checking
 
 - **Return Processing**
-  - Automated fine calculation for overdue items
-  - Condition assessment upon return
+  - Basic fine calculation for overdue items
   - Late return penalty application
-  - Loan record completion and archiving
+  - Loan record completion
 
 - **Overdue Management**
-  - Flexible penalty system with multiple strategies
-  - Progressive fine calculation
-  - Account suspension for severe violations
-  - Grace period handling for special circumstances
+  - Basic penalty system with multiple strategies
+  - Fine calculation
+  - Account suspension capabilities
 
 - **Loan History and Analytics**
-  - Complete borrowing history per member
-  - Popular book tracking and recommendations
-  - Usage pattern analysis
-  - Performance metrics and reporting
+  - Basic borrowing history per member
 
 ##### 4. Intelligent Search System
 - **Multi-Strategy Search Architecture**
-  - Title-based search with fuzzy matching
+  - Title-based search
   - Author name search across all publications
   - Category-based browsing and filtering
-  - Combined search criteria support
-
-- **Advanced Search Features**
-  - Fuzzy matching using Levenshtein distance
-  - Search result ranking by relevance
 
 - **Dynamic Strategy Selection**
   - Runtime strategy switching
-  - Performance optimization based on query type
-  - Search result caching for frequently accessed queries
-  - Statistical analysis of search patterns
+  - Strategy selection based on user preference
 
 ##### 5. Real-Time Notification System
 - **Observer Pattern Implementation**
-  - Event-driven architecture for real-time updates
-  - Loose coupling between event sources and handlers
-  - Multiple observer types for different user roles
-  - Notification filtering and personalization
+  - Event-driven architecture for updates
+  - Basic coupling between event sources and handlers
+  - Observer types for different user roles
 
 - **Notification Types**
   - Book status change notifications
@@ -443,8 +423,8 @@ classDiagram
 
 ### Design Pattern Implementation Details
 
-#### Observer Pattern (Real-time Event Notification System)
-**Problem Solved**: The system needs to notify multiple stakeholders (members, librarians) about various events (book availability changes, loan status updates, due date reminders) without creating tight coupling between event sources and notification recipients.
+#### Observer Pattern (Basic Event Notification System)
+**Problem Solved**: The system needs to notify multiple stakeholders (members, librarians) about various events (book availability changes, loan status updates) without creating tight coupling between event sources and notification recipients.
 
 **Architecture Components**:
 
@@ -453,24 +433,21 @@ classDiagram
 - **IObserver**: Defines subscriber contract for receiving and processing notifications
 
 **Concrete Publishers**:
-- **BookSubject**: Manages notifications for book-related events (availability changes, reservations)
-- **LoanSubject**: Handles loan-related notifications (due dates, overdue status, returns)
+- **BookSubject**: Manages notifications for book-related events
+- **LoanSubject**: Handles loan-related notifications
 
 **Concrete Subscribers**:
-- **MemberObserver**: Provides user-friendly notifications to library members
-- **LibrarianObserver**: Delivers detailed system alerts to library staff
+- **MemberObserver**: Provides notifications to library members
+- **LibrarianObserver**: Delivers alerts to library staff
 
 **Key Implementation Features**:
-- **Thread-safe observer management**: Observers are managed safely in multi-threaded environments with mutex protection
-- **Robust error handling**: Faulty observers are automatically removed to maintain system stability  
-- **Automatic lifecycle management**: Observer subjects handle registration/deregistration seamlessly
-- **Message filtering**: Different observer types can filter notifications based on relevance
+- **Basic observer management**: Simple registration/deregistration of observers
+- **Event notification**: Subjects notify all registered observers of state changes
+- **Message delivery**: Observers receive and process notifications based on their role
 
-**Real-world Usage Examples**:
-- **Book availability notifications**: When a book is returned, all waiting members are automatically notified
-- **Due date reminders**: Members receive automated reminders before books are due
-- **Librarian alerts**: Staff are notified of overdue books, damage reports, or system issues
-- **Reservation processing**: Queue management with automatic notifications when reserved books become available
+**Usage Examples**:
+- **Book status notifications**: When a book status changes, relevant observers are notified
+- **Loan status updates**: Members and librarians receive updates about loan changes
 
 #### Strategy Pattern (Algorithm Family Management)
 
@@ -498,17 +475,6 @@ classDiagram
         -matchCategory(book, query) bool
     }
 
-    class ISBNSearchStrategy {
-        +search(books, query) vector~Book*~
-        -matchISBN(book, query) bool
-    }
-
-    class FuzzySearchStrategy {
-        +search(books, query) vector~Book*~
-        -calculateRelevanceScore(book, query) double
-        -scoreMultiField(book, terms) double
-    }
-
     class IPenaltyStrategy {
         <<interface>>
         +applyPenalty(member, loan, overdueDays) void*
@@ -533,14 +499,6 @@ classDiagram
         +calculateFine(overdueDays) double
     }
 
-    class SmartPenaltyStrategy {
-        +applyPenalty(member, loan, overdueDays) void
-        +calculateFine(overdueDays) double
-        -analyzeMember(member) MemberProfile
-        -calculateBaseFine(days) double
-        -applyMembershipDiscount(fine, tier) double
-    }
-
     class LibraryManager {
         -ISearchStrategy* searchStrategy
         -IPenaltyStrategy* penaltyStrategy
@@ -550,28 +508,16 @@ classDiagram
         +processPenalty(member, loan) void
     }
 
-    class ContextAwareStrategySelector {
-        +selectSearchStrategy(query, userType) ISearchStrategy*
-        +selectPenaltyStrategy(member, violation) IPenaltyStrategy*
-        -analyzeQueryPattern(query) string
-        -assessMemberRisk(member) string
-    }
-
     ISearchStrategy <|-- TitleSearchStrategy : implements
     ISearchStrategy <|-- AuthorSearchStrategy : implements
     ISearchStrategy <|-- CategorySearchStrategy : implements
-    ISearchStrategy <|-- ISBNSearchStrategy : implements
-    ISearchStrategy <|-- FuzzySearchStrategy : implements
     
     IPenaltyStrategy <|-- FinePenaltyStrategy : implements
     IPenaltyStrategy <|-- SuspendPenaltyStrategy : implements
     IPenaltyStrategy <|-- WarningPenaltyStrategy : implements
-    IPenaltyStrategy <|-- SmartPenaltyStrategy : implements
     
     LibraryManager --> ISearchStrategy : uses
     LibraryManager --> IPenaltyStrategy : uses
-    ContextAwareStrategySelector ..> ISearchStrategy : creates
-    ContextAwareStrategySelector ..> IPenaltyStrategy : creates
 ```
 
 #### Decorator Pattern (Dynamic Feature Enhancement)
@@ -646,21 +592,21 @@ classDiagram
 
 ### Pattern Integration Benefits
 
-The three design patterns work synergistically to create a highly flexible and maintainable system:
+The three design patterns work together to create a flexible system:
 
-- **Observer + Strategy**: Search strategies can notify observers about search patterns and performance metrics
-- **Observer + Decorator**: Decorated books can trigger specialized notifications based on their enhancements
-- **Strategy + Decorator**: Different search strategies can apply different decoration strategies to results
-- **All Patterns Together**: Create a responsive, adaptive system that personalizes user experience while maintaining clean architecture
+- **Observer + Strategy**: Basic integration for notifications and search functionality
+- **Observer + Decorator**: Decorated books can trigger notifications
+- **Strategy + Decorator**: Different search approaches with basic book enhancements
+- **All Patterns Together**: Simple, clean architecture with basic pattern implementations
 
 #### Pattern Integration Benefits
 
-The three design patterns work synergistically to create a highly flexible and maintainable system:
+The three design patterns work together to create a flexible system:
 
-- **Observer + Strategy**: Search strategies can notify observers about search patterns and performance metrics
-- **Observer + Decorator**: Decorated books can trigger specialized notifications based on their enhancements
-- **Strategy + Decorator**: Different search strategies can apply different decoration strategies to results
-- **All Patterns Together**: Create a responsive, adaptive system that personalizes user experience while maintaining clean architecture
+- **Observer + Strategy**: Basic integration for notifications and search functionality
+- **Observer + Decorator**: Decorated books can trigger notifications
+- **Strategy + Decorator**: Different search approaches with basic book enhancements
+- **All Patterns Together**: Simple, clean architecture with basic pattern implementations
 
 ##### UML Design Patterns Diagram
 ```mermaid
@@ -1601,42 +1547,31 @@ classDiagram
     BookDecorator --> Book : decorates
 ```
 
-**High-Level Service Abstraction:**
+**LibraryManager System Architecture:**
 ```mermaid
 classDiagram
-    class LibraryService {
-        <<abstract>>
-        +processBookLoan(memberID : string, ISBN : string) bool
-        +processBookReturn(memberID : string, ISBN : string) bool
-        +searchCatalog(query : string, searchType : string) vector~Book*~
-        +generateMemberReport(memberID : string) void
-        +processOverdueNotifications() void
-    }
-    
     class LibraryManager {
         <<singleton>>
         -vector~Book*~ books
         -vector~Member*~ members
         -vector~Loan*~ loans
         -ISearchStrategy* searchStrategy
-        -vector~IObserver*~ observers
-        +processBookLoan(memberID : string, ISBN : string) bool
-        +processBookReturn(memberID : string, ISBN : string) bool
-        +searchCatalog(query : string, searchType : string) vector~Book*~
-        +generateMemberReport(memberID : string) void
-        +processOverdueNotifications() void
+        -IPenaltyStrategy* penaltyStrategy
+        -IObserver* observer
+        +getInstance() LibraryManager&
         +borrowBook(memberID : string, ISBN : string) bool
         +returnBook(memberID : string, ISBN : string) bool
-        -validateMemberEligibility(memberID : string) bool
-        -checkBookAvailability(ISBN : string) bool
-        -createLoanRecord(memberID : string, ISBN : string) Loan*
-        -updateBookStatus(ISBN : string, status : bool) void
-        -notifyObservers(event : string, book : Book*) void
-        -logTransaction(transaction : string) void
+        +searchBooks(query : string) vector~Book*~
+        +findMember(memberID : string) Member*
+        +findBook(ISBN : string) Book*
+        +addBookToSystem(book : Book*) void
+        +addMemberToSystem(member : Member*) void
+        +setSearchStrategy(strategy : ISearchStrategy*) void
+        +setObserver(observer : IObserver*) void
+        +loadBooksIntoLibrary() void
+        +startLoanCheckTimer() void
+        +stopLoanCheckTimer() void
     }
-    
-    %% Relationships
-    LibraryService <|-- LibraryManager : implements
 ```
 
 **Generic Data Abstraction:**
@@ -1687,24 +1622,24 @@ classDiagram
 
 ```mermaid
 classDiagram
-    class LibraryService {
-        <<abstract>>
-        +searchCatalog(query : string, searchType : string) vector~Book*~
-        +processBookLoan(memberID : string, ISBN : string) bool
-        +processBookReturn(memberID : string, ISBN : string) bool
-    }
-    
-    class EnhancedLibraryManager {
-        -vector~unique_ptr~Book~~ books
-        -unique_ptr~ISearchStrategy~ searchStrategy
-        -vector~unique_ptr~IObserver~~ observers
-        -bool validateLoanRequest(memberID : string, ISBN : string)
-        -void notifyObservers(event : string, book : Book*)
-        -Book* findBook(ISBN : string)
-        -vector~Book*~ extractRawPointers(books : vector~unique_ptr~Book~~)
-        +setSearchStrategy(strategy : unique_ptr~ISearchStrategy~) void
-        +searchCatalog(query : string, searchType : string) vector~Book*~
-        +processBookLoan(memberID : string, ISBN : string) bool
+    class LibraryManager {
+        <<singleton>>
+        -vector~Book*~ books
+        -vector~Member*~ members
+        -vector~Loan*~ loans
+        -ISearchStrategy* searchStrategy
+        -IPenaltyStrategy* penaltyStrategy
+        -IObserver* observer
+        -vector~BookSubject*~ bookSubjects
+        -vector~LoanSubject*~ loanSubjects
+        +getInstance() LibraryManager&
+        +setSearchStrategy(strategy : ISearchStrategy*) void
+        +setObserver(observer : IObserver*) void
+        +searchBooks(query : string) vector~Book*~
+        +borrowBook(memberID : string, ISBN : string) bool
+        +returnBook(memberID : string, ISBN : string) bool
+        +findMember(memberID : string) Member*
+        +findBook(ISBN : string) Book*
     }
     
     class ISearchStrategy {
@@ -1715,7 +1650,6 @@ classDiagram
     class IObserver {
         <<interface>>
         +update(message : string, book : Book*, loan : Loan*) void
-        +logNotification(message : string, book : Book*, loan : Loan*) void
     }
     
     class Book {
@@ -1725,24 +1659,22 @@ classDiagram
         +getISBN() string
         +getTitle() string
         +isAvailable() bool
-        +setAvailability(status : bool) void
     }
     
-    %% Relationships demonstrating all 4 OOP principles
-    LibraryService <|-- EnhancedLibraryManager : Inheritance + Abstraction
-    EnhancedLibraryManager --> ISearchStrategy : Polymorphism
-    EnhancedLibraryManager --> IObserver : Polymorphism  
-    EnhancedLibraryManager --> Book : Encapsulation
+    %% Relationships demonstrating OOP principles
+    LibraryManager --> ISearchStrategy : uses
+    LibraryManager --> IObserver : uses
+    LibraryManager --> Book : manages
     
-    note for EnhancedLibraryManager "Demonstrates all 4 OOP principles:\n1. Encapsulation: Private data & methods\n2. Inheritance: Extends LibraryService\n3. Polymorphism: Uses strategy & observer patterns\n4. Abstraction: Simple interface, complex implementation"
+    note for LibraryManager "Demonstrates OOP principles:\n1. Encapsulation: Private data & methods\n2. Polymorphism: Uses strategy & observer patterns\n3. Abstraction: Simple interface, manages complexity\n4. Singleton: Single instance management"
 ```
 
-This integration demonstrates how all four OOP principles work together to create a robust, maintainable, and extensible system architecture.
+This integration demonstrates how OOP principles work together to create a maintainable system architecture.
 
 ### Design Pattern Implementation Details
 
 #### Observer Pattern: Event-Driven Notification System
-**Problem Solved**: Traditional polling-based systems create unnecessary overhead and delay in status updates. Users need immediate notifications when book availability changes or loans become overdue.
+**Problem Solved**: Users need notifications when book availability changes or loan status updates occur.
 
 **Architecture Overview**:
 - **Subject Classes**: BookSubject and LoanSubject act as event publishers
