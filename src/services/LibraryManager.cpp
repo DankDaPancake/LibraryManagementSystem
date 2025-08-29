@@ -221,49 +221,49 @@ void LibraryManager::loadBooksIntoLibrary() {
 }
 
 void LibraryManager::saveBooksNewInfo() {
-    ofstream authorFile("../data/authors.csv");
-    authorFile.clear();
-    authorFile << "authorName,biography\n";
+    // ofstream authorFile("../data/authors.csv");
+    // authorFile.clear();
+    // authorFile << "authorName,biography\n";
 
-    for (auto author: authors) {
-        cout << "Saved author '" << author->getName() << "' information."<< endl;
-        authorFile << author->getAuthorID() << "," 
-                   << author->getName() << "," 
-                   << author->getBiograph() << '\n';
-    }
-    authorFile.close();
-
-    ofstream categoryFile("../data/categories.csv");
-    categoryFile.clear();
-    categoryFile << "categoryName,description\n";
-
-    for (auto category: categories) {
-        cout << "Saved '" << category->getName() << "' information." << endl;
-        categoryFile << category->getCategoryID() << "," 
-                     << category->getName() << "," 
-                     << category->getDescription() << '\n';
-    }
-    categoryFile.close();
-
-    ofstream file("../data/books.csv");
-    file.clear();
-    file << "isbn,title,authorID,categoryID,status,totalCopies,availableCopies\n";
-
-    for (auto book: books) {
-        cout << "Saved '" << book->getTitle() << "' information." << endl;
-        file << book->getFullDescription() << '\n';
-    }
-    file.close();
-
-    // ofstream loanFile("../data/loans.csv");
-    // loanFile.clear();
-    // loanFile << "loanID,isbn,memberID,borrowDate,dueDate,returnDate,loanstatus\n";
-
-    // for (auto loan: loans) {
-    //     cout << "Saved '" << loan->getLoanID() << "' information." << endl;
-    //     loanFile << loan->loanCSVFormat() << '\n';
+    // for (auto author: authors) {
+    //     cout << "Saved author '" << author->getName() << "' information."<< endl;
+    //     authorFile << author->getAuthorID() << "," 
+    //                << author->getName() << "," 
+    //                << author->getBiograph() << '\n';
     // }
-    // loanFile.close();
+    // authorFile.close();
+
+    // ofstream categoryFile("../data/categories.csv");
+    // categoryFile.clear();
+    // categoryFile << "categoryName,description\n";
+
+    // for (auto category: categories) {
+    //     cout << "Saved '" << category->getName() << "' information." << endl;
+    //     categoryFile << category->getCategoryID() << "," 
+    //                  << category->getName() << "," 
+    //                  << category->getDescription() << '\n';
+    // }
+    // categoryFile.close();
+
+    // ofstream file("../data/books.csv");
+    // file.clear();
+    // file << "isbn,title,authorID,categoryID,status,totalCopies,availableCopies\n";
+
+    // for (auto book: books) {
+    //     cout << "Saved '" << book->getTitle() << "' information." << endl;
+    //     file << book->getFullDescription() << '\n';
+    // }
+    // file.close();
+
+    ofstream loanFile("../data/loans.csv");
+    loanFile.clear();
+    loanFile << "loanID,isbn,memberID,borrowDate,dueDate,returnDate,loanstatus\n";
+
+    for (auto loan: loans) {
+        cout << "Saved '" << loan->getLoanID() << "' information." << endl;
+        loanFile << loan->loanCSVFormat() << '\n';
+    }
+    loanFile.close();
 }
 
 void LibraryManager::loadMembersFromCSV(const std::string& path) {
@@ -369,6 +369,10 @@ bool LibraryManager::addBook(const std::string& ISBN,
 
 const std::vector<Book*>& LibraryManager::getBooks() const {
     return books;
+}
+
+const std::vector<Loan*>& LibraryManager::getLoans() const {
+    return loans;
 }
 
 void LibraryManager::startLoanCheckTimer() {
