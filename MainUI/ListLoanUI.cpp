@@ -30,10 +30,53 @@ static std::string FormatYMD(const std::chrono::system_clock::time_point& tp)
 void ListLoanUI(AppState& appState)
 {
     auto& manager = LibraryManager::getInstance();
-
-    ImGui::TextUnformatted("Loans");
+    ImGui::TextUnformatted("Loans:");
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0, 6));
+
+    const float penaltyBtnW = 100.0f;
+    float curX   = ImGui::GetCursorPosX();
+    float availX = ImGui::GetContentRegionAvail().x;   // phần còn lại sau chữ "Loans"
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(curX + availX - penaltyBtnW);
+    if (ImGui::Button("Penalty", ImVec2(penaltyBtnW, 0)))
+        ImGui::OpenPopup("penalty mode");
+
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0, 6));
+
+    static char penaltyMemberId[32] = "";      
+
+    if (ImGui::BeginPopupModal("penalty mode", nullptr,
+                               ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize))
+    {
+        ImGui::TextUnformatted("Select penalty action:");
+        ImGui::Dummy(ImVec2(0, 6));
+
+        ImGui::TextUnformatted("Member ID:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(200.0f);
+        ImGui::InputTextWithHint("##pen_mid", "e.g. M001", penaltyMemberId, IM_ARRAYSIZE(penaltyMemberId));
+
+        ImGui::Dummy(ImVec2(0, 10));
+
+        const float bw = 100.0f, gap = 10.0f;
+        const float total = bw * 3.0f + gap * 2.0f;
+
+        float innerAvail = ImGui::GetContentRegionAvail().x;
+        float startPad   = (innerAvail > total) ? (innerAvail - total) * 0.5f : 0.0f;
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startPad);
+
+        if (ImGui::Button("Fine", ImVec2(bw, 0)))    {}
+        ImGui::SameLine(0, gap);
+        if (ImGui::Button("Suspend", ImVec2(bw, 0))) {}
+        ImGui::SameLine(0, gap);
+        if (ImGui::Button("Warning", ImVec2(bw, 0))) {}
+
+        ImGui::Dummy(ImVec2(0, 10));
+        if (ImGui::Button("Close", ImVec2(80, 0)))   ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
 
     ImGuiTableFlags flags =
         ImGuiTableFlags_Borders |

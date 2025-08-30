@@ -32,7 +32,7 @@ static int AppStateToIndex(AppState s, bool isLibrarian) {
 
 static AppState IndexToAppState(int idx, bool isLibrarian) {
     if (!isLibrarian) {
-        if (idx == 0) return AppState::SearchBook;   // Browse
+        if (idx == 0) return AppState::SearchBook;   
         if (idx == 1) return AppState::MemberManage;
         if (idx == 2) return AppState::Notification;
         return AppState::SearchBook;

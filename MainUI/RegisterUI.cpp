@@ -43,15 +43,15 @@ void RegisterUI(AppState &appState) {
     const float cardW      = std::clamp(availX * 0.70f, 540.0f, 760.0f);
     const float cardX      = (availX - cardW) * 0.5f;
 
-    const float desiredH   = 520.0f;                 // thấp hơn vì bỏ phần Role
+    const float desiredH   = 520.0f;                 
     float maxCardH         = std::max(420.0f, availY - topPad - bottomGap);
     float cardH            = std::min(desiredH, maxCardH);
 
     ImGui::Dummy(ImVec2(0, topPad));
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cardX);
 
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.95f, 0.96f, 0.98f, 1.0f)); // trắng ngà
-    ImGui::PushStyleColor(ImGuiCol_Border,  ImVec4(0.08f, 0.22f, 0.28f, 1.0f)); // viền đậm
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.95f, 0.96f, 0.98f, 1.0f)); 
+    ImGui::PushStyleColor(ImGuiCol_Border,  ImVec4(0.08f, 0.22f, 0.28f, 1.0f)); 
     ImGui::PushStyleColor(ImGuiCol_Text,    ImVec4(0,0,0,1));
     ImGui::PushStyleVar  (ImGuiStyleVar_ChildRounding, 14.0f);
     ImGui::PushStyleVar  (ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 20.0f));
@@ -96,13 +96,22 @@ void RegisterUI(AppState &appState) {
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar(2);
 
-        const float kHintToButtonsGap = 72.0f;
-        ImGui::Dummy(ImVec2(0, kHintToButtonsGap));
+        ImGui::Dummy(ImVec2(0, 8));
+        {
+            const char* hint = "Password must at least 8 characters!";
+            float tw = ImGui::CalcTextSize(hint).x;
+            float cx = (ImGui::GetContentRegionAvail().x - tw) * 0.5f;
+            float keepX = ImGui::GetCursorPosX();
+            ImGui::SetCursorPosX(keepX + (cx > 0 ? cx : 0));
+            ImGui::TextUnformatted(hint);
+            ImGui::SetCursorPosX(keepX);
+        }
 
+        ImGui::Dummy(ImVec2(0, 48.0f));                
         const float padX = 12.0f, gap = 12.0f, btnH = 44.0f;
         float contentW = ImGui::GetContentRegionAvail().x;
         float btnW     = (contentW - padX * 2.0f - gap) * 0.5f;
-
+ 
         ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.10f,0.35f,0.50f,1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.12f,0.46f,0.66f,1.0f));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.08f,0.30f,0.45f,1.0f));
@@ -118,8 +127,6 @@ void RegisterUI(AppState &appState) {
         ImGui::SameLine(0, gap);
         bool doRegister = ImGui::Button("Register", ImVec2(btnW, btnH));
         ImGui::PopStyleColor(4);
-
-        ImGui::Dummy(ImVec2(0, 48.0f));
 
         if (doRegister) {
             newUsername = usernameBuf;

@@ -48,7 +48,6 @@ void AddBookUI(AppState& appState)
     if (ImGui::Button("Remove", ImVec2(btnW, 0)))
         ImGui::OpenPopup("Remove Book Popup");
 
-    /* ------------------- Add Book ------------------- */
     if (ImGui::BeginPopupModal("Add Book Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::TextUnformatted("Enter Book Details:");

@@ -42,7 +42,7 @@ void LoginUI(AppState& appState)
 
     const float cardW  = std::clamp(availX * 0.70f, 540.0f, 760.0f);
     const float cardX  = (availX - cardW) * 0.5f;
-    const float wantH  = 480.0f;                    
+    const float wantH  = 520.0f;                    
     const float maxH   = std::max(360.0f, availY - topPad - bottomGap);
     const float cardH  = std::min(wantH, maxH);
 

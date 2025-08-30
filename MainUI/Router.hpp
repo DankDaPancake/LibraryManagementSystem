@@ -7,9 +7,9 @@ void RenderUI(AppState& appState) {
     else if (appState == AppState::SearchBook)   SearchBookUI(appState);
     else if (appState == AppState::BorrowBook)   BorrowBookUI(appState);
     else if (appState == AppState::ListMember)   ListMemberUI(appState);
-    else if (appState == AppState::ListLoan)   ListLoanUI(appState);
-    else if (appState == AppState::MemberManage)   MemberManageUI(appState);
+    else if (appState == AppState::ListLoan)     ListLoanUI(appState);
+    else if (appState == AppState::MemberManage) MemberManageUI(appState);
     else if (appState == AppState::AddBook)      AddBookUI(appState);
-    else if (appState == AppState::Notification)      NotificationUI(appState);
+    else if (appState == AppState::Notification) NotificationUI(appState);
 }
 
