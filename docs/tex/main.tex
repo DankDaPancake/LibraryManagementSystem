@@ -19,8 +19,8 @@
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{hyperref}
-\usepackage{csquotes}
 \usepackage{array}
+\usepackage{multirow}
 \hypersetup{
 colorlinks=true,
 linkcolor=black,
@@ -37,10 +37,13 @@ total={170mm,257mm},
 left=20mm,
 top=20mm,
 }
+\setlength{\headheight}{27.78131pt}
+\addtolength{\topmargin}{-3.78131pt}
 \usepackage{lipsum}
 \usepackage{multicol}
 \usepackage[svgnames,table]{xcolor}
 \usepackage{minted}
+\usepackage{csquotes}
 \definecolor{LightGray}{gray}{0.9}
 \usepackage{amsmath}
 \begin{document}
@@ -49,6 +52,9 @@ top=20mm,
 \include{header_footer}
 
 %Thông tin nhóm
+\include{CHAPTER/information}
+\newpage
+
 \include{CHAPTER/introduction}
 \newpage
 

@@ -1,0 +1,251 @@
+\section*{Group Introduction}
+
+\subsection*{Group details:}
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt} % Giảm khoảng cách giữa các cột để tiết kiệm không gian
+		\rowcolors{2}{gray!15}{white}
+		\resizebox{\textwidth}{!}{ % Tự động co bảng vừa chiều rộng trang
+			\begin{tabular}{|c|l|l|l|}
+				\hline
+				\rowcolor{gray!30}
+				\textbf{ID} & \textbf{Full name} & \textbf{Email}               & \textbf{Roles}            \\
+				\hline
+				24127104    & Du Hoai Phuc       & dhphuc2424@clc.fitus.edu.vn  & Backend Developer, Leader \\
+				24127272    & Ly Huynh Minh Dang & lhmdang2404@clc.fitus.edu.vn & Backend Developer         \\
+				24127347    & Ta Duc Dung        & tddung2426@clc.fitus.edu.vn  & UI/UX Developer           \\
+				24127163    & Nguyen Son Hai     & nshai2431@clc.fitus.edu.vn   & Designer, Report Writing  \\
+				\hline
+			\end{tabular}}
+		\caption{Group details}
+	\end{table}
+\end{center}
+
+\subsection*{Presentation Video}
+This is the link to our team's demo gameplay video: \newline
+\href{https://drive.google.com/file/d/1u-jRM0ugusIxY0lzi2Ym1pQjp-EEtaHl/view?usp=sharing}{https://drive.google.com/file/d/1u-jRM0ugusIxY0lzi2Ym1pQjp-EEtaHl/view?usp=sharing}
+
+\subsection*{Source Code (In Github)}
+This is the link to our team's source code:
+\href{https://github.com/nightshade94/Knight-Prequel}{https://github.com/nightshade94/Knight-Prequel}
+
+
+\subsection*{Project Requirements Overview}
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+		% Lưu ý: \rowcolors không hiển thị đẹp với \multirow, nên tạm thời không dùng cho bảng này
+
+		% Sử dụng tabularx và thay đổi cột cuối thành 'c' (center) cho phù hợp
+		\begin{tabularx}{\textwidth}{| c | X | c |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Group} & \textbf{Requirement}                                              & \textbf{Progress} \\
+			\hline
+
+			\textbf{Problem Statement}
+			               & Library Management System                                         & 100\%             \\
+			% \cline{2-3} % Vẽ đường kẻ cho cột 2 và 3
+			\hline
+
+			% \multirow{3}{*}{...} gộp 3 hàng tiếp theo lại làm một
+			\multirow{3}{*}{\parbox{4cm}{\centering\textbf{Programming \& Design Requirements}}}
+			               & Programming Language                                              & C++               \\
+			\cline{2-3}
+			               & Object-Oriented Principles                                        & 4/4 principles    \\
+			\cline{2-3}
+			               & Design Patterns                                                   & 5/2 patterns      \\
+			\hline
+
+			\multirow{3}{*}{\parbox{4cm}{\centering\textbf{User Interface Requirements}}}
+			               & Friendly, clearly formatted, and fully interactive user interface & 100\%             \\
+			\cline{2-3}
+			               & Console-based UI requirements                                     & 100\%             \\
+			\cline{2-3}
+			               & GUI frameworks                                                    & ImGUI             \\
+			\cline{2-3}
+			\hline
+		\end{tabularx}
+
+		\caption{Project Requirements table}
+	\end{table}
+\end{center}
+
+\newpage
+
+\subsection*{Individual Contributions}
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+		% Lưu ý: \rowcolors không hiển thị đẹp với \multirow, nên tạm thời không dùng cho bảng này
+
+		% Sử dụng tabularx và thay đổi cột cuối thành 'c' (center) cho phù hợp
+		\begin{tabularx}{\textwidth}{| c | l | X |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Name} & \textbf{Contribution}       & \textbf{Detail}                                       \\
+			\hline
+
+			% Du Hoai Phuc - Team Leader & Core Architecture
+			\multirow{7}{*}{\parbox{3.5cm}{\centering\textbf{Du Hoai Phuc}                                      \\ \small{(Team Leader \& Core Architecture)}}}
+			              & Core Classes Design         & User, Member, Librarian, Book, Author, Category, Loan \\
+			\cline{2-3}
+			              & Polymorphism Implementation & Virtual functions, runtime behavior selection         \\
+			\cline{2-3}
+			              & Project Coordination        & Timeline management, code integration                 \\
+			\cline{2-3}
+			              & Design Patterns Architect   & Observer, Strategy, Decorator patterns                \\
+			\cline{2-3}
+			              & User Experience Design      & System workflow and interaction design                \\
+			\hline
+
+			% Ly Huynh Minh Dang - Backend Systems Developer
+			\multirow{8}{*}{\parbox{3.5cm}{\centering\textbf{Ly Huynh Minh Dang}                                \\ \small{(Backend Systems Developer)}}}
+			              & Data Persistence            & CSV-based storage with CSVHandler utility             \\
+			\cline{2-3}
+			              & Library Management Services & LibraryManager singleton implementation               \\
+			\cline{2-3}
+			              & Loan Management             & Borrowing/returning system with fine calculation      \\
+			\cline{2-3}
+			              & Business Logic              & Core operations and member status management          \\
+			\cline{2-3}
+			              & Input Validation            & Form validation and error handling                    \\
+			\hline
+
+			% Ta Duc Dung - UI/UX Developer
+			\multirow{5}{*}{\parbox{3.5cm}{\centering\textbf{Ta Duc Dung}                                       \\ \small{(UI/UX Developer)}}}
+			              & GUI Implementation          & Complete ImGui-based interface                        \\
+			\cline{2-3}
+			              & Authentication System       & Login/logout with password validation                 \\
+			\cline{2-3}
+			              & Visual Design               & Consistent styling and layout                         \\
+			\cline{2-3}
+			              & Responsive Interface        & Smooth navigation and interaction                     \\
+			\cline{2-3}
+			              & User Experience Design      & Intuitive menu systems                                \\
+			\hline
+
+			% Nguyen Son Hai - Designer & Tester
+			\multirow{4}{*}{\parbox{3.5cm}{\centering\textbf{Nguyen Son Hai}                                    \\ \small{(Designer \& Tester)}}}
+			              & Slide Maker                 & Presentation materials and diagrams                   \\
+			\cline{2-3}
+			              & Report Writing              & Technical documentation                               \\
+			\cline{2-3}
+			%  & Encapsulation Implementation & Data validation and access control \\
+			% \cline{2-3}
+			%  & Inheritance Hierarchy & User base class with derived classes \\
+			% \cline{2-3}
+			              & Tester                      & System testing and quality assurance                  \\
+			\hline
+		\end{tabularx}
+		\caption{Individual Contributions}
+	\end{table}
+\end{center}
+
+\newpage
+
+\subsection*{Self-evaluation}
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+
+		\begin{tabularx}{\textwidth}{| c | X | c |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Group} & \textbf{Requirement}                                                               & \textbf{Progress} \\
+			\hline
+
+			\textbf{Problem Statement}
+			               & Library Management System                                                          & 100\%             \\
+			\hline
+
+			\multirow{5}{*}{\parbox{4cm}{\centering\textbf{OOP Principles Implementation}}}
+			               & Encapsulation - All classes have private members with controlled public interfaces & 10/10             \\
+			\cline{2-3}
+			               & Inheritance - Clear inheritance hierarchy with User base class                     & 10/10             \\
+			\cline{2-3}
+			               & Polymorphism - Virtual functions, interface implementations                        & 10/10             \\
+			\cline{2-3}
+			               & Abstraction - Abstract interfaces for strategies and observers                     & 10/10             \\
+			\cline{2-3}
+			               & \textbf{Overall OOP Implementation}                                                & \textbf{10/10}    \\
+			\hline
+
+			\multirow{7}{*}{\parbox{4cm}{\centering\textbf{Design Patterns}}}
+			               & Singleton Pattern - Thread-safe LibraryManager instance management                 & 10/10             \\
+			\cline{2-3}
+			               & Facade Pattern - LibraryManager as unified subsystem interface                     & 10/10             \\
+			\cline{2-3}
+			               & Observer Pattern - Book and loan status notifications                              & 10/10             \\
+			\cline{2-3}
+			               & Strategy Pattern - Search algorithms and penalty systems                           & 10/10             \\
+			\cline{2-3}
+			               & Decorator Pattern - Enhanced book information display                              & 10/10             \\
+			\cline{2-3}
+			               & \textbf{Total Patterns Implemented}                                                & \textbf{5/2}      \\
+			\hline
+
+			\multirow{6}{*}{\parbox{4cm}{\centering\textbf{User Interface Requirements}}}
+			               & GUI Framework Implementation                                                       & ImGui 10/10       \\
+			\cline{2-3}
+			               & Menu Navigation - Multi-level menu with clear structure                            & 10/10             \\
+			\cline{2-3}
+			               & User Input Handling - Structured data input with validation                        & 10/10             \\
+			\cline{2-3}
+			               & Output Formatting - Clear display with proper formatting                           & 10/10             \\
+			\cline{2-3}
+			               & Error Handling - Smooth interaction with error checking                            & 10/10             \\
+			\cline{2-3}
+			               & Overall User Interface                                                             & 10/10             \\
+			\hline
+		\end{tabularx}
+	\end{table}
+\end{center}
+
+\newpage
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+
+		\begin{tabularx}{\textwidth}{| c | X | c |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Group} & \textbf{Requirement}                                                & \textbf{Progress} \\
+			\hline
+
+
+
+			\multirow{5}{*}{\parbox{4cm}{\centering\textbf{Technical Implementation}}}
+			               & Programming Language - Modern C++ features and best practices       & 10/10             \\
+			\cline{2-3}
+			               & Code Quality - Clean architecture, proper memory management         & 10/10             \\
+			\cline{2-3}
+			               & Modularity - Clear separation of concerns with layered architecture & 10/10             \\
+			\cline{2-3}
+			               & Data Persistence - CSV-based storage with automatic loading/saving  & 10/10             \\
+			\cline{2-3}
+			               & Overall Technical Implementation                                    & 10/10             \\
+			\hline
+
+			\multirow{4}{*}{\parbox{4cm}{\centering\textbf{Documentation \& Testing}}}
+			               & Code Documentation - Comprehensive comments and class documentation & 10/10             \\
+			\cline{2-3}
+			               & System Testing - Manual testing performed                           & 10/10             \\
+			\cline{2-3}
+			               & User Manual - Clear usage instructions and examples                 & 10/10             \\
+			\cline{2-3}
+			               & Overall Documentation \& Testing                                    & 10/10             \\
+			\hline
+			\textbf{Overall Project Completion}
+			               & Core requirements met with excellent implementation                 & \textbf{100/100}  \\
+			\hline
+		\end{tabularx}
+
+		\caption{Self-Evaluation Overview}
+	\end{table}
+\end{center}

@@ -1,0 +1,42 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{5}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Project Overview}{5}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Goals and Objectives}{5}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Scope of the Project}{6}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1}In Scope}{6}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2}Out of Scope}{6}{subsubsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.4}Report Organization}{6}{subsection.1.4}%
+\contentsline {section}{\numberline {2}System Analysis and Design}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Functional Requirements}{7}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}System Architecture}{7}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}UML Class Diagram}{8}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Implementation and Object-Oriented Principles}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Encapsulation}{9}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Inheritance}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Polymorphism}{10}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Abstraction}{10}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Software Design Patterns}{12}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Singleton Pattern}{12}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}Purpose}{12}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}Implementation}{12}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}Observer Pattern}{12}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Purpose}{12}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Implementation}{12}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.3}Strategy Pattern}{13}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Purpose}{13}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Implementation}{13}{subsubsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.4}Decorator Pattern}{14}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Purpose}{14}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Implementation}{14}{subsubsection.4.4.2}%
+\contentsline {section}{\numberline {5}Application Walkthrough and Usage}{16}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Registering a New Member}{16}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Borrowing a Book}{16}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Returning a Book}{17}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}User Interface Showcase}{18}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Conclusion}{20}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Challenges Faced During Development}{20}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Future Enhancements}{20}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Project Summary and Team Evaluation}{22}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Member Contributions and Task Allocation}{22}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Development Workflow and Collaboration}{22}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Key Challenges and Resolutions}{23}{subsection.7.3}%
