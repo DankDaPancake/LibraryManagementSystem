@@ -1,0 +1,51 @@
+\section{Application Walkthrough and Usage}
+\label{sec:walkthrough}
+
+This section demonstrates the system in action by walking through its primary use cases. For each key feature, we provide a description of the user interaction, a UML Sequence Diagram to illustrate the technical flow of method calls between objects, and screenshots to showcase the console-based user interface.
+
+\subsection{Registering a New Member}
+A new user interacts with the system to create a member account. The user selects the registration option from the main menu and provides the required credentials (username and password). The system then validates the input and creates a new member record, assigning a unique Member ID. The sequence of object interactions for this process is detailed in Figure \ref{fig:seq_register}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sequence_register.png}
+    \caption{Sequence Diagram for New Member Registration.}
+    \label{fig:seq_register}
+\end{figure}
+
+\subsection{Borrowing a Book}
+A logged-in member can borrow a book from the library. The typical flow involves the member searching for a book and then selecting the "borrow" option, providing the book's ISBN. The system validates that the book is available, checks the member's borrowing eligibility, creates a new loan record, and finally updates the book's status. This workflow is visualized in Figure \ref{fig:seq_borrow}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sequence_borrow.png}
+    \caption{Sequence Diagram for Borrowing a Book.}
+    \label{fig:seq_borrow}
+\end{figure}
+
+\subsection{Returning a Book}
+When a member returns a book, they select the return option and provide the book's ISBN. The system finds the corresponding active loan record, updates its status to "returned," records the return date, and increments the number of available copies for that book. Figure \ref{fig:seq_return} illustrates the object interactions for this process.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/sequence_return.png}
+    \caption{Sequence Diagram for Returning a Book.}
+    \label{fig:seq_return}
+\end{figure}
+
+\subsection{User Interface Showcase}
+The following screenshots provide a glimpse into the application's interactive console-based user interface, demonstrating its clarity and ease of use.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/screenshot_main_menu.png}
+    \caption{The main menu provides clear options for the user.}
+    \label{fig:ss_main_menu}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/screenshot_search_result.png}
+    \caption{An example of a book search result display.}
+    \label{fig:ss_search}
+\end{figure}
