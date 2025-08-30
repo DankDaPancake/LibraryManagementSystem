@@ -56,3 +56,13 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp 
+
+# Latex build files
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.log
+*.out
+*.toc
+*.bcf
