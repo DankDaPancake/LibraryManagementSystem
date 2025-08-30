@@ -1041,7 +1041,6 @@ classDiagram
     %% Relationships
     StringHandler ..> Book : processes
 ```
-```
 
 ### OOP Principles Demonstration
 
