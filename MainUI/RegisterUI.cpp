@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 
+// Stripe focus cho input (giữ nguyên)
 static void DrawFocusStripe(float pad_y, float thickness, ImU32 col, float dash = 8.0f, float gap = 5.0f) {
     ImDrawList* dl = ImGui::GetWindowDrawList();
     ImVec2 a = ImGui::GetItemRectMin();
@@ -33,31 +34,33 @@ void RegisterUI(AppState &appState) {
     static bool        registerFailed  = false;
     static char usernameBuf[64] = "";
     static char passwordBuf[64] = "";
-    static int  roleIndex = 0; 
 
     if (!ImGui::Begin("LMS/Register", nullptr, flags)) { ImGui::End(); return; }
 
+    // Kích thước/định vị card (giữ bố cục)
     const float topPad     = 36.0f;
-    const float bottomGap  = 110.0f;              
+    const float bottomGap  = 110.0f;
     const float availX     = ImGui::GetContentRegionAvail().x;
     const float availY     = ImGui::GetContentRegionAvail().y;
     const float cardW      = std::clamp(availX * 0.70f, 540.0f, 760.0f);
     const float cardX      = (availX - cardW) * 0.5f;
 
-    const float desiredH   = 580.0f; 
+    const float desiredH   = 520.0f;                 // thấp hơn vì bỏ phần Role
     float maxCardH         = std::max(420.0f, availY - topPad - bottomGap);
     float cardH            = std::min(desiredH, maxCardH);
 
     ImGui::Dummy(ImVec2(0, topPad));
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cardX);
 
+    // Card style
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.95f, 0.96f, 0.98f, 1.0f)); // trắng ngà
     ImGui::PushStyleColor(ImGuiCol_Border,  ImVec4(0.08f, 0.22f, 0.28f, 1.0f)); // viền đậm
     ImGui::PushStyleColor(ImGuiCol_Text,    ImVec4(0,0,0,1));
     ImGui::PushStyleVar  (ImGuiStyleVar_ChildRounding, 14.0f);
     ImGui::PushStyleVar  (ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 20.0f));
 
-    if (ImGui::BeginChild("register_card", ImVec2(cardW, cardH), true /*border*/, ImGuiWindowFlags_NoScrollbar)) {
+    if (ImGui::BeginChild("register_card", ImVec2(cardW, cardH), true, ImGuiWindowFlags_NoScrollbar)) {
+        // Header
         ImGui::Dummy(ImVec2(0, 6));
         float s = ImGui::GetFont()->Scale;
         ImGui::GetFont()->Scale = s * 1.35f; ImGui::PushFont(ImGui::GetFont());
@@ -69,6 +72,7 @@ void RegisterUI(AppState &appState) {
         ImGui::Separator();
         ImGui::Dummy(ImVec2(0, 6));
 
+        // Inputs (stripe focus như login)
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_FrameBg,        ImVec4(1,1,1,1));
@@ -76,15 +80,18 @@ void RegisterUI(AppState &appState) {
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  ImVec4(0.93f,0.97f,1.0f,1.0f));
         ImGui::PushStyleColor(ImGuiCol_Border,         ImVec4(0.12f,0.44f,0.66f,1.0f));
 
+        // Username
         ImGui::TextUnformatted("New Username");
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText("##reg_user", usernameBuf, IM_ARRAYSIZE(usernameBuf));
         if (ImGui::IsItemHovered())
-            DrawFocusStripe(4.0f, 3.0f, IM_COL32(60, 140, 200, 180));     
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(60, 140, 200, 180));
         if (ImGui::IsItemActive())
-            DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));     
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));
 
         ImGui::Dummy(ImVec2(0, 10));
+
+        // Password
         ImGui::TextUnformatted("New Password");
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText("##reg_pass", passwordBuf, IM_ARRAYSIZE(passwordBuf), ImGuiInputTextFlags_Password);
@@ -93,20 +100,11 @@ void RegisterUI(AppState &appState) {
         if (ImGui::IsItemActive())
             DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));
 
-        ImGui::Dummy(ImVec2(0, 10));
-        ImGui::TextUnformatted("Role");
-        ImGui::SetNextItemWidth(-FLT_MIN);
-        ImGui::PushStyleColor(ImGuiCol_PopupBg,       ImVec4(1,1,1,1));
-        ImGui::PushStyleColor(ImGuiCol_Header,        ImVec4(0.86f,0.93f,1.00f,1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.82f,0.90f,1.00f,1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive,  ImVec4(0.74f,0.84f,1.00f,1.0f));
-        const char* roleNames[] = { "MEMBER", "LIBRARIAN" };
-        ImGui::Combo("##role_combo", &roleIndex, roleNames, IM_ARRAYSIZE(roleNames));
+        // Kết thúc block input styles
         ImGui::PopStyleColor(4);
-
-        ImGui::PopStyleColor(4); 
         ImGui::PopStyleVar(2);
 
+        // Hint
         ImGui::Dummy(ImVec2(0, 8));
         {
             const char* hint = "Already have an account? Use \"Sign in\" button below!";
@@ -121,6 +119,7 @@ void RegisterUI(AppState &appState) {
         const float kHintToButtonsGap = 72.0f;
         ImGui::Dummy(ImVec2(0, kHintToButtonsGap));
 
+        // Buttons
         const float padX = 12.0f, gap = 12.0f, btnH = 44.0f;
         float contentW = ImGui::GetContentRegionAvail().x;
         float btnW     = (contentW - padX * 2.0f - gap) * 0.5f;
@@ -146,7 +145,9 @@ void RegisterUI(AppState &appState) {
         if (doRegister) {
             newUsername = usernameBuf;
             newPassword = passwordBuf;
-            Role chosenRole = (roleIndex == 1) ? Role::LIBRARIAN : Role::MEMBER;
+
+            // Không cho chọn role -> mặc định MEMBER
+            Role chosenRole = Role::MEMBER;
 
             AuthenticateManager auth;
             if (auth.registerUser(newUsername, newPassword, chosenRole)) {
@@ -169,7 +170,7 @@ void RegisterUI(AppState &appState) {
     }
     ImGui::EndChild();
 
-    ImGui::PopStyleVar(2);   
-    ImGui::PopStyleColor(3); 
+    ImGui::PopStyleVar(2);   // WindowPadding, ChildRounding
+    ImGui::PopStyleColor(3); // ChildBg, Border, Text
     ImGui::End();
 }
