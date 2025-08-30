@@ -31,18 +31,18 @@
 - **Encapsulation Implementation**: Ensured proper data hiding and controlled access across all core classes
 
 #### Member 2 - Design Patterns Architect  
-- **Observer Pattern**: Implemented complete notification system with BookSubject, LoanSubject, MemberObserver, and LibrarianObserver
-- **Strategy Pattern**: Developed flexible search algorithms (TitleSearchStrategy, AuthorSearchStrategy, CategorySearchStrategy) and penalty systems (FinePenaltyStrategy, SuspendPenaltyStrategy, WarningPenaltyStrategy)
+- **Observer Pattern**: Implemented notification system with BookSubject, LoanSubject, MemberObserver, and LibrarianObserver
+- **Strategy Pattern**: Developed search algorithms (TitleSearchStrategy, AuthorSearchStrategy, CategorySearchStrategy) and penalty systems (FinePenaltyStrategy, SuspendPenaltyStrategy, WarningPenaltyStrategy)
 - **Decorator Pattern**: Created book enhancement system with DifficultyLabelDecorator, SpecialTagDecorator, and AdditionalInfoDecorator
-- **Pattern Integration**: Ensured seamless interaction between different design patterns
+- **Pattern Integration**: Ensured interaction between different design patterns
 - **Polymorphism Implementation**: Utilized virtual functions and interfaces for runtime behavior selection
 
 #### Member 3 - Backend Systems Developer
 - **Library Management Services**: Implemented LibraryManager class with singleton pattern for centralized operations
 - **Authentication System**: Developed basic login/logout functionality with simple password validation
-- **Loan Management**: Created comprehensive borrowing and returning system with automatic fine calculation
+- **Loan Management**: Created borrowing and returning system with basic fine calculation
 - **Business Logic**: Implemented core library operations including book availability tracking and member status management
-- **Notification Service**: Developed automated notification system for overdue books and member alerts
+- **Notification Service**: Developed basic notification system for overdue books and member alerts
 
 #### Member 4 - User Interface Developer
 - **GUI Implementation**: Developed complete ImGui-based user interface with multiple screens and navigation
@@ -302,7 +302,6 @@ classDiagram
         +getCategoryID() string
         +getName() string
         +getDescription() string
-        +setDescription(desc) void
     }
 
     class Loan {
@@ -398,12 +397,10 @@ classDiagram
     }
 
     class NotificationService {
-        -vector~IObserver*~ globalObservers
-        +getInstance() NotificationService
-        +registerObserver(observer) void
-        +removeObserver(observer) void
-        +notifyAll(message, book, loan) void
-        +logSystemNotification(message) void
+        -LibraryManager* libraryManager
+        +sendDueSoonNotifications() void
+        +checkAndNotifyDueLoans() void
+        +sendReservationAvailableNotifications() void
     }
 
     ISubject <|-- BookSubject : implements
@@ -493,26 +490,19 @@ classDiagram
 
     class IPenaltyStrategy {
         <<interface>>
-        +applyPenalty(member, loan, overdueDays) void*
-        +calculateFine(overdueDays) double*
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class FinePenaltyStrategy {
-        -DAILY_FINE_RATE double
-        +applyPenalty(member, loan, overdueDays) void
-        +calculateFine(overdueDays) double
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class SuspendPenaltyStrategy {
-        -SUSPENSION_THRESHOLD int
-        +applyPenalty(member, loan, overdueDays) void
-        +calculateFine(overdueDays) double
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class WarningPenaltyStrategy {
-        -MAX_WARNINGS int
-        +applyPenalty(member, loan, overdueDays) void
-        +calculateFine(overdueDays) double
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class LibraryManager {
@@ -562,34 +552,20 @@ classDiagram
     class BookDecorator {
         <<abstract>>
         #shared_ptr~Book~ decoratedBook
-        #string decoratorType
-        +BookDecorator(book, type)
-        +getISBN() string
-        +getTitle() string
-        +getAuthor() Author
-        +getCategory() Category
-        +getPublicationYear() string
-        +isAvailable() bool
+        +BookDecorator(book)
         +getFullDescription() string
-        +virtual getDecoratorEnhancement() string*
-        +getDecoratorType() string
-        #safeDelegate(accessor, defaultValue) ReturnType
     }
 
     class DifficultyLabelDecorator {
-        -string difficultyLevel
-        +DifficultyLabelDecorator(book, difficulty)
-        +getDecoratorEnhancement() string
-        -assessDifficulty(book) string
+        -string difficultyLabel
+        +DifficultyLabelDecorator(book, label)
+        +getFullDescription() string
     }
 
     class SpecialTagDecorator {
         -vector~string~ tags
         +SpecialTagDecorator(book, tagList)
-        +getDecoratorEnhancement() string
-        +addTag(tag) void
-        +removeTag(tag) void
-        -formatTags() string
+        +getFullDescription() string
     }
 
     class AdditionalInfoDecorator {
@@ -699,25 +675,19 @@ classDiagram
 
     class IPenaltyStrategy {
         <<interface>>
-        +applyPenalty(member, loan, overdueDays) void
-        +getPenaltyDescription() string
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class FinePenaltyStrategy {
-        -DAILY_FINE_RATE double
-        +applyPenalty(member, loan, overdueDays) void
-        +getPenaltyDescription() string
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class SuspendPenaltyStrategy {
-        -suspensionDays int
-        +applyPenalty(member, loan, overdueDays) void
-        +getPenaltyDescription() string
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     class WarningPenaltyStrategy {
-        +applyPenalty(member, loan, overdueDays) void
-        +getPenaltyDescription() string
+        +applyPenalty(member, loan, daysOverdue) void
     }
 
     %% Decorator Pattern
@@ -840,8 +810,8 @@ classDiagram
         +processOverdueLoans() void
         +generateReports() void
         +sendNotifications() void
-        +startTimerThread() void
-        +stopTimerThread() void
+        +startLoanCheckTimer() void
+        +stopLoanCheckTimer() void
     }
     
     class Librarian {
@@ -926,28 +896,10 @@ classDiagram
 ```mermaid
 classDiagram
     class AuthenticateManager {
-        -LibraryManager* libraryManager
-        -map~string, User*~ activeUsers
-        -map~string, time_t~ loginAttempts
-        -int MAX_LOGIN_ATTEMPTS$ = 3
-        -int LOCKOUT_DURATION$ = 900
-        +AuthenticateManager(manager : LibraryManager*)
-        +authenticateUser(userID : string, password : string) User*
-        +registerMember(userID : string, name : string, password : string, email : string, phoneNumber : string) bool
-        +registerLibrarian(userID : string, name : string, password : string, email : string, phoneNumber : string, employeeID : string) bool
-        +loginUser(user : User*) void
-        +logoutUser(userID : string) void
-        +isUserLoggedIn(userID : string) bool
-        +getCurrentUser(userID : string) User*
-        +changePassword(userID : string, oldPassword : string, newPassword : string) bool
-        +resetPassword(userID : string, newPassword : string) bool
-        +isAccountLocked(userID : string) bool
-        +unlockAccount(userID : string) void
-        +validateUserID(userID : string) bool
-        +validatePassword(password : string) bool
-        +validateEmail(email : string) bool
-        +isUserIDTaken(userID : string) bool
-        +getAllRegisteredUsers() vector~User*~
+        +registerUser(userName : string, password : string, role : Role) bool
+        +loginUser(userName : string, password : string) User*
+        +logoutUser() void
+    }
         +deactivateUser(userID : string) void
         +activateUser(userID : string) void
     }
@@ -998,75 +950,12 @@ classDiagram
 classDiagram
     class CSVHandler {
         <<utility>>
-        +loadBooks(filename : string)$ vector~Book*~
-        +saveBooks(filename : string, books : vector~Book*~)$ void
-        +loadMembers(filename : string)$ vector~Member*~
-        +saveMembers(filename : string, members : vector~Member*~)$ void
-        +loadLibrarians(filename : string)$ vector~Librarian*~
-        +saveLibrarians(filename : string, librarians : vector~Librarian*~)$ void
-        +loadLoans(filename : string)$ vector~Loan*~
-        +saveLoans(filename : string, loans : vector~Loan*~)$ void
-        +loadAuthors(filename : string)$ vector~Author*~
-        +saveAuthors(filename : string, authors : vector~Author*~)$ void
-        +loadCategories(filename : string)$ vector~Category*~
-        +saveCategories(filename : string, categories : vector~Category*~)$ void
         +parseCSVLine(line : string)$ vector~string~
-        +formatCSVField(field : string)$ string
-        +fileExists(filename : string)$ bool
-        +createBackup(filename : string)$ void
-        +validateDataIntegrity(filename : string)$ bool
-        +exportToJSON(csvFile : string, jsonFile : string)$ void
-        +importFromJSON(jsonFile : string, csvFile : string)$ void
-        +generateReport(reportType : string, outputFile : string)$ void
+        +userExists(userID : string, fileName : string)$ bool
+        +validateCredentials(userName : string, password : string, fileName : string)$ string
+        +addUser(userID : string, userName : string, password : string, fileName : string)$ bool
+        +generateUserID(prefix : string)$ string
     }
-    
-    class Book {
-        -string ISBN
-        -string title
-        -string author
-        -bool isAvailable
-    }
-    
-    class Member {
-        -string memberID
-        -string name
-        -string email
-        -string phoneNumber
-    }
-    
-    class Librarian {
-        -string librarianID
-        -string name
-        -string employeeID
-    }
-    
-    class Loan {
-        -string loanID
-        -string memberID
-        -string ISBN
-        -Date borrowDate
-        -Date dueDate
-    }
-    
-    class Author {
-        -string authorID
-        -string name
-        -string biography
-    }
-    
-    class Category {
-        -string categoryID
-        -string name
-        -string description
-    }
-    
-    %% Relationships
-    CSVHandler ..> Book : serializes/deserializes
-    CSVHandler ..> Member : serializes/deserializes
-    CSVHandler ..> Librarian : serializes/deserializes
-    CSVHandler ..> Loan : serializes/deserializes
-    CSVHandler ..> Author : serializes/deserializes
-    CSVHandler ..> Category : serializes/deserializes
 ```
 
 ##### Notification Service
@@ -1075,48 +964,50 @@ classDiagram
 classDiagram
     class NotificationService {
         -LibraryManager* libraryManager
-        -vector~string~ notificationQueue
-        -mutex notificationMutex
-        +NotificationService()
         +sendDueSoonNotifications() void
         +checkAndNotifyDueLoans() void
         +sendReservationAvailableNotifications() void
-        +sendBookAddedNotification(book : Book*) void
-        +sendBookRemovedNotification(ISBN : string) void
-        +sendMembershipExpiryNotification(member : Member*) void
-        +addToQueue(notification : string) void
-        +processNotificationQueue() void
-        +clearQueue() void
-        +setNotificationPreferences(userID : string, preferences : map~string, bool~) void
-        +getNotificationPreferences(userID : string) map~string, bool~
-        +formatNotificationMessage(template : string, variables : map~string, string~) string
-        +logNotification(message : string, userID : string) void
-        +getNotificationHistory(userID : string) vector~string~
     }
     
     class LibraryManager {
         <<singleton>>
         +getInstance() LibraryManager&
-        +getOverdueLoans() vector~Loan*~
-        +getAllMembers() vector~Member*~
     }
     
     class Book {
         -string ISBN
         -string title
-        -string author
+        -Author author
+        -Category category
+        -BookStatus status
+        -int totalCopies
+        -int availableCopies
         +getISBN() string
         +getTitle() string
+        +getAuthor() Author
+        +getCategory() Category
+        +getStatus() BookStatus
+        +isAvailable() bool
+        +getFullDescription() string
     }
     
     class Member {
-        -string memberID
-        -string name
-        -string email
-        -Date membershipExpiry
-        +getMemberID() string
-        +getName() string
-        +getEmail() string
+        -Date membershipDate
+        -vector~Book*~ borrowedBooks
+        -int warningCount
+        -bool suspended
+        -time_t suspensionEndDate
+        -double totalFines
+        +getMembershipDate() Date
+        +getBorrowedBooks() vector~Book*~
+        +borrowBook(ISBN : string) bool
+        +returnBook(ISBN : string) bool
+        +addWarning() void
+        +getWarningCount() int
+        +isSuspended() bool
+        +addFine(amount : double) void
+        +getTotalFines() double
+        +payFine(amount : double) void
     }
     
     class Loan {
@@ -1162,38 +1053,11 @@ classDiagram
         +containsIgnoreCase(text : string, search : string)$ bool
         +calculateSimilarity(str1 : string, str2 : string)$ double
         +extractKeywords(text : string)$ vector~string~
-    }
-    
-    class Date {
-        -int year
-        -int month
-        -int day
-        +Date()
-        +Date(year : int, month : int, day : int)
-        +Date(dateString : string)
-        +getYear() int
-        +getMonth() int
-        +getDay() int
-        +addDays(days : int) Date
-        +subtractDays(days : int) Date
-        +daysBetween(other : Date) int
-        +isValid() bool
-        +isLeapYear() bool
-        +operator==(other : Date) bool
-        +operator!=(other : Date) bool
-        +operator<(other : Date) bool
-        +operator>(other : Date) bool
-        +operator<=(other : Date) bool
-        +operator>=(other : Date) bool
-        +toString() string
-        +toFormattedString(format : string) string
-        +getCurrentDate()$ Date
-        +isValidDate(year : int, month : int, day : int)$ bool
-        +getDaysInMonth(year : int, month : int)$ int
-    }
-    
+```
+
     %% Relationships
-    StringHandler ..> Date : formats
+    StringHandler ..> Book : processes
+```
 ```
 
 ### OOP Principles Demonstration
@@ -1294,48 +1158,69 @@ classDiagram
 classDiagram
     class User {
         <<abstract>>
-        #string userID
-        #string name
-        #string email
-        #string phoneNumber
-        #string hashedPassword
-        +User(userID : string, userName : string, password : string)
+        -string userID
+        -string userName
+        -string password
+        -Role role
+        +User()
+        +User(name : string, r : Role)
+        +User(userID : string, userName : string, password : string, role : Role)
         +getUserID() string
-        +getName() string
-        +authenticate(password : string) bool
-        +getUserType()* string
+        +getUserName() string
+        +getRole() Role
+        +viewProfile() void
     }
     
     class Member {
-        -vector~Loan*~ currentLoans
-        -double fineAmount
+        -Date membershipDate
+        -vector~Book*~ borrowedBooks
+        -int warningCount
+        -bool suspended
+        -time_t suspensionEndDate
+        -double totalFines
         +Member(userID : string, userName : string, password : string)
-        +getUserType() string
+        +getMembershipDate() Date
+        +getBorrowedBooks() vector~Book*~
         +borrowBook(ISBN : string) bool
+        +returnBook(ISBN : string) bool
+        +addWarning() void
+        +getWarningCount() int
+        +isSuspended() bool
+        +addFine(amount : double) void
+        +getTotalFines() double
         +payFine(amount : double) void
-        +getCurrentLoans() vector~Loan*~
-        +getFineAmount() double
     }
     
     class Librarian {
-        -string employeeID
-        -string department
         +Librarian(userID : string, userName : string, password : string)
-        +getUserType() string
         +addBook(book : Book*) void
         +removeBook(ISBN : string) void
+        +updateBookInfo(book : Book*) void
+        +manageMemberInfo(member : Member*) void
         +viewAllLoans() vector~Loan*~
-        +generateReport() void
     }
     
     class Loan {
         -string loanID
-        -string memberID
         -string bookISBN
+        -string memberID
         -Date borrowDate
         -Date dueDate
+        -Date returnDate
+        -LoanStatus status
+        +getLoanID() string
+        +getBookISBN() string
+        +getMemberID() string
+        +getBorrowDate() Date
+        +getDueDate() Date
+        +getReturnDate() Date
+        +getStatus() LoanStatus
+        +setLoanID(id : string) void
+        +setStatus(newStatus : LoanStatus) void
         +isOverdue() bool
         +getDaysOverdue() int
+        +calculateFine() int
+        +loanCSVFormat() string
     }
     
     class Book {
@@ -1485,26 +1370,18 @@ classDiagram
     class IPenaltyStrategy {
         <<interface>>
         +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +getPenaltyDescription() string
-        +calculatePenaltyAmount(overdueDays : int) double
     }
     
     class FinePenaltyStrategy {
         +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +getPenaltyDescription() string
-        +calculatePenaltyAmount(overdueDays : int) double
     }
     
     class SuspendPenaltyStrategy {
         +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +getPenaltyDescription() string
-        +calculatePenaltyAmount(overdueDays : int) double
     }
     
     class WarningPenaltyStrategy {
         +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +getPenaltyDescription() string
-        +calculatePenaltyAmount(overdueDays : int) double
     }
     
     %% Relationships
@@ -1811,45 +1688,34 @@ classDiagram
 classDiagram
     class IPenaltyStrategy {
         <<interface>>
-        +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +calculateFine(overdueDays : int) double
-        +getPenaltyDescription() string
+        +applyPenalty(member : Member*, loan : Loan*, daysOverdue : int) void
     }
     
     class FinePenaltyStrategy {
-        -double finePerDay = 0.50
-        +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +calculateFine(overdueDays : int) double
-        +getPenaltyDescription() string
+        +applyPenalty(member : Member*, loan : Loan*, daysOverdue : int) void
     }
     
     class SuspendPenaltyStrategy {
-        -int suspensionThreshold = 30
-        +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +calculateFine(overdueDays : int) double
-        +getPenaltyDescription() string
+        +applyPenalty(member : Member*, loan : Loan*, daysOverdue : int) void
     }
     
     class WarningPenaltyStrategy {
-        -int maxWarnings = 3
-        +applyPenalty(member : Member*, loan : Loan*, overdueDays : int) void
-        +calculateFine(overdueDays : int) double
-        +getPenaltyDescription() string
+        +applyPenalty(member : Member*, loan : Loan*, daysOverdue : int) void
     }
     
     class Member {
-        -double fineAmount
+        -int warningCount
         -bool suspended
+        -double totalFines
+        +addWarning() void
+        +suspendAccount(days : int) void
         +addFine(amount : double) void
-        +suspend() void
-        +getFinaAmount() double
     }
     
     class Loan {
         -string loanID
         -Date dueDate
-        -bool isOverdue
-        +getDaysOverdue() int
+        +calculateFine() int
     }
     
     IPenaltyStrategy <|.. FinePenaltyStrategy : implements
@@ -1913,10 +1779,9 @@ classDiagram
     }
     
     class AdditionalInfoDecorator {
-        -map~string, string~ additionalInfo
-        +AdditionalInfoDecorator(book : shared_ptr~Book~, info : map~string, string~)
+        -string additionalInfo
+        +AdditionalInfoDecorator(book : shared_ptr~Book~, info : string)
         +getFullDescription() string
-        +getAdditionalInfo() map~string, string~
     }
     
     class Author {
@@ -2225,20 +2090,16 @@ classDiagram
 - **Observer Pattern Coordination**: Manages event notifications
 - **Transaction Management**: Atomic operations for data consistency
 
-**Advanced Features**:
+**Basic Features**:
 - **Book Catalog Management**:
-  - ISBN validation with checksum verification
-  - Duplicate detection and merging capabilities
-  - Bulk import/export with CSV batch processing
-  - Advanced metadata management with custom fields
-  - Book condition tracking and maintenance scheduling
+  - ISBN-based book identification
+  - Basic book information storage (title, author, category)
+  - Book availability status tracking
 
 - **Loan Processing Engine**:
   - Basic eligibility checking (member existence, book availability, no duplicate loans)
-  - Dynamic due date calculation based on book type and member status
-  - Reservation system with priority queuing
-  - Automated renewal with configurable limits
-  - Grace period handling for special circumstances
+  - Simple due date calculation
+  - Basic fine calculation for overdue books
 
 - **Business Rule Engine**:
 ```mermaid
@@ -2341,38 +2202,12 @@ classDiagram
     
     class Router {
         <<utility>>
-        +handleStateTransition(newState : AppState) void
-    }
-        +handleInput(input : InputEvent) bool
-        +validateCredentials() bool
+        +RenderUI(appState : AppState&) void
     }
     
-    class MainMenuUI {
-        -vector~MenuOption~ options
-        -int selectedOption
-        +render() void
-        +handleInput(input : InputEvent) bool
-        +getMenuOptions(userRole : UserRole) vector~MenuOption~
-    }
-    
-    class SearchBookUI {
-        -string searchQuery
-        -vector~Book*~ searchResults
-        -ISearchStrategy* currentStrategy
-        +render() void
-        +handleInput(input : InputEvent) bool
-        +performSearch() void
-    }
-    
-    %% Relationships
-    AppStateManager --> UIState : manages
-    AppStateManager --> UIComponent : contains
-    UIComponent <|-- LoginUI : implements
-    UIComponent <|-- MainMenuUI : implements
-    UIComponent <|-- SearchBookUI : implements
-    UIComponent --> UIState : associated with
-    
-    note for AppStateManager "Manages UI state transitions\nwith history navigation\nand component lifecycle"
+    %% Simple UI Functions
+    note for Router "Simple router with function calls:\n- LoginUI(appState)\n- RegisterUI(appState)\n- MainMenuUI(appState)\n- SearchBookUI(appState)"
+```
 ```
 
 #### 4. Notification and Messaging Module
@@ -2394,14 +2229,12 @@ classDiagram
 - **NotificationService**: Simple due date checking and availability notifications
 
 #### 5. Data Persistence and Management Module
-**Purpose**: Robust data storage with integrity and performance optimization
+**Purpose**: Simple CSV-based data storage system
 
-**Enhanced CSV Management**:
-- **Transaction Support**: Atomic write operations with rollback capability
-- **Data Validation**: Comprehensive input validation and sanitization
-- **Backup Management**: Automatic backups before major operations
-- **Concurrent Access**: File locking mechanisms for data integrity
-- **Performance Optimization**: Lazy loading and caching strategies
+**Basic CSV Management**:
+- **File I/O Operations**: Basic CSV file reading and writing
+- **Data Validation**: Simple input validation 
+- **CSVHandler Utility**: Centralized CSV processing functions
 
 **Data Integrity Features**:
 ```mermaid
@@ -2484,31 +2317,28 @@ classDiagram
         -bool isValid
         -vector~ValidationError~ errors
         -vector~ValidationWarning~ warnings
-        +isValid() bool
-        +getErrors() vector~ValidationError~
-        +getWarnings() vector~ValidationWarning~
-        +addError(error : ValidationError) void
-        +addWarning(warning : ValidationWarning) void
+**Simple CSV Implementation**:
+```mermaid
+classDiagram
+    class CSVHandler {
+        <<utility>>
+        +generateUserID(prefix : string)$ string
     }
     
-    %% Relationships
-    DataManager --> TransactionContext : manages
-    DataManager --> BackupManager : uses
-    DataManager --> FileHandler : manages
-    DataManager --> DataValidator : uses
-    DataValidator <|.. CSVValidator : implements
-    DataValidator --> ValidationResult : produces
-    BackupManager --> TransactionContext : references
+    class LibraryManager {
+        +loadBooksIntoLibrary() void
+        +saveBooksNewInfo() void  
+        +loadMembersFromCSV(path : string) void
+        +loadLoansFromCSV(path : string) void
+    }
     
-    note for DataManager "ACID transaction support with\nbackup/restore capabilities\nand comprehensive validation"
-    note for TransactionContext "Tracks all changes within\na transaction for rollback\nand audit purposes"
+    LibraryManager ..> CSVHandler : uses
 ```
 
-**Advanced Query Capabilities**:
-- **Indexed Search**: Pre-built indices for common queries
-- **Complex Filtering**: Multiple criteria with boolean operators
-- **Aggregation Functions**: Statistics and reporting capabilities
-- **Data Export**: Multiple format support (CSV, JSON, XML)
+**Basic Query Capabilities**:
+- **Simple Search**: Search by title, author, or category
+- **Basic Filtering**: Filter by book availability
+- **Simple Data Export**: CSV format support
 
 ### Example Input/Output Screenshots
 
