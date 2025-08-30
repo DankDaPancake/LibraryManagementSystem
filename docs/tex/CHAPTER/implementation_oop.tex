@@ -8,98 +8,45 @@ Encapsulation is the practice of bundling data and the methods that operate on t
 
 In this project, all domain models enforce encapsulation. For example, the \texttt{User} class declares its attributes \texttt{userID} and \texttt{password} as \texttt{private}. Access from outside the class is only permitted through its public interface, protecting the object's internal state.
 
-\begin{verbatim}
-// -- Demonstrating Encapsulation in C++ --
-class User {
-private:
-    // Data members are hidden from outside access
-    std::string userID;
-    std::string password;
-
-public:
-    // Public methods provide a controlled interface
-    std::string getUserID() const;
-    void setPassword(const std::string& newPassword);
-};
-\end{verbatim}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{figures/user_class_encap.png}
+	\caption{UML Diagram for the User Class with Encapsulation.}
+	\label{fig:user_class_encap}
+\end{figure}
 
 \subsection{Inheritance}
 Inheritance allows a new class (subclass) to be based on an existing class (base class), promoting code reusability. C++ supports this directly through class derivation.
 
 The system utilizes inheritance to model user types. The \texttt{Member} and \texttt{Librarian} classes both inherit publicly from the base \texttt{User} class. They acquire common attributes and functionalities while also implementing their own specialized methods.
 
-\begin{verbatim}
-// -- Demonstrating Inheritance in C++ --
-
-// Base class
-class User { /* ... */ };
-
-// Derived class Member "is-a" User
-class Member : public User {
-private:
-    // Member-specific attributes
-    std::vector<Loan*> borrowedBooks;
-public:
-    // Member-specific behavior
-    void borrowBook(const std::string& isbn);
-};
-\end{verbatim}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/inheritance.png}
+	\caption{UML Diagram for the User Class with Inheritance.}
+	\label{fig:user_class_inheritance}
+\end{figure}
 
 \subsection{Polymorphism}
 Polymorphism allows objects of different classes to be treated as objects of a common superclass. In C++, this is primarily achieved at runtime through \texttt{virtual} functions.
 
-A clear example is the Decorator pattern for books. The base \texttt{Book} class declares a \texttt{virtual} method \texttt{getFullDescription()}. Decorator classes override this method. When \texttt{getFullDescription()} is called on a \texttt{Book*} pointer, C++'s dynamic dispatch mechanism ensures the correct overridden version is invoked at runtime.
+A clear example is the Strategy pattern implemented in the \texttt{SearchManager} class. The \texttt{SearchManager} contains a pointer to an \texttt{ISearchStrategy} interface and delegates search operations to concrete strategy implementations. When \texttt{search()} is called on the strategy pointer, C++'s dynamic dispatch mechanism ensures the correct overridden version (e.g., \texttt{TitleSearchStrategy}, \texttt{AuthorSearchStrategy}) is invoked at runtime, allowing the search behavior to be changed dynamically.
 
-\begin{verbatim}
-// -- Demonstrating Polymorphism in C++ --
-
-// Base class defines the virtual interface
-class Book {
-public:
-    virtual std::string getFullDescription() const {
-        return "Title: " + this->title;
-    }
-};
-
-// Decorator class overrides the virtual function
-class SpecialTagDecorator : public Book {
-private:
-    Book* bookComponent;
-    std::string tag;
-public:
-    std::string getFullDescription() const override {
-        // Dynamically calls the wrapped object's method
-        return bookComponent->getFullDescription() + " [Tag: " + tag + "]";
-    }
-};
-\end{verbatim}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/polymorphism.png}
+	\caption{UML Diagram for Search Strategies with Polymorphism.}
+	\label{fig:search_strategies_polymorphism}
+\end{figure}
 
 \subsection{Abstraction}
 Abstraction involves hiding complex implementation details and exposing only essential functionalities. In C++, this is often achieved using abstract classes (classes with one or more pure virtual functions).
 
-This principle is used in the Strategy pattern. An abstract class, \texttt{ISearchStrategy}, is defined with a pure virtual function \texttt{search() = 0}. This creates an interface, or a contract, that all concrete search strategy classes must implement, decoupling the client from the specific search algorithms.
+This principle is demonstrated through the Decorator pattern implementation. An abstract base class, \texttt{BookDecorator}, is defined with pure virtual functions that establish a contract for all concrete decorators. This abstraction allows clients to work with decorated books without knowing the specific decoration implementations, effectively hiding the complexity of feature additions while providing a unified interface.
 
-\begin{verbatim}
-// -- Demonstrating Abstraction in C++ --
-
-// Abstract base class (Interface)
-class ISearchStrategy {
-public:
-    virtual ~ISearchStrategy() = default;
-    
-    // Pure virtual function defines a contract
-    virtual std::vector<Book*> search(
-        const std::vector<Book*>& books,
-        const std::string& query) = 0;
-};
-
-// Concrete implementation must provide the search method
-class TitleSearchStrategy : public ISearchStrategy {
-public:
-    std::vector<Book*> search(
-        const std::vector<Book*>& books,
-        const std::string& query) override {
-        // ... specific implementation for searching by title
-    }
-};
-\end{verbatim}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{figures/abstraction.png}
+	\caption{UML Diagram for Book Decorator with Abstraction.}
+	\label{fig:book_decorator_abstraction}
+\end{figure}

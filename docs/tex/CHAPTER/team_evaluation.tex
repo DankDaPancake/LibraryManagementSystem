@@ -6,20 +6,93 @@ This final section provides a comprehensive overview of the project's management
 \subsection{Member Contributions and Task Allocation}
 The project's success was built on a clear allocation of tasks and the dedicated contribution of each team member. The work was divided based on individual strengths and interests to maximize efficiency and quality.
 
-\begin{description}
-	\item[Member 1 - [Tên vai trò, ví dụ: Team Lead / Core Architect]]
-	      [Mô tả chi tiết đóng góp, ví dụ: Responsible for the overall system architecture, designing the core domain models (Book, User, Loan), and implementing the Singleton and Strategy patterns. Led team meetings and managed the Git repository.]
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+		% Lưu ý: \rowcolors không hiển thị đẹp với \multirow, nên tạm thời không dùng cho bảng này
 
-	\item[Member 2 - [Tên vai trò, ví dụ: Backend Developer / Data Layer]]
-	      [Mô tả chi tiết đóng góp, ví dụ: Developed the entire data persistence layer, including the CSVHandler for file I/O and the data integrity module using file hashing. Implemented the book and member management logic.]
+		% Sử dụng tabularx và thay đổi cột cuối thành 'c' (center) cho phù hợp
+		\begin{tabularx}{\textwidth}{| c | l | X |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Name} & \textbf{Contribution}       & \textbf{Detail}                                       \\
+			\hline
 
-	\item[Member 3 - [Tên vai trò, ví dụ: Backend Developer / Business Logic]]
-	      [Mô tả chi tiết đóng góp, ví dụ: Focused on the business logic for loan management, including borrowing, returning, and overdue calculations. Implemented the Observer and Decorator patterns for the notification and book description features.]
+			% Du Hoai Phuc - Team Leader & Core Architecture
+			\multirow{7}{*}{\parbox{3.5cm}{\centering\textbf{Du Hoai Phuc}                                      \\ \small{(Team Leader \& Core Architecture)}}}
+			              & Core Classes Design         & User, Member, Librarian, Book, Author, Category, Loan \\
+			\cline{2-3}
+			              & Polymorphism Implementation & Virtual functions, runtime behavior selection         \\
+			\cline{2-3}
+			              & Project Coordination        & Timeline management, code integration                 \\
+			\cline{2-3}
+			              & Design Patterns Architect   & Observer, Strategy, Decorator patterns                \\
+			\cline{2-3}
+			              & User Experience Design      & System workflow and interaction design                \\
+			\hline
 
-	\item[Member 4 - [Tên vai trò, ví dụ: UI \& Documentation]]
-	      [Mô tả chi tiết đóng góp, ví dụ: Developed the entire console-based user interface, ensuring a user-friendly and interactive experience. Was also responsible for writing and formatting the final technical report and creating the UML diagrams.]
+			% Ly Huynh Minh Dang - Backend Systems Developer
+			\multirow{8}{*}{\parbox{3.5cm}{\centering\textbf{Ly Huynh Minh Dang}                                \\ \small{(Backend Systems Developer)}}}
+			              & Data Persistence            & CSV-based storage with CSVHandler utility             \\
+			\cline{2-3}
+			              & Library Management Services & LibraryManager singleton implementation               \\
+			\cline{2-3}
+			              & Loan Management             & Borrowing/returning system with fine calculation      \\
+			\cline{2-3}
+			              & Business Logic              & Core operations and member status management          \\
+			\cline{2-3}
+			              & Input Validation            & Form validation and error handling                    \\
+			\hline
 
-\end{description}
+			% Ta Duc Dung - UI/UX Developer
+			\multirow{5}{*}{\parbox{3.5cm}{\centering\textbf{Ta Duc Dung}                                       \\ \small{(UI/UX Developer)}}}
+			              & GUI Implementation          & Complete ImGui-based interface                        \\
+			\cline{2-3}
+			              & Authentication System       & Login/logout with password validation                 \\
+			\cline{2-3}
+			              & Visual Design               & Consistent styling and layout                         \\
+			\cline{2-3}
+			              & Responsive Interface        & Smooth navigation and interaction                     \\
+			\cline{2-3}
+			              & User Experience Design      & Intuitive menu systems                                \\
+			\hline
+		\end{tabularx}
+		\caption{Individual Contributions}
+	\end{table}
+\end{center}
+
+\newpage
+
+\begin{center}
+	\begin{table}[H]
+		\renewcommand{\arraystretch}{1.5}
+		\setlength{\tabcolsep}{8pt}
+		% Lưu ý: \rowcolors không hiển thị đẹp với \multirow, nên tạm thời không dùng cho bảng này
+
+		% Sử dụng tabularx và thay đổi cột cuối thành 'c' (center) cho phù hợp
+		\begin{tabularx}{\textwidth}{| c | l | X |}
+			\hline
+			\rowcolor{gray!30}
+			\textbf{Name} & \textbf{Contribution}       & \textbf{Detail}                                       \\
+			\hline
+
+			% Nguyen Son Hai - Designer & Tester
+			\multirow{5}{*}{\parbox{3.5cm}{\centering\textbf{Nguyen Son Hai}                                    \\ \small{(Designer \& Tester)}}}
+			              & Slide Maker                 & Presentation materials and diagrams                   \\
+			\cline{2-3}
+			              & Report Writing              & Technical documentation                               \\
+			\cline{2-3}
+			 & Encapsulation Implementation & Data validation and access control \\
+			\cline{2-3}
+			 & Inheritance Hierarchy & User base class with derived classes \\
+			\cline{2-3}
+			              & Tester                      & System testing and quality assurance                  \\
+			\hline
+		\end{tabularx}
+		\caption{Individual Contributions}
+	\end{table}
+\end{center}
 
 \subsection{Development Workflow and Collaboration}
 To ensure a smooth and organized development process, our team adopted a structured workflow utilizing industry-standard tools and practices.

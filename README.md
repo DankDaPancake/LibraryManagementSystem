@@ -4,16 +4,16 @@
 
 ```
 ElectronicLibrary/
-├── data/                   # Chứa các file dữ liệu (VD: books.csv, members.csv, loans.csv)
-├── include/                # Chứa các file header (.h, .hpp)
-│   ├── core/               # Các lớp cốt lõi (Book, Member, Loan, Author, Category)
-│   ├── patterns/           # Các interface và lớp liên quan đến Design Patterns
+├── data/                   # Contains data files (e.g., books.csv, members.csv, loans.csv)
+├── include/                # Contains header files (.h, .hpp)
+│   ├── core/               # Core classes (Book, Member, Loan, Author, Category)
+│   ├── patterns/           # Interfaces and classes related to Design Patterns
 │   │   ├── observer/
 │   │   ├── strategy/
 │   │   └── decorator/
-│   ├── services/           # Các lớp quản lý logic nghiệp vụ (LibraryManager, AuthManager, NotificationService)
-│   └── utils/              # Các lớp tiện ích (DateUtils, Validator)
-├── src/                    # Chứa các file source (.cpp)
+│   ├── services/           # Business logic management classes (LibraryManager, AuthManager, NotificationService)
+│   └── utils/              # Utility classes (DateUtils, Validator)
+├── src/                    # Contains source files (.cpp)
 │   ├── core/
 │   ├── patterns/
 │   │   ├── observer/
@@ -21,11 +21,11 @@ ElectronicLibrary/
 │   │   └── decorator/
 │   ├── services/
 │   └── utils/
-├── .gitignore              # Ẩn các file build khi compile
-├── build.bat               # File khởi tạo chương trình
-├── CMakeLists.txt          # Hoặc Makefile, dùng để build dự án
-├── main.cpp                # Điểm khởi chạy chương trình, xử lý UI console
-└── README.md               # Note theo đõi dự án
+├── .gitignore              # Hide build files during compilation
+├── build.bat               # Program initialization file
+├── CMakeLists.txt          # Or Makefile, used to build the project
+├── main.cpp                # Program entry point, handles console UI
+└── README.md               # Project tracking notes
 ```
 
 ### II. Phân tích và Thiết kế Lớp (Class Design)
