@@ -10,7 +10,6 @@
 
 extern User curUser;
 
-// State cho popup Add
 static std::string s_lastUserId;
 static char s_isbn[32]      = "";
 static char s_title[128]    = "";
@@ -19,7 +18,6 @@ static char s_categoryID[16]= "";
 static int  s_totalCopies   = 1;
 static char s_msg[256]      = "";
 
-// State cho popup Remove
 static char s_rmIsbn[32]    = "";
 static char s_rmMsg[256]    = "";
 
@@ -28,10 +26,8 @@ void AddBookUI(AppState& appState)
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
     if (curUser.getRole() != Role::LIBRARIAN)  { appState = AppState::MainMenu; return; }
 
-    // Dùng lại giữa các popup
     auto& manager = LibraryManager::getInstance();
 
-    // Reset form khi đổi user
     if (s_lastUserId != curUser.getUserID()) {
         s_lastUserId = curUser.getUserID();
         s_isbn[0] = s_title[0] = s_authorID[0] = s_categoryID[0] = 0;
@@ -40,7 +36,6 @@ void AddBookUI(AppState& appState)
         s_rmIsbn[0] = s_rmMsg[0] = 0;
     }
 
-    // Header + nút
     ImGui::Dummy(ImVec2(0, 6));
     ImGui::TextUnformatted("Book Manage");
 
@@ -82,7 +77,6 @@ void AddBookUI(AppState& appState)
                 try { aID = std::stoi(a); cID = std::stoi(c); }
                 catch (...) {
                     std::snprintf(s_msg, sizeof(s_msg), "Author/Category ID must be numbers.");
-                    // KHÔNG return ở giữa Popup!
                 }
 
                 if (s_msg[0] == 0) {
@@ -110,7 +104,6 @@ void AddBookUI(AppState& appState)
         ImGui::EndPopup();
     }
 
-    /* ------------------ Remove Book ----------------- */
     if (ImGui::BeginPopupModal("Remove Book Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::TextUnformatted("Enter ISBN to remove:");
@@ -131,7 +124,6 @@ void AddBookUI(AppState& appState)
             s_rmMsg[0] = 0;
 
             Book* target = nullptr;
-            // lấy con trỏ ghi (manager.getBooks() trả const ref -> cast về non-const để erase)
             auto& nonConst = const_cast<std::vector<Book*>&>(manager.getBooks());
             for (Book* b : nonConst) { if (b && b->getISBN() == s_rmIsbn) { target = b; break; } }
 
@@ -159,7 +151,6 @@ void AddBookUI(AppState& appState)
         ImGui::EndPopup();
     }
 
-    /* ------------------ Bảng liệt kê ----------------- */
     ImGui::Separator();
     ImGui::TextUnformatted("Book collection:");
 
