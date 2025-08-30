@@ -9,7 +9,7 @@ enum class AppState {
     BorrowBook,
     ReturnBook,
     AddBook,
-    FindAuthor,
+    ListMember,
     FindCategory
 };
 

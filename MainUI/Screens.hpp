@@ -9,5 +9,4 @@ void SearchBookUI(AppState&);
 void BorrowBookUI(AppState&);
 void ReturnBookUI(AppState&);
 void AddBookUI(AppState&);
-void FindAuthorUI(AppState&);
-void FindCategoryUI(AppState&);
+void ListMemberUI(AppState&);

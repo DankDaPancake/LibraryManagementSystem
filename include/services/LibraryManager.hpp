@@ -61,6 +61,7 @@ public:
     Book* findBook(const string &ISBN) const;
     const std::vector<Book*>& getBooks() const;
     const std::vector<Loan*>& getLoans() const;
+    const std::vector<Member*>& getMembers() const;
 
     bool borrowBook(const string &memberID, const string &ISBN);
     bool returnBook(const string &memberID, const string &ISBN);

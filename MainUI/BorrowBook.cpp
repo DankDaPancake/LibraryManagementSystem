@@ -48,7 +48,7 @@ static char sIsbn[64] = "";
 static char sMsg[256] = "";
 static void ClearFields() { sMid[0] = sIsbn[0] = sMsg[0] = '\0'; }
 
-void BorrowBookUI(AppState& /*appState*/)
+void BorrowBookUI(AppState& appState)
 {
     static std::string lastUserId;
     static char memberID[64] = "";
@@ -66,10 +66,25 @@ void BorrowBookUI(AppState& /*appState*/)
         s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
     };
 
+    // ====== DASHBOARD title (chỉ thêm UI, không đổi logic) ======
+    {
+        ImGui::Dummy(ImVec2(0, 4));               // top padding nhỏ
+        float old = ImGui::GetFont()->Scale;
+        ImGui::GetFont()->Scale = old * 1.05f;    // nhỉnh hơn chút để giống tiêu đề
+        ImGui::PushFont(ImGui::GetFont());
+        ImGui::TextUnformatted("Dashboard");
+        ImGui::PopFont();
+        ImGui::GetFont()->Scale = old;
+        ImGui::Dummy(ImVec2(0, 2));
+        ImGui::Separator();                        // phân tách với phần nội dung bên dưới
+        ImGui::Dummy(ImVec2(0, 6));
+    }
+
+    // ===== Hàng tiêu đề + 2 nút bên phải =====
     {
         const float btnW = 140.0f;
         const float gap  = 10.0f;
-        ImGui::TextUnformatted("List of Books Currently Borrowed:");
+        ImGui::TextUnformatted("Books collection:");
         ImGui::SameLine();
 
         float keepX = ImGui::GetCursorPosX();
@@ -117,8 +132,8 @@ void BorrowBookUI(AppState& /*appState*/)
             ImGui::TableSetColumnIndex(4); ShowDate(loan->getBorrowDate());
             ImGui::TableSetColumnIndex(5);
 
-            bool overdue = loan->isOverdue();                
-            int days     = loan->getDaysOverdue();            
+            bool overdue = loan->isOverdue();
+            int  days    = loan->getDaysOverdue();
 
             std::string st = loan->loanStatusToString(loan->getStatus());
 
@@ -174,6 +189,7 @@ void BorrowBookUI(AppState& /*appState*/)
         ImGui::EndPopup();
     }
 
+    // ===== Popup: Return Book =====
     if (BeginCenteredModal("Return Book", ImVec2(680, 300))) {
         auto& manager = LibraryManager::getInstance();
 

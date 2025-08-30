@@ -37,8 +37,9 @@ void AddBookUI(AppState& appState) {
         totalCopies = 1;
     }
 
-    ImGui::Separator();
-    ImGui::Text("Add New Book");
+    const float headerPad = 6.0f;
+    ImGui::Dummy(ImVec2(0, headerPad));
+    ImGui::Text("Book Manage");
 
     ImGui::SameLine(ImGui::GetWindowWidth() - 300);
     if (ImGui::Button("Add Book")) {
@@ -113,7 +114,7 @@ void AddBookUI(AppState& appState) {
     }
 
     ImGui::Separator();
-    ImGui::Text("List of Books in Library:");
+    ImGui::Text("Book collection:");
 
     if (ImGui::BeginTable("Books Table", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
         ImGui::TableSetupColumn("ISBN");
