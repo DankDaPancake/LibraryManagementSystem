@@ -98,19 +98,17 @@ void SearchBookUI(AppState &appState) {
             ImGui::TableSetColumnIndex(1);
             ImGui::Text("%s", book->getTitle().c_str());
 
-            ImGui::TableSetColumnIndex(2);
             const Author& a = book->getAuthor();
+            ImGui::TableSetColumnIndex(2);
             ImGui::Text("%s", a.getName().c_str());
-
             ImGui::TableSetColumnIndex(3);
-            ImGui::Text("%d", a.getAuthorID());
+            ImGui::Text("%s", a.getAuthorID().c_str());
 
-            ImGui::TableSetColumnIndex(4);
             const Category& c = book->getCategory();
+            ImGui::TableSetColumnIndex(4);
             ImGui::Text("%s", c.getName().c_str());
-
             ImGui::TableSetColumnIndex(5);
-            ImGui::Text("%d", c.getCategoryID());
+            ImGui::Text("%s", c.getCategoryID().c_str()); 
 
             ImGui::TableSetColumnIndex(6);
             ImGui::Text("%d / %d", book->getAvailableCopies(), book->getTotalCopies());
