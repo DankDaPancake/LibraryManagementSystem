@@ -10,3 +10,4 @@ void BorrowBookUI(AppState&);
 void ReturnBookUI(AppState&);
 void AddBookUI(AppState&);
 void ListMemberUI(AppState&);
+void ListLoanUI(AppState&);

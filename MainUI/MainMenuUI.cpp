@@ -16,6 +16,7 @@ static int AppStateToIndex(AppState s, bool isLibrarian) {
         case AppState::SearchBook:  return 1;
         case AppState::AddBook:     return isLibrarian ? 2 : 0;
         case AppState::ListMember: return isLibrarian ? 3 : 0; // NEW
+        case AppState::ListLoan: return isLibrarian ? 4 : 0;
         default:                    return 0;
     }
 }
@@ -28,7 +29,8 @@ static AppState IndexToAppState(int idx, bool isLibrarian) {
     if (idx < 2) return mapCommon[idx];
     if (isLibrarian) {
         if (idx == 2) return AppState::AddBook;
-        if (idx == 3) return AppState::ListMember; // NEW
+        if (idx == 3) return AppState::ListMember; 
+        if (idx == 4) return AppState::ListLoan;
     }
     return AppState::BorrowBook;
 }
@@ -63,7 +65,8 @@ inline void LmsShellUI(AppState& appState) {
     std::vector<const char*> actions = { "Dashboard", "Browse" };
     if (isLibrarian) {
         actions.push_back("Book Manage");
-        actions.push_back("Member Manage"); // NEW
+        actions.push_back("Member Manage"); 
+        actions.push_back("Loan Manage");
     }
 
     static int selected = AppStateToIndex(appState, isLibrarian);
@@ -106,10 +109,8 @@ inline void LmsShellUI(AppState& appState) {
 
         ImGui::SameLine();
 
-        // Content
         ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_None);
         {
-            // Topbar (bên trái từng screen sẽ tự vẽ tiêu đề: Dashboard/Browse/…)
             ImGui::BeginChild("topbar", ImVec2(0, 44), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
             {
                 const std::string user  = curUser.getUserName();
@@ -138,7 +139,8 @@ inline void LmsShellUI(AppState& appState) {
                 case AppState::BorrowBook:   BorrowBookUI(appState);   break;
                 case AppState::SearchBook:   SearchBookUI(appState);   break;
                 case AppState::AddBook:      AddBookUI(appState);      break;
-                case AppState::ListMember:  ListMemberUI(appState);   break; // NEW
+                case AppState::ListMember:  ListMemberUI(appState);   break; 
+                case AppState::ListLoan:  ListLoanUI(appState);   break;
                 default:
                     ImGui::TextDisabled("Select a feature from the left sidebar.");
                     break;
