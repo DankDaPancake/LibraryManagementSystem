@@ -322,17 +322,38 @@ classDiagram
         +getStatus() LoanStatus
         +setReturnDate(date) void
         +setStatus(status) void
-        +extendDueDate(days) void
         +isOverdue() bool
         +getDaysOverdue() int
         +calculateFine() int
-        +getStatusString() string
+        +loanStatusToString(status) string
+    }
+
+    class BookStatus {
+        <<enumeration>>
+        AVAILABLE = 0
+        UNAVAILABLE = 1
+    }
+
+    class LoanStatus {
+        <<enumeration>>
+        ACTIVE = 0
+        RETURNED = 1
+        OVERDUE = 2
+    }
+
+    class Role {
+        <<enumeration>>
+        LIBRARIAN = 0
+        MEMBER = 1
     }
 
     User <|-- Member : Inheritance
     User <|-- Librarian : Inheritance
     Book *-- Author : Composition
     Book *-- Category : Composition
+    Book --> BookStatus : uses
+    Loan --> LoanStatus : uses
+    User --> Role : has
     Member "1" --> "0..*" Loan : has
     Book "1" --> "0..*" Loan : referenced by
 ```
@@ -464,6 +485,14 @@ The Singleton Pattern ensures single-instance coordination for all library opera
 - **Resource Management**: Centralized control of library state
 - **Consistency**: Ensures single source of truth for library operations
 - **Automated Operations**: Background processing for loan monitoring and penalty management
+
+**Timer Implementation Details**:
+The LibraryManager includes a background timer thread that:
+- **Runs Every 60 Seconds**: Automatically checks all active loans
+- **Thread-Safe Processing**: Uses mutex locking for safe concurrent access
+- **Automatic Penalty Application**: Applies appropriate penalties based on overdue duration
+- **Observer Notifications**: Triggers loan status change notifications when loans become overdue
+- **Resource Management**: Proper thread cleanup with atomic stop flag
 
 #### Strategy Pattern (Algorithm Family Management)
 
@@ -798,10 +827,7 @@ classDiagram
         +getAllCategories() vector~Category*~
         +borrowBook(memberID : string, ISBN : string) bool
         +returnBook(memberID : string, ISBN : string) bool
-        +extendLoan(loanID : string, days : int) void
-        +getAllLoans() vector~Loan*~
-        +getOverdueLoans() vector~Loan*~
-        +getMemberLoans(memberID : string) vector~Loan*~
+        +getLoans() vector~Loan*~
         +addObserverToAllBooks() void
         +addObserverToAllLoans() void
         +removeObserverBooks() void
@@ -1710,6 +1736,14 @@ classDiagram
 - **Testability**: Individual strategies can be tested in isolation
 - **Extensibility**: New strategies can be added without modifying existing code
 
+**Penalty Strategy Selection Algorithm**:
+The LibraryManager automatically selects penalty strategies based on overdue duration:
+- **1-14 days overdue**: WarningPenaltyStrategy (adds warning count)
+- **15-30 days overdue**: FinePenaltyStrategy (applies monetary fine)
+- **Over 30 days**: SuspendPenaltyStrategy (suspends member account)
+
+This selection is handled by the `selectPenaltyStrategy(int daysOverdue)` method which creates the appropriate strategy instance at runtime.
+
 #### Decorator Pattern: Dynamic Feature Enhancement
 **Problem Solved**: Books may need additional information (difficulty level, special tags, detailed descriptions) without modifying the core Book class structure. Traditional inheritance would create a combinatorial explosion of classes.
 
@@ -2005,60 +2039,11 @@ flowchart TD
   - Observer pattern integration for user context
 
 **Role-Based Access Control**:
-```mermaid
-classDiagram
-    class UserRole {
-        <<enumeration>>
-        LIBRARIAN = 0
-        MEMBER = 1
-    }
-    
-    class User {
-        <<abstract>>
-        #UserRole role
-        +getRole() UserRole
-    }
-    
-    class Member {
-        +Member(userID, userName, password)
-        +getUserType() string
-    }
-    
-    class Librarian {
-        +Librarian(userID, userName, password)
-        +getUserType() string
-    }
-    
-    class Member {
-        +Member()
-        +borrowBook() bool
-        +returnBook() bool
-    }
-    
-    class Librarian {
-        +Librarian()
-        +manageBooks() bool
-        +manageMembers() bool
-    }
-    
-    class Admin {
-        +Admin()
-        +configureSystem() bool
-        +manageAllUsers() bool
-    }
-    
-    %% Relationships
-    AccessControl ..> UserRole : uses
-    AccessControl ..> Operation : evaluates
-    User --> UserRole : has
-    User <|-- Guest : inherits
-    User <|-- Member : inherits
-    User <|-- Librarian : inherits
-    User <|-- Admin : inherits
-    AccessControl ..> User : validates
-    
-    note for AccessControl "Permission hierarchy:\nADMIN > LIBRARIAN > MEMBER > GUEST"
-```
+The system uses a simple Role enumeration with two types:
+- **LIBRARIAN**: Administrative access with book management capabilities
+- **MEMBER**: Basic user access with borrowing capabilities
+
+The User class serves as the base class with role-based functionality implemented through inheritance hierarchy.
 
 #### 2. Library Management Module
 **Purpose**: Core business logic and operational workflow management
@@ -2079,76 +2064,6 @@ classDiagram
   - Basic eligibility checking (member existence, book availability, no duplicate loans)
   - Simple due date calculation
   - Basic fine calculation for overdue books
-
-- **Business Rule Engine**:
-```mermaid
-classDiagram
-    class BusinessRuleEngine {
-        -LoanRules loanRules
-        +canBorrowBook(member : Member, book : Book) bool
-        +canRenewLoan(loan : Loan) bool
-        +calculateFine(overdueDays : int, bookType : BookType) double
-        +validateMemberEligibility(member : Member) bool
-        +applyGracePeriod(loan : Loan) bool
-        +calculateLoanPeriod(bookType : BookType) int
-    }
-    
-    class LoanRules {
-        +int maxActiveLoans = 5
-        +int maxRenewalCount = 2
-        +double maxFineBeforeSuspension = 50.0
-        +int gracePeriodDays = 3
-        +int standardLoanPeriodDays = 14
-        +int extendedLoanPeriodDays = 28
-        +double dailyFineRate = 0.50
-        +int suspensionThreshold = 7
-    }
-    
-    class BookType {
-        <<enumeration>>
-        STANDARD
-        REFERENCE
-        RARE_COLLECTION
-        PERIODICAL
-        DIGITAL_MEDIA
-    }
-    
-    class Member {
-        -vector~Loan*~ activeLoans
-        -double totalFines
-        -bool suspended
-        +getActiveLoanCount() int
-        +getTotalFines() double
-        +isSuspended() bool
-    }
-    
-    class Book {
-        -BookType type
-        -bool isAvailable
-        +getType() BookType
-        +isAvailable() bool
-    }
-    
-    class Loan {
-        -int renewalCount
-        -Date dueDate
-        -bool isOverdue
-        +getRenewalCount() int
-        +getDaysOverdue() int
-        +canBeRenewed() bool
-    }
-    
-    %% Relationships
-    BusinessRuleEngine --> LoanRules : uses
-    BusinessRuleEngine ..> Member : validates
-    BusinessRuleEngine ..> Book : evaluates
-    BusinessRuleEngine ..> Loan : processes
-    BusinessRuleEngine ..> BookType : considers
-    Book --> BookType : has
-    Member "1" --o "0..*" Loan : has
-    
-    note for BusinessRuleEngine "Centralizes all business\nlogic and validation\nrules for library operations"
-```
 
 #### 3. User Interface Module
 **Purpose**: ImGui-based GUI using simple state management
@@ -2216,58 +2131,12 @@ classDiagram
 - **CSVHandler Utility**: Centralized CSV processing functions
 
 **Data Integrity Features**:
-```mermaid
-classDiagram
-    class TransactionContext {
-        -vector~string~ backupFiles
-        -vector~string~ modifiedFiles
-        -bool inTransaction
-        -DateTime startTime
-        -string transactionId
-        +addBackupFile(filename : string) void
-        +addModifiedFile(filename : string) void
-        +setTransactionState(state : bool) void
-        +getBackupFiles() vector~string~
-        +getModifiedFiles() vector~string~
-        +isInTransaction() bool
-        +getStartTime() DateTime
-        +getTransactionId() string
-    }
-    
-    class DataManager {
-        -TransactionContext currentTransaction
-        -map~string, FileHandler*~ fileHandlers
-        -BackupManager backupManager
-        -mutex transactionMutex
-        -vector~DataValidator*~ validators
-        +beginTransaction() void
-        +commitTransaction() void
-        +rollbackTransaction() void
-        +validateDataIntegrity() bool
-        +createBackup(filename : string) void
-        +restoreFromBackup(backupFile : string) void
-        +registerFileHandler(filename : string, handler : FileHandler*) void
-        +addValidator(validator : DataValidator*) void
-        +getTransactionStatus() TransactionStatus
-    }
-    
-    class BackupManager {
-        -string backupDirectory
-        -map~string, vector~BackupInfo~~ backupHistory
-        -int maxBackupsPerFile
-        +createBackup(filename : string, transactionId : string) string
-        +restoreFromBackup(backupFile : string) bool
-        +listBackups(filename : string) vector~BackupInfo~
-        +cleanupOldBackups() void
-        +verifyBackupIntegrity(backupFile : string) bool
-        +getBackupSize(backupFile : string) size_t
-    }
-    
-    class DataValidator {
-        <<interface>>
-        +validate(data : string) ValidationResult
-        +getValidationRules() vector~ValidationRule~
-        +setStrictMode(enabled : bool) void
+- **Simple CSV File Management**: Basic file reading and writing operations
+- **Data Format Validation**: Basic input validation for CSV data
+- **File Path Management**: Centralized file path handling through CSVHandler
+
+**Simple CSV Implementation**:
+The system uses a straightforward CSV-based storage approach with the CSVHandler utility class providing:
     }
     
     class CSVValidator {
