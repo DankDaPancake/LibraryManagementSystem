@@ -16,7 +16,7 @@ void MemberManageUI(AppState& appState)
 
     ImGui::TextUnformatted("Your Borrowed Books");
     ImGui::Separator();
-    ImGui::Dummy(ImVec2(0, 4));
+    ImGui::Dummy(ImVec2(0, 6));
 
     ImGuiTableFlags flags =
         ImGuiTableFlags_Borders |

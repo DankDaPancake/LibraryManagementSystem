@@ -66,25 +66,23 @@ void BorrowBookUI(AppState& appState)
         s.erase(std::find_if(s.rbegin(), s.rend(), [&](unsigned char c){ return !issp(c); }).base(), s.end());
     };
 
-    // ====== DASHBOARD title (chỉ thêm UI, không đổi logic) ======
     {
-        ImGui::Dummy(ImVec2(0, 4));               // top padding nhỏ
+        ImGui::Dummy(ImVec2(0, 4));               
         float old = ImGui::GetFont()->Scale;
-        ImGui::GetFont()->Scale = old * 1.05f;    // nhỉnh hơn chút để giống tiêu đề
+        ImGui::GetFont()->Scale = old * 1.05f;    
         ImGui::PushFont(ImGui::GetFont());
         ImGui::TextUnformatted("Dashboard");
         ImGui::PopFont();
         ImGui::GetFont()->Scale = old;
         ImGui::Dummy(ImVec2(0, 2));
-        ImGui::Separator();                        // phân tách với phần nội dung bên dưới
+        ImGui::Separator();                       
         ImGui::Dummy(ImVec2(0, 6));
     }
 
-    // ===== Hàng tiêu đề + 2 nút bên phải =====
     {
         const float btnW = 140.0f;
         const float gap  = 10.0f;
-        ImGui::TextUnformatted("Books collection:");
+        ImGui::TextUnformatted("Loan lists:");
         ImGui::SameLine();
 
         float keepX = ImGui::GetCursorPosX();
@@ -149,12 +147,11 @@ void BorrowBookUI(AppState& appState)
         ImGui::EndTable();
     }
 
-    // ===== Popup: Borrow Book =====
-    if (BeginCenteredModal("Borrow Book", ImVec2(520, 220))) {
+    if (BeginCenteredModal("Borrow Book", ImVec2(680, 300))) {
         ImGui::TextUnformatted("Enter Borrow Book Details:");
         ImGui::InputText("Member ID", memberID, IM_ARRAYSIZE(memberID));
         ImGui::InputText("Book ISBN",  isbn,     IM_ARRAYSIZE(isbn));
-        ImGui::InputInt ("Borrow Date", &dueDate); // nếu không dùng có thể ẩn đi
+        ImGui::InputInt ("Borrow Date", &dueDate); 
 
         if (ImGui::Button("Borrow")) {
             std::string mid = memberID, code = isbn; trim(mid); trim(code);
@@ -166,7 +163,6 @@ void BorrowBookUI(AppState& appState)
                     manager.saveBooksNewInfo();
                     std::snprintf(message, sizeof(message), "Book borrowed successfully!");
                     isbn[0] = '\0';
-                    ImGui::CloseCurrentPopup();
                 } else {
                     if (Book* b = manager.findBook(code)) {
                         if (b->getAvailableCopies() <= 0)
@@ -180,16 +176,14 @@ void BorrowBookUI(AppState& appState)
             }
         }
         ImGui::SameLine();
-        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
 
         if (message[0]) {
             ImGui::Dummy(ImVec2(0, 6));
-            ImGui::TextColored(ImVec4(1,0,0,1), "%s", message);
         }
         ImGui::EndPopup();
     }
 
-    // ===== Popup: Return Book =====
     if (BeginCenteredModal("Return Book", ImVec2(680, 300))) {
         auto& manager = LibraryManager::getInstance();
 

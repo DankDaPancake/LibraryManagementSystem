@@ -14,24 +14,28 @@ static int AppStateToIndex(AppState s, bool isLibrarian) {
         switch (s) {
             case AppState::SearchBook:   return 0;
             case AppState::MemberManage: return 1;
+            case AppState::Notification: return 2;
             default:                     return 0;
         }
     }
 
     switch (s) {
-        case AppState::BorrowBook: return 0;
-        case AppState::SearchBook: return 1;
-        case AppState::AddBook:    return 2;
-        case AppState::ListMember: return 3;
-        case AppState::ListLoan:   return 4;
-        default:                   return 0;
+        case AppState::BorrowBook:   return 0;
+        case AppState::SearchBook:   return 1;
+        case AppState::AddBook:      return 2;
+        case AppState::ListMember:   return 3;
+        case AppState::ListLoan:     return 4;
+        case AppState::Notification: return 5;
+        default:                     return 0;
     }
 }
 
 static AppState IndexToAppState(int idx, bool isLibrarian) {
     if (!isLibrarian) {
-        if (idx <= 0) return AppState::SearchBook;
-        return AppState::MemberManage;
+        if (idx == 0) return AppState::SearchBook;   // Browse
+        if (idx == 1) return AppState::MemberManage;
+        if (idx == 2) return AppState::Notification;
+        return AppState::SearchBook;
     }
 
     if (idx == 0) return AppState::BorrowBook;
@@ -39,6 +43,7 @@ static AppState IndexToAppState(int idx, bool isLibrarian) {
     if (idx == 2) return AppState::AddBook;
     if (idx == 3) return AppState::ListMember;
     if (idx == 4) return AppState::ListLoan;
+    if (idx == 5) return AppState::Notification;
     return AppState::BorrowBook;
 }
 
@@ -72,9 +77,9 @@ inline void LmsShellUI(AppState& appState) {
 
     std::vector<const char*> actions;
     if (isLibrarian) {
-        actions = { "Dashboard", "Browse", "Book Manage", "Member Manage", "Loan Manage" };
+        actions = { "Dashboard", "Browse", "Book Manage", "Member Manage", "Loan Manage" , "Notification"};
     } else {
-        actions = { "Browse", "Member Manage" }; 
+        actions = { "Browse", "Member Manage", "Notification"}; 
     }
 
     static int selected = AppStateToIndex(appState, isLibrarian);
@@ -85,7 +90,6 @@ inline void LmsShellUI(AppState& appState) {
     if (selected >= (int)actions.size()) selected = (int)actions.size() - 1;
 
     if (ImGui::Begin("LMS - Shell", nullptr, flags)) {
-        // Sidebar
         ImGui::BeginChild("sidebar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoScrollbar);
         {
             ImGui::Dummy(ImVec2(0, 6));
@@ -146,7 +150,7 @@ inline void LmsShellUI(AppState& appState) {
                 case AppState::AddBook:      AddBookUI(appState);      break;
                 case AppState::ListMember:   ListMemberUI(appState);   break;
                 case AppState::ListLoan:     ListLoanUI(appState);     break;
-
+                case AppState::Notification: NotificationUI(appState); break;
                 case AppState::SearchBook:   SearchBookUI(appState);   break;
                 case AppState::MemberManage: MemberManageUI(appState); break;
 
