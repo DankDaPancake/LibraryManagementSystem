@@ -17,12 +17,11 @@ extern User curUser;
 void SearchBookUI(AppState &appState) {
     if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
 
-    // ==== Header: hai thanh kẻ trên/dưới giống "Dashboard" ====
     ImGui::Dummy(ImVec2(0, 6));
     ImGui::TextUnformatted("Browse");
     ImGui::Dummy(ImVec2(0, 6));
-    ImGui::Separator();          // underline duy nhất
-    ImGui::Dummy(ImVec2(0, 10));       // khoảng cách xuống phần filter
+    ImGui::Separator();         
+    ImGui::Dummy(ImVec2(0, 10));       
 
     static std::string lastUserId;
     static int   mode = 0;
@@ -32,25 +31,21 @@ void SearchBookUI(AppState &appState) {
 
     const char* modes[] = { "Title (Name)", "Author Name", "Category Name" };
 
-    // Reset theo user
     if (lastUserId != curUser.getUserID()) {
         lastUserId = curUser.getUserID();
         mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0';
     }
 
-    // ==== Hàng filter: Keyword (trái) và Mode (phải) trên cùng một hàng ====
     if (ImGui::BeginTable("filters_row", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV)) {
         ImGui::TableSetupColumn("left",  ImGuiTableColumnFlags_WidthStretch, 0.5f);
         ImGui::TableSetupColumn("right", ImGuiTableColumnFlags_WidthStretch, 0.5f);
         ImGui::TableNextRow();
 
-        // Cột trái: Keyword
         ImGui::TableSetColumnIndex(0);
-        ImGui::TextUnformatted("Title (Name)");     // nhãn phía trên ô nhập
+        ImGui::TextUnformatted("Title (Name)");     
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText("##keyword", queryBuf, IM_ARRAYSIZE(queryBuf));
 
-        // Cột phải: Mode
         ImGui::TableSetColumnIndex(1);
         ImGui::TextUnformatted("Mode");
         ImGui::SetNextItemWidth(-FLT_MIN);
@@ -59,7 +54,6 @@ void SearchBookUI(AppState &appState) {
         ImGui::EndTable();
     }
 
-    // ==== Nút Search / Clear ====
     auto trim = [](std::string& s){
         auto issp = [](unsigned char c){ return std::isspace(c); };
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
@@ -88,7 +82,6 @@ void SearchBookUI(AppState &appState) {
         ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
     }
 
-    // ==== Bảng kết quả ====
     if (ImGui::BeginTable("Book Table", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable)) {
         ImGui::TableSetupColumn("ISBN");
         ImGui::TableSetupColumn("Title");

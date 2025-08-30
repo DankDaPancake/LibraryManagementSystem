@@ -11,10 +11,10 @@ void ListMemberUI(AppState& appState)
 {
     auto& manager = LibraryManager::getInstance();
 
-    ImGui::Dummy(ImVec2(0, 2));
+    ImGui::Dummy(ImVec2(0, 6));
     ImGui::TextUnformatted("Members");
     ImGui::Separator();
-    ImGui::Dummy(ImVec2(0, 2));
+    ImGui::Dummy(ImVec2(0, 6));
 
     ImGuiTableFlags flags =
         ImGuiTableFlags_Borders |

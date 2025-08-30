@@ -6,7 +6,6 @@
 #include <string>
 #include <cstring>
 
-// Stripe focus cho input (giữ nguyên)
 static void DrawFocusStripe(float pad_y, float thickness, ImU32 col, float dash = 8.0f, float gap = 5.0f) {
     ImDrawList* dl = ImGui::GetWindowDrawList();
     ImVec2 a = ImGui::GetItemRectMin();
@@ -37,7 +36,6 @@ void RegisterUI(AppState &appState) {
 
     if (!ImGui::Begin("LMS/Register", nullptr, flags)) { ImGui::End(); return; }
 
-    // Kích thước/định vị card (giữ bố cục)
     const float topPad     = 36.0f;
     const float bottomGap  = 110.0f;
     const float availX     = ImGui::GetContentRegionAvail().x;
@@ -52,7 +50,6 @@ void RegisterUI(AppState &appState) {
     ImGui::Dummy(ImVec2(0, topPad));
     ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cardX);
 
-    // Card style
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.95f, 0.96f, 0.98f, 1.0f)); // trắng ngà
     ImGui::PushStyleColor(ImGuiCol_Border,  ImVec4(0.08f, 0.22f, 0.28f, 1.0f)); // viền đậm
     ImGui::PushStyleColor(ImGuiCol_Text,    ImVec4(0,0,0,1));
@@ -60,7 +57,6 @@ void RegisterUI(AppState &appState) {
     ImGui::PushStyleVar  (ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 20.0f));
 
     if (ImGui::BeginChild("register_card", ImVec2(cardW, cardH), true, ImGuiWindowFlags_NoScrollbar)) {
-        // Header
         ImGui::Dummy(ImVec2(0, 6));
         float s = ImGui::GetFont()->Scale;
         ImGui::GetFont()->Scale = s * 1.35f; ImGui::PushFont(ImGui::GetFont());
@@ -72,7 +68,6 @@ void RegisterUI(AppState &appState) {
         ImGui::Separator();
         ImGui::Dummy(ImVec2(0, 6));
 
-        // Inputs (stripe focus như login)
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_FrameBg,        ImVec4(1,1,1,1));
@@ -80,7 +75,6 @@ void RegisterUI(AppState &appState) {
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  ImVec4(0.93f,0.97f,1.0f,1.0f));
         ImGui::PushStyleColor(ImGuiCol_Border,         ImVec4(0.12f,0.44f,0.66f,1.0f));
 
-        // Username
         ImGui::TextUnformatted("New Username");
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText("##reg_user", usernameBuf, IM_ARRAYSIZE(usernameBuf));
@@ -91,7 +85,6 @@ void RegisterUI(AppState &appState) {
 
         ImGui::Dummy(ImVec2(0, 10));
 
-        // Password
         ImGui::TextUnformatted("New Password");
         ImGui::SetNextItemWidth(-FLT_MIN);
         ImGui::InputText("##reg_pass", passwordBuf, IM_ARRAYSIZE(passwordBuf), ImGuiInputTextFlags_Password);
@@ -100,14 +93,12 @@ void RegisterUI(AppState &appState) {
         if (ImGui::IsItemActive())
             DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));
 
-        // Kết thúc block input styles
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar(2);
 
         const float kHintToButtonsGap = 72.0f;
         ImGui::Dummy(ImVec2(0, kHintToButtonsGap));
 
-        // Buttons
         const float padX = 12.0f, gap = 12.0f, btnH = 44.0f;
         float contentW = ImGui::GetContentRegionAvail().x;
         float btnW     = (contentW - padX * 2.0f - gap) * 0.5f;

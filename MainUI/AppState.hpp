@@ -7,11 +7,11 @@ enum class AppState {
     Register,
     SearchBook,
     BorrowBook,
-    ReturnBook,
     AddBook,
     ListMember,
     ListLoan,
-    MemberManage
+    MemberManage,
+    Notification
 };
 
 inline const char* roleToString(Role role) {
