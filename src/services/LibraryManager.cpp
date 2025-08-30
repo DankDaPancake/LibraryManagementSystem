@@ -439,6 +439,11 @@ const std::vector<Loan *> &LibraryManager::getLoans() const
     return loans;
 }
 
+const std::vector<Member *> &LibraryManager::getMembers() const
+{
+    return members;
+}
+
 void LibraryManager::startLoanCheckTimer()
 {
     if (stopTimer)

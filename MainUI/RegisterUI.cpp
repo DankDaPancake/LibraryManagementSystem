@@ -104,18 +104,6 @@ void RegisterUI(AppState &appState) {
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar(2);
 
-        // Hint
-        ImGui::Dummy(ImVec2(0, 8));
-        {
-            const char* hint = "Already have an account? Use \"Sign in\" button below!";
-            float tw = ImGui::CalcTextSize(hint).x;
-            float cx = (ImGui::GetContentRegionAvail().x - tw) * 0.5f;
-            float keepX = ImGui::GetCursorPosX();
-            ImGui::SetCursorPosX(keepX + (cx > 0 ? cx : 0));
-            ImGui::TextUnformatted(hint);
-            ImGui::SetCursorPosX(keepX);
-        }
-
         const float kHintToButtonsGap = 72.0f;
         ImGui::Dummy(ImVec2(0, kHintToButtonsGap));
 

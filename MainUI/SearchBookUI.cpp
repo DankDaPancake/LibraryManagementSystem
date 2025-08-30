@@ -15,34 +15,51 @@
 extern User curUser;
 
 void SearchBookUI(AppState &appState) {
-    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) {
-        appState = AppState::MainMenu;
-        return;
-    }
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape)) { appState = AppState::MainMenu; return; }
 
-    ImGui::Text("Search Book");
-    ImGui::Separator();
-    ImGui::Dummy(ImVec2(0, 6));  
+    // ==== Header: hai thanh kẻ trên/dưới giống "Dashboard" ====
+    ImGui::Dummy(ImVec2(0, 6));
+    ImGui::TextUnformatted("Browse");
+    ImGui::Dummy(ImVec2(0, 6));
+    ImGui::Separator();          // underline duy nhất
+    ImGui::Dummy(ImVec2(0, 10));       // khoảng cách xuống phần filter
 
-    static string lastUserId;
-    static int mode = 0;
-    const char* modes[] = { "Title (Name)", "Author Name", "Category Name" };
-    ImGui::Combo("Mode", &mode, modes, IM_ARRAYSIZE(modes));
-
-    static char queryBuf[128] = "";
-    ImGui::InputText("Keyword", queryBuf, IM_ARRAYSIZE(queryBuf));
-
+    static std::string lastUserId;
+    static int   mode = 0;
+    static char  queryBuf[128] = "";
     static std::vector<Book*> results;
-    static char message[256] = "";
+    static char  message[256] = "";
 
+    const char* modes[] = { "Title (Name)", "Author Name", "Category Name" };
+
+    // Reset theo user
     if (lastUserId != curUser.getUserID()) {
         lastUserId = curUser.getUserID();
-        mode = 0;
-        queryBuf[0] = '\0';
-        results.clear();
-        message[0] = '\0';
+        mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0';
     }
 
+    // ==== Hàng filter: Keyword (trái) và Mode (phải) trên cùng một hàng ====
+    if (ImGui::BeginTable("filters_row", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV)) {
+        ImGui::TableSetupColumn("left",  ImGuiTableColumnFlags_WidthStretch, 0.5f);
+        ImGui::TableSetupColumn("right", ImGuiTableColumnFlags_WidthStretch, 0.5f);
+        ImGui::TableNextRow();
+
+        // Cột trái: Keyword
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextUnformatted("Title (Name)");     // nhãn phía trên ô nhập
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##keyword", queryBuf, IM_ARRAYSIZE(queryBuf));
+
+        // Cột phải: Mode
+        ImGui::TableSetColumnIndex(1);
+        ImGui::TextUnformatted("Mode");
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::Combo("##mode", &mode, modes, IM_ARRAYSIZE(modes));
+
+        ImGui::EndTable();
+    }
+
+    // ==== Nút Search / Clear ====
     auto trim = [](std::string& s){
         auto issp = [](unsigned char c){ return std::isspace(c); };
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [&](unsigned char c){ return !issp(c); }));
@@ -50,70 +67,56 @@ void SearchBookUI(AppState &appState) {
     };
 
     if (ImGui::Button("Search")) {
-        std::string q = queryBuf;
-        trim(q);
-        results.clear();
-        std::snprintf(message, sizeof(message), "%s", "");
+        std::string q = queryBuf; trim(q);
+        results.clear(); std::snprintf(message, sizeof(message), "%s", "");
 
-        auto& mgr   = LibraryManager::getInstance();
-        const auto& books = mgr.getBooks();   
+        auto& mgr = LibraryManager::getInstance();
+        const auto& books = mgr.getBooks();
 
         switch (mode) {
             case 0: { TitleSearchStrategy    s; results = s.search(books, q); break; }
             case 1: { AuthorSearchStrategy   s; results = s.search(books, q); break; }
             case 2: { CategorySearchStrategy s; results = s.search(books, q); break; }
         }
-
-        if (results.empty()) {
-            std::snprintf(message, sizeof(message), "No result found.");
-        }
+        if (results.empty()) std::snprintf(message, sizeof(message), "No result found.");
     }
-
     ImGui::SameLine();
-    if (ImGui::Button("Clear")) { 
-        mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0'; 
-    }
+    if (ImGui::Button("Clear")) { mode = 0; queryBuf[0] = '\0'; results.clear(); message[0] = '\0'; }
 
     if (message[0]) {
         ImGui::Separator();
         ImGui::TextColored(ImVec4(1,1,0,1), "%s", message);
     }
 
+    // ==== Bảng kết quả ====
     if (ImGui::BeginTable("Book Table", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-        ImGui::TableSetupColumn("ISBN", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Title", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Author", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Author ID", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Category ID", ImGuiTableColumnFlags_None);
-        ImGui::TableSetupColumn("Available / Total", ImGuiTableColumnFlags_None);
-        ImGui::TableHeadersRow(); 
+        ImGui::TableSetupColumn("ISBN");
+        ImGui::TableSetupColumn("Title");
+        ImGui::TableSetupColumn("Author");
+        ImGui::TableSetupColumn("Author ID");
+        ImGui::TableSetupColumn("Category");
+        ImGui::TableSetupColumn("Category ID");
+        ImGui::TableSetupColumn("Available / Total");
+        ImGui::TableHeadersRow();
 
         for (Book* book : results) {
             ImGui::TableNextRow();
 
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%s", book->getISBN().c_str());
-
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", book->getTitle().c_str());
+            ImGui::TableSetColumnIndex(0); ImGui::Text("%s", book->getISBN().c_str());
+            ImGui::TableSetColumnIndex(1); ImGui::Text("%s", book->getTitle().c_str());
 
             const Author& a = book->getAuthor();
-            ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%s", a.getName().c_str());
-            ImGui::TableSetColumnIndex(3);
-            ImGui::Text("%s", a.getAuthorID().c_str());
+            ImGui::TableSetColumnIndex(2); ImGui::Text("%s", a.getName().c_str());
+            ImGui::TableSetColumnIndex(3); ImGui::Text("%s", a.getAuthorID().c_str());
 
             const Category& c = book->getCategory();
-            ImGui::TableSetColumnIndex(4);
-            ImGui::Text("%s", c.getName().c_str());
-            ImGui::TableSetColumnIndex(5);
-            ImGui::Text("%s", c.getCategoryID().c_str()); 
+            ImGui::TableSetColumnIndex(4); ImGui::Text("%s", c.getName().c_str());
+            ImGui::TableSetColumnIndex(5); ImGui::Text("%s", c.getCategoryID().c_str());
 
             ImGui::TableSetColumnIndex(6);
             ImGui::Text("%d / %d", book->getAvailableCopies(), book->getTotalCopies());
         }
-
-        ImGui::EndTable(); 
+        ImGui::EndTable();
     }
 }
+

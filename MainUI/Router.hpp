@@ -7,8 +7,7 @@ void RenderUI(AppState& appState) {
     else if (appState == AppState::SearchBook)   SearchBookUI(appState);
     else if (appState == AppState::BorrowBook)   BorrowBookUI(appState);
     else if (appState == AppState::ReturnBook)   ReturnBookUI(appState);
-    else if (appState == AppState::FindAuthor)   FindAuthorUI(appState);
-    else if (appState == AppState::FindCategory) FindCategoryUI(appState);
+    else if (appState == AppState::ListMember)   ListMemberUI(appState);
     else if (appState == AppState::AddBook)      AddBookUI(appState);
 }
 

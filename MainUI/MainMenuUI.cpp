@@ -9,24 +9,28 @@
 extern User curUser;
 const char* roleToString(Role);
 
-// Ánh xạ AppState -> index (không còn ReturnBook)
+// Ánh xạ AppState -> index (thêm ListMembers; vẫn bỏ ReturnBook)
 static int AppStateToIndex(AppState s, bool isLibrarian) {
     switch (s) {
-        case AppState::BorrowBook: return 0;
-        case AppState::SearchBook: return 1;
-        case AppState::AddBook:    return isLibrarian ? 2 : 0;
-        // Bất kỳ state khác (kể cả ReturnBook) mặc định về Borrow
-        default:                   return 0;
+        case AppState::BorrowBook:  return 0;
+        case AppState::SearchBook:  return 1;
+        case AppState::AddBook:     return isLibrarian ? 2 : 0;
+        case AppState::ListMember: return isLibrarian ? 3 : 0; // NEW
+        default:                    return 0;
     }
 }
 
-// Ánh xạ index -> AppState (không còn ReturnBook)
+// Ánh xạ index -> AppState (thêm ListMembers cho librarian)
 static AppState IndexToAppState(int idx, bool isLibrarian) {
     static AppState mapCommon[2] = {
         AppState::BorrowBook, AppState::SearchBook
     };
     if (idx < 2) return mapCommon[idx];
-    return isLibrarian ? AppState::AddBook : AppState::BorrowBook;
+    if (isLibrarian) {
+        if (idx == 2) return AppState::AddBook;
+        if (idx == 3) return AppState::ListMember; // NEW
+    }
+    return AppState::BorrowBook;
 }
 
 static bool NavButton(const char* label, bool selected, float width) {
@@ -55,9 +59,12 @@ inline void LmsShellUI(AppState& appState) {
 
     const bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
 
-    // Sidebar chỉ còn Borrow, Search (+ Add nếu Librarian)
-    std::vector<const char*> actions = { "Borrow / Return Book", "Search Book" };
-    if (isLibrarian) actions.push_back("Add Book");
+    // Sidebar: Dashboard (Borrow), Browse (Search), Book Manage (Add), Member Manage (ListMembers)
+    std::vector<const char*> actions = { "Dashboard", "Browse" };
+    if (isLibrarian) {
+        actions.push_back("Book Manage");
+        actions.push_back("Member Manage"); // NEW
+    }
 
     static int selected = AppStateToIndex(appState, isLibrarian);
     if (curUser.getRole() != lastRole) {
@@ -102,7 +109,7 @@ inline void LmsShellUI(AppState& appState) {
         // Content
         ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_None);
         {
-            // Topbar
+            // Topbar (bên trái từng screen sẽ tự vẽ tiêu đề: Dashboard/Browse/…)
             ImGui::BeginChild("topbar", ImVec2(0, 44), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
             {
                 const std::string user  = curUser.getUserName();
@@ -117,7 +124,6 @@ inline void LmsShellUI(AppState& appState) {
 
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + topPadY);
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availW - textW);
-
                 ImGui::AlignTextToFramePadding();
                 ImGui::TextUnformatted(label.c_str());
             }
@@ -132,6 +138,7 @@ inline void LmsShellUI(AppState& appState) {
                 case AppState::BorrowBook:   BorrowBookUI(appState);   break;
                 case AppState::SearchBook:   SearchBookUI(appState);   break;
                 case AppState::AddBook:      AddBookUI(appState);      break;
+                case AppState::ListMember:  ListMemberUI(appState);   break; // NEW
                 default:
                     ImGui::TextDisabled("Select a feature from the left sidebar.");
                     break;
