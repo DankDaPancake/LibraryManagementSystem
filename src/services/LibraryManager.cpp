@@ -273,15 +273,15 @@ void LibraryManager::saveBooksNewInfo()
     // }
     // categoryFile.close();
 
-    // ofstream file("../data/books.csv");
-    // file.clear();
-    // file << "isbn,title,authorID,categoryID,status,totalCopies,availableCopies\n";
+    ofstream file("../data/books.csv");
+    file.clear();
+    file << "isbn,title,authorID,categoryID,status,totalCopies,availableCopies\n";
 
-    // for (auto book: books) {
-    //     cout << "Saved '" << book->getTitle() << "' information." << endl;
-    //     file << book->getFullDescription() << '\n';
-    // }
-    // file.close();
+    for (auto book: books) {
+        cout << "Saved '" << book->getTitle() << "' information." << endl;
+        file << book->getFullDescription() << '\n';
+    }
+    file.close();
 
     ofstream loanFile("../data/loans.csv");
     loanFile.clear();
