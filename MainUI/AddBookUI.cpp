@@ -154,7 +154,7 @@ void AddBookUI(AppState& appState)
     ImGui::Separator();
     ImGui::TextUnformatted("Book collection:");
 
-    if (ImGui::BeginTable("Books Table", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+    if (ImGui::BeginTable("Books Table", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
     {
         ImGui::TableSetupColumn("ISBN");
         ImGui::TableSetupColumn("Title");

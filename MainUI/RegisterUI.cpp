@@ -134,7 +134,6 @@ void RegisterUI(AppState &appState) {
             newUsername = usernameBuf;
             newPassword = passwordBuf;
 
-            // Không cho chọn role -> mặc định MEMBER
             Role chosenRole = Role::MEMBER;
 
             AuthenticateManager auth;
@@ -158,7 +157,7 @@ void RegisterUI(AppState &appState) {
     }
     ImGui::EndChild();
 
-    ImGui::PopStyleVar(2);   // WindowPadding, ChildRounding
-    ImGui::PopStyleColor(3); // ChildBg, Border, Text
+    ImGui::PopStyleVar(2);  
+    ImGui::PopStyleColor(3); 
     ImGui::End();
 }

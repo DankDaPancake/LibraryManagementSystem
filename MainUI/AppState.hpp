@@ -10,7 +10,8 @@ enum class AppState {
     ReturnBook,
     AddBook,
     ListMember,
-    ListLoan
+    ListLoan,
+    MemberManage
 };
 
 inline const char* roleToString(Role role) {

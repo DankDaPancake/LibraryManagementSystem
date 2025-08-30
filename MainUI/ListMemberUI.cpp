@@ -7,7 +7,7 @@
 
 extern User curUser;
 
-void ListMemberUI(AppState& /*appState*/)
+void ListMemberUI(AppState& appState)
 {
     auto& manager = LibraryManager::getInstance();
 
@@ -29,7 +29,7 @@ void ListMemberUI(AppState& /*appState*/)
     const float wMemberID   = 0.80f;         
     const float wUsername   = 1.20f;        
 
-    if (ImGui::BeginTable("members_table", 3, flags, ImVec2(-FLT_MIN, tableMinH)))
+    if (ImGui::BeginTable("members_table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
     {
         ImGui::TableSetupColumn("Member ID",    ImGuiTableColumnFlags_WidthStretch, wMemberID);
         ImGui::TableSetupColumn("Username",     ImGuiTableColumnFlags_WidthStretch, wUsername);

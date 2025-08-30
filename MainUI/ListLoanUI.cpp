@@ -32,7 +32,6 @@ void ListLoanUI(AppState& appState)
     auto& manager = LibraryManager::getInstance();
 
     ImGui::TextUnformatted("Loans");
-    ImGui::Separator(); 
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0, 4));
 
@@ -45,9 +44,8 @@ void ListLoanUI(AppState& appState)
 
     const float tableMinH = ImGui::GetContentRegionAvail().y;
 
-    if (ImGui::BeginTable("loan_list_table", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    if (ImGui::BeginTable("loan_list_table", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
     {
-        // Cột: set width để Status/Date không bị nuốt
         ImGui::TableSetupColumn("Loan ID",     ImGuiTableColumnFlags_WidthFixed,   90.0f);
         ImGui::TableSetupColumn("Book ISBN",   ImGuiTableColumnFlags_WidthFixed,  130.0f);
         ImGui::TableSetupColumn("Book Title",  ImGuiTableColumnFlags_WidthStretch);

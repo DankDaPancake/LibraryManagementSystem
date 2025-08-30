@@ -9,29 +9,36 @@
 extern User curUser;
 const char* roleToString(Role);
 
-// Ánh xạ AppState -> index (thêm ListMembers; vẫn bỏ ReturnBook)
 static int AppStateToIndex(AppState s, bool isLibrarian) {
+    if (!isLibrarian) {
+        switch (s) {
+            case AppState::SearchBook:   return 0;
+            case AppState::MemberManage: return 1;
+            default:                     return 0;
+        }
+    }
+
     switch (s) {
-        case AppState::BorrowBook:  return 0;
-        case AppState::SearchBook:  return 1;
-        case AppState::AddBook:     return isLibrarian ? 2 : 0;
-        case AppState::ListMember: return isLibrarian ? 3 : 0; // NEW
-        case AppState::ListLoan: return isLibrarian ? 4 : 0;
-        default:                    return 0;
+        case AppState::BorrowBook: return 0;
+        case AppState::SearchBook: return 1;
+        case AppState::AddBook:    return 2;
+        case AppState::ListMember: return 3;
+        case AppState::ListLoan:   return 4;
+        default:                   return 0;
     }
 }
 
-// Ánh xạ index -> AppState (thêm ListMembers cho librarian)
 static AppState IndexToAppState(int idx, bool isLibrarian) {
-    static AppState mapCommon[2] = {
-        AppState::BorrowBook, AppState::SearchBook
-    };
-    if (idx < 2) return mapCommon[idx];
-    if (isLibrarian) {
-        if (idx == 2) return AppState::AddBook;
-        if (idx == 3) return AppState::ListMember; 
-        if (idx == 4) return AppState::ListLoan;
+    if (!isLibrarian) {
+        if (idx <= 0) return AppState::SearchBook;
+        return AppState::MemberManage;
     }
+
+    if (idx == 0) return AppState::BorrowBook;
+    if (idx == 1) return AppState::SearchBook;
+    if (idx == 2) return AppState::AddBook;
+    if (idx == 3) return AppState::ListMember;
+    if (idx == 4) return AppState::ListLoan;
     return AppState::BorrowBook;
 }
 
@@ -58,15 +65,16 @@ inline void LmsShellUI(AppState& appState) {
 
     static float sidebarWidth = 260.0f;
     static Role lastRole = curUser.getRole();
-
     const bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
 
-    // Sidebar: Dashboard (Borrow), Browse (Search), Book Manage (Add), Member Manage (ListMembers)
-    std::vector<const char*> actions = { "Dashboard", "Browse" };
+    if (!isLibrarian && appState == AppState::BorrowBook)
+        appState = AppState::SearchBook;
+
+    std::vector<const char*> actions;
     if (isLibrarian) {
-        actions.push_back("Book Manage");
-        actions.push_back("Member Manage"); 
-        actions.push_back("Loan Manage");
+        actions = { "Dashboard", "Browse", "Book Manage", "Member Manage", "Loan Manage" };
+    } else {
+        actions = { "Browse", "Member Manage" }; 
     }
 
     static int selected = AppStateToIndex(appState, isLibrarian);
@@ -131,21 +139,21 @@ inline void LmsShellUI(AppState& appState) {
             ImGui::EndChild();
             ImGui::Separator();
 
-            // Body
             ImGui::BeginChild("content_body", ImVec2(0, 0), false, ImGuiWindowFlags_None);
-
             AppState inner = IndexToAppState(selected, isLibrarian);
             switch (inner) {
                 case AppState::BorrowBook:   BorrowBookUI(appState);   break;
-                case AppState::SearchBook:   SearchBookUI(appState);   break;
                 case AppState::AddBook:      AddBookUI(appState);      break;
-                case AppState::ListMember:  ListMemberUI(appState);   break; 
-                case AppState::ListLoan:  ListLoanUI(appState);   break;
+                case AppState::ListMember:   ListMemberUI(appState);   break;
+                case AppState::ListLoan:     ListLoanUI(appState);     break;
+
+                case AppState::SearchBook:   SearchBookUI(appState);   break;
+                case AppState::MemberManage: MemberManageUI(appState); break;
+
                 default:
                     ImGui::TextDisabled("Select a feature from the left sidebar.");
                     break;
             }
-
             ImGui::EndChild();
         }
         ImGui::EndChild();

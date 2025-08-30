@@ -8,7 +8,8 @@ void RenderUI(AppState& appState) {
     else if (appState == AppState::BorrowBook)   BorrowBookUI(appState);
     else if (appState == AppState::ReturnBook)   ReturnBookUI(appState);
     else if (appState == AppState::ListMember)   ListMemberUI(appState);
-    else if (appState == AppState::ListMember)   ListLoanUI(appState);
+    else if (appState == AppState::ListLoan)   ListLoanUI(appState);
+    else if (appState == AppState::MemberManage)   MemberManageUI(appState);
     else if (appState == AppState::AddBook)      AddBookUI(appState);
 }
 

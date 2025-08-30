@@ -89,7 +89,7 @@ void SearchBookUI(AppState &appState) {
     }
 
     // ==== Bảng kết quả ====
-    if (ImGui::BeginTable("Book Table", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+    if (ImGui::BeginTable("Book Table", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable)) {
         ImGui::TableSetupColumn("ISBN");
         ImGui::TableSetupColumn("Title");
         ImGui::TableSetupColumn("Author");

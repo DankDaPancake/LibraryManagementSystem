@@ -11,3 +11,4 @@ void ReturnBookUI(AppState&);
 void AddBookUI(AppState&);
 void ListMemberUI(AppState&);
 void ListLoanUI(AppState&);
+void MemberManageUI(AppState&);
