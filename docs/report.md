@@ -347,15 +347,15 @@ The Observer Pattern enables real-time notifications between different component
 classDiagram
     class IObserver {
         <<interface>>
-        +update(message, book, loan) void*
-        +logNotification(message, book, loan) void*
+        +update(message, book, loan) void
+        +logNotification(message, book, loan) void
     }
 
     class ISubject {
         <<interface>>
-        +attach(observer) void*
-        +detach(observer) void*
-        +notify() void*
+        +attach(observer) void
+        +detach(observer) void
+        +notify() void
     }
 
     class BookSubject {
@@ -456,11 +456,14 @@ The Singleton Pattern ensures single-instance coordination for all library opera
 - **Static getInstance() Method**: Returns single shared instance
 - **Private Constructor**: Prevents direct instantiation
 - **Deleted Copy Operations**: Ensures single instance guarantee
+- **Threading Support**: Background timer thread for automatic loan monitoring
+- **Automatic Penalty Processing**: Timer-based checking of overdue loans with penalty application
 
 **Benefits**:
 - **Global Access**: Single point of access for library functionality
 - **Resource Management**: Centralized control of library state
 - **Consistency**: Ensures single source of truth for library operations
+- **Automated Operations**: Background processing for loan monitoring and penalty management
 
 #### Strategy Pattern (Algorithm Family Management)
 
@@ -658,7 +661,7 @@ classDiagram
     %% Strategy Pattern
     class ISearchStrategy {
         <<interface>>
-        +search(books, query) vector~Book*~*
+        +search(books, query) vector~Book*~
     }
 
     class TitleSearchStrategy {
@@ -1032,28 +1035,11 @@ classDiagram
 classDiagram
     class StringHandler {
         <<utility>>
-        +trim(str : string)$ string
-        +toLowerCase(str : string)$ string
-        +toUpperCase(str : string)$ string
-        +split(str : string, delimiter : char)$ vector~string~
-        +join(strings : vector~string~, delimiter : string)$ string
-        +isValidISBN(isbn : string)$ bool
-        +isValidEmail(email : string)$ bool
-        +isValidPhoneNumber(phone : string)$ bool
-        +isValidDate(date : string)$ bool
-        +isValidUserID(userID : string)$ bool
-        +formatDate(date : Date)$ string
-        +formatCurrency(amount : double)$ string
-        +formatDuration(days : int)$ string
-        +generateID(prefix : string)$ string
-        +encodePassword(password : string)$ string
-        +verifyPassword(password : string, hash : string)$ bool
-        +sanitizeInput(input : string)$ string
-        +escapeHTML(input : string)$ string
-        +containsIgnoreCase(text : string, search : string)$ bool
-        +calculateSimilarity(str1 : string, str2 : string)$ double
-        +extractKeywords(text : string)$ vector~string~
-```
+        +getLowercase(s : string)$ string
+        +findTopMatches(patterns : vector~pair~string,Book*~~, query : string, topN : int)$ vector~pair~double,Book*~~
+        -levenshteinDistance(a : string, b : string)$ int
+        -matchScore(author : string, query : string)$ double
+    }
 
     %% Relationships
     StringHandler ..> Book : processes
@@ -1149,7 +1135,7 @@ classDiagram
 - **Data Integrity**: Private members prevent unauthorized modifications
 - **Business Logic Enforcement**: Controlled access ensures business rules compliance
 - **Interface Stability**: Internal changes don't affect client code
-- **Security**: Sensitive data (passwords, financial info) properly protected
+- **Basic Data Protection**: User credentials stored in CSV files with basic validation
 
 #### 2. Inheritance (Code Reuse and IS-A Relationships)
 **Class Hierarchy Implementation:**
