@@ -903,9 +903,6 @@ classDiagram
         +loginUser(userName : string, password : string) User*
         +logoutUser() void
     }
-        +deactivateUser(userID : string) void
-        +activateUser(userID : string) void
-    }
     
     class LibraryManager {
         <<singleton>>
