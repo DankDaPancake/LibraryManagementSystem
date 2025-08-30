@@ -7,23 +7,25 @@
 #include <string>
 
 extern User curUser;
-const char* roleToString(Role);  
+const char* roleToString(Role);
 
+// Ánh xạ AppState -> index (không còn ReturnBook)
 static int AppStateToIndex(AppState s, bool isLibrarian) {
     switch (s) {
-        case AppState::BorrowBook:   return 0;
-        case AppState::ReturnBook:   return 1;
-        case AppState::SearchBook:   return 2;
-        case AppState::AddBook:      return isLibrarian ? 3 : 0;
-        default:                     return 0;
+        case AppState::BorrowBook: return 0;
+        case AppState::SearchBook: return 1;
+        case AppState::AddBook:    return isLibrarian ? 2 : 0;
+        // Bất kỳ state khác (kể cả ReturnBook) mặc định về Borrow
+        default:                   return 0;
     }
 }
 
+// Ánh xạ index -> AppState (không còn ReturnBook)
 static AppState IndexToAppState(int idx, bool isLibrarian) {
-    static AppState mapCommon[3] = {
-        AppState::BorrowBook, AppState::ReturnBook, AppState::SearchBook
+    static AppState mapCommon[2] = {
+        AppState::BorrowBook, AppState::SearchBook
     };
-    if (idx < 3) return mapCommon[idx];
+    if (idx < 2) return mapCommon[idx];
     return isLibrarian ? AppState::AddBook : AppState::BorrowBook;
 }
 
@@ -51,9 +53,10 @@ inline void LmsShellUI(AppState& appState) {
     static float sidebarWidth = 260.0f;
     static Role lastRole = curUser.getRole();
 
-    bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
+    const bool isLibrarian = (curUser.getRole() == Role::LIBRARIAN);
 
-    std::vector<const char*> actions = { "Borrow Book", "Return Book", "Search Book"};
+    // Sidebar chỉ còn Borrow, Search (+ Add nếu Librarian)
+    std::vector<const char*> actions = { "Borrow / Return Book", "Search Book" };
     if (isLibrarian) actions.push_back("Add Book");
 
     static int selected = AppStateToIndex(appState, isLibrarian);
@@ -64,6 +67,7 @@ inline void LmsShellUI(AppState& appState) {
     if (selected >= (int)actions.size()) selected = (int)actions.size() - 1;
 
     if (ImGui::Begin("LMS - Shell", nullptr, flags)) {
+        // Sidebar
         ImGui::BeginChild("sidebar", ImVec2(sidebarWidth, 0), true, ImGuiWindowFlags_NoScrollbar);
         {
             ImGui::Dummy(ImVec2(0, 6));
@@ -95,8 +99,10 @@ inline void LmsShellUI(AppState& appState) {
 
         ImGui::SameLine();
 
+        // Content
         ImGui::BeginChild("content", ImVec2(0, 0), false, ImGuiWindowFlags_None);
         {
+            // Topbar
             ImGui::BeginChild("topbar", ImVec2(0, 44), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
             {
                 const std::string user  = curUser.getUserName();
@@ -112,30 +118,30 @@ inline void LmsShellUI(AppState& appState) {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + topPadY);
                 ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availW - textW);
 
-                ImGui::AlignTextToFramePadding();  
+                ImGui::AlignTextToFramePadding();
                 ImGui::TextUnformatted(label.c_str());
             }
             ImGui::EndChild();
             ImGui::Separator();
 
+            // Body
             ImGui::BeginChild("content_body", ImVec2(0, 0), false, ImGuiWindowFlags_None);
 
             AppState inner = IndexToAppState(selected, isLibrarian);
-
             switch (inner) {
                 case AppState::BorrowBook:   BorrowBookUI(appState);   break;
-                case AppState::ReturnBook:   ReturnBookUI(appState);   break;
                 case AppState::SearchBook:   SearchBookUI(appState);   break;
                 case AppState::AddBook:      AddBookUI(appState);      break;
                 default:
                     ImGui::TextDisabled("Select a feature from the left sidebar.");
                     break;
             }
+
             ImGui::EndChild();
         }
         ImGui::EndChild();
     }
-    ImGui::End(); 
+    ImGui::End();
 }
 
 void MainMenuUI(AppState& appState) {
