@@ -1,68 +1,175 @@
 #include "imgui.h"
-#include "AppState.hpp"                 
-#include "services/AuthenticateManager.hpp"    
+#include "AppState.hpp"
+#include "services/AuthenticateManager.hpp"
+#include "core/User.hpp"
+#include <algorithm>
 #include <string>
-#include <cstring>                           
+#include <cstring>
+
+static void DrawFocusStripe(float pad_y, float thickness, ImU32 col, float dash = 8.0f, float gap = 5.0f) {
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImVec2 a = ImGui::GetItemRectMin();
+    ImVec2 b = ImGui::GetItemRectMax();
+    float y1 = b.y + pad_y;
+    float y2 = y1 + thickness;
+    for (float x = a.x; x < b.x; x += (dash + gap)) {
+        float x2 = x + dash;
+        if (x2 > b.x) x2 = b.x;
+        dl->AddRectFilled(ImVec2(x, y1), ImVec2(x2, y2), col, thickness * 0.5f);
+    }
+}
 
 void RegisterUI(AppState &appState) {
-    static std::string newUsername = "";
-    static std::string newPassword = "";
+    ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(vp->WorkPos);
+    ImGui::SetNextWindowSize(vp->WorkSize);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoMove     | ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
-    static bool registerSuccess = false;
-    static bool registerFailed  = false;
+    static std::string newUsername;
+    static std::string newPassword;
+    static bool        registerSuccess = false;
+    static bool        registerFailed  = false;
+    static char usernameBuf[64] = "";
+    static char passwordBuf[64] = "";
+    static int  roleIndex = 0; 
 
-    static char usernameBuf[64];
-    std::strncpy(usernameBuf, newUsername.c_str(), sizeof(usernameBuf));
-    usernameBuf[sizeof(usernameBuf) - 1] = '\0';
+    if (!ImGui::Begin("LMS/Register", nullptr, flags)) { ImGui::End(); return; }
 
-    static char passwordBuf[64];
-    std::strncpy(passwordBuf, newPassword.c_str(), sizeof(passwordBuf));
-    passwordBuf[sizeof(passwordBuf) - 1] = '\0';
+    const float topPad     = 36.0f;
+    const float bottomGap  = 110.0f;              
+    const float availX     = ImGui::GetContentRegionAvail().x;
+    const float availY     = ImGui::GetContentRegionAvail().y;
+    const float cardW      = std::clamp(availX * 0.70f, 540.0f, 760.0f);
+    const float cardX      = (availX - cardW) * 0.5f;
 
-    ImGui::Begin("Register");
+    const float desiredH   = 580.0f; 
+    float maxCardH         = std::max(420.0f, availY - topPad - bottomGap);
+    float cardH            = std::min(desiredH, maxCardH);
 
-    ImGui::Text("Register form here...");
-    if (ImGui::InputText("New Username", usernameBuf, IM_ARRAYSIZE(usernameBuf))) {
-        newUsername = usernameBuf;
-    }
-    if (ImGui::InputText("New Password", passwordBuf, IM_ARRAYSIZE(passwordBuf),
-                         ImGuiInputTextFlags_Password)) {
-        newPassword = passwordBuf;
-    }
+    ImGui::Dummy(ImVec2(0, topPad));
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cardX);
 
-    struct RoleItem { const char* name; Role value; };
-    static RoleItem roleItems[] = {
-        {"MEMBER",    Role::MEMBER},
-        {"LIBRARIAN", Role::LIBRARIAN},
-    };
-    static int currentRoleIndex = 0;
-    const char* roleNames[] = { roleItems[0].name, roleItems[1].name };
-    const int   roleCount   = 2;
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.95f, 0.96f, 0.98f, 1.0f)); // trắng ngà
+    ImGui::PushStyleColor(ImGuiCol_Border,  ImVec4(0.08f, 0.22f, 0.28f, 1.0f)); // viền đậm
+    ImGui::PushStyleColor(ImGuiCol_Text,    ImVec4(0,0,0,1));
+    ImGui::PushStyleVar  (ImGuiStyleVar_ChildRounding, 14.0f);
+    ImGui::PushStyleVar  (ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 20.0f));
 
-    ImGui::Combo("Role", &currentRoleIndex, roleNames, roleCount);
-    Role chosenRole = roleItems[currentRoleIndex].value;
+    if (ImGui::BeginChild("register_card", ImVec2(cardW, cardH), true /*border*/, ImGuiWindowFlags_NoScrollbar)) {
+        ImGui::Dummy(ImVec2(0, 6));
+        float s = ImGui::GetFont()->Scale;
+        ImGui::GetFont()->Scale = s * 1.35f; ImGui::PushFont(ImGui::GetFont());
+        ImGui::TextUnformatted("fit@hcmus");
+        ImGui::PopFont(); ImGui::GetFont()->Scale = s;
+        ImGui::TextUnformatted("VNUHCM - UNIVERSITY OF SCIENCE");
+        ImGui::TextUnformatted("FACULTY OF INFORMATION TECHNOLOGY");
+        ImGui::Dummy(ImVec2(0, 8));
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(0, 6));
 
-    if (ImGui::Button("Register")) {
-        AuthenticateManager auth;
-        if (auth.registerUser(newUsername, newPassword, chosenRole)) {
-            registerSuccess = true;
-            registerFailed  = false;
-            appState        = AppState::Login;
-        } else {
-            registerSuccess = false;
-            registerFailed  = true;
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 12.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg,        ImVec4(1,1,1,1));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.96f,0.98f,1.0f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive,  ImVec4(0.93f,0.97f,1.0f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Border,         ImVec4(0.12f,0.44f,0.66f,1.0f));
+
+        ImGui::TextUnformatted("New Username");
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##reg_user", usernameBuf, IM_ARRAYSIZE(usernameBuf));
+        if (ImGui::IsItemHovered())
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(60, 140, 200, 180));     
+        if (ImGui::IsItemActive())
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));     
+
+        ImGui::Dummy(ImVec2(0, 10));
+        ImGui::TextUnformatted("New Password");
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::InputText("##reg_pass", passwordBuf, IM_ARRAYSIZE(passwordBuf), ImGuiInputTextFlags_Password);
+        if (ImGui::IsItemHovered())
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(60, 140, 200, 180));
+        if (ImGui::IsItemActive())
+            DrawFocusStripe(4.0f, 3.0f, IM_COL32(30, 110, 180, 255));
+
+        ImGui::Dummy(ImVec2(0, 10));
+        ImGui::TextUnformatted("Role");
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        ImGui::PushStyleColor(ImGuiCol_PopupBg,       ImVec4(1,1,1,1));
+        ImGui::PushStyleColor(ImGuiCol_Header,        ImVec4(0.86f,0.93f,1.00f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.82f,0.90f,1.00f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive,  ImVec4(0.74f,0.84f,1.00f,1.0f));
+        const char* roleNames[] = { "MEMBER", "LIBRARIAN" };
+        ImGui::Combo("##role_combo", &roleIndex, roleNames, IM_ARRAYSIZE(roleNames));
+        ImGui::PopStyleColor(4);
+
+        ImGui::PopStyleColor(4); 
+        ImGui::PopStyleVar(2);
+
+        ImGui::Dummy(ImVec2(0, 8));
+        {
+            const char* hint = "Already have an account? Use \"Sign in\" button below!";
+            float tw = ImGui::CalcTextSize(hint).x;
+            float cx = (ImGui::GetContentRegionAvail().x - tw) * 0.5f;
+            float keepX = ImGui::GetCursorPosX();
+            ImGui::SetCursorPosX(keepX + (cx > 0 ? cx : 0));
+            ImGui::TextUnformatted(hint);
+            ImGui::SetCursorPosX(keepX);
+        }
+
+        const float kHintToButtonsGap = 72.0f;
+        ImGui::Dummy(ImVec2(0, kHintToButtonsGap));
+
+        const float padX = 12.0f, gap = 12.0f, btnH = 44.0f;
+        float contentW = ImGui::GetContentRegionAvail().x;
+        float btnW     = (contentW - padX * 2.0f - gap) * 0.5f;
+
+        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.10f,0.35f,0.50f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.12f,0.46f,0.66f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.08f,0.30f,0.45f,1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Text,          ImVec4(1,1,1,1));
+
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + padX);
+        if (ImGui::Button("Back to Login", ImVec2(btnW, btnH))) {
+            appState = AppState::Login;
+            ImGui::PopStyleColor(4);
+            ImGui::EndChild(); ImGui::PopStyleVar(2); ImGui::PopStyleColor(3); ImGui::End();
+            return;
+        }
+        ImGui::SameLine(0, gap);
+        bool doRegister = ImGui::Button("Register", ImVec2(btnW, btnH));
+        ImGui::PopStyleColor(4);
+
+        ImGui::Dummy(ImVec2(0, 48.0f));
+
+        if (doRegister) {
+            newUsername = usernameBuf;
+            newPassword = passwordBuf;
+            Role chosenRole = (roleIndex == 1) ? Role::LIBRARIAN : Role::MEMBER;
+
+            AuthenticateManager auth;
+            if (auth.registerUser(newUsername, newPassword, chosenRole)) {
+                registerSuccess = true;
+                registerFailed  = false;
+                appState        = AppState::Login;
+                ImGui::EndChild(); ImGui::PopStyleVar(2); ImGui::PopStyleColor(3); ImGui::End();
+                return;
+            } else {
+                registerSuccess = false;
+                registerFailed  = true;
+            }
+        }
+
+        if (registerSuccess) {
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), "Registered successfully!");
+        } else if (registerFailed) {
+            ImGui::TextColored(ImVec4(1, 0, 0, 1), "Register failed! Try again.");
         }
     }
+    ImGui::EndChild();
 
-    if (registerSuccess) {
-        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Registered successfully!");
-    } else if (registerFailed) {
-        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Register failed! Try again.");
-    }
-
-    if (ImGui::Button("Back to Login")) {
-        appState = AppState::Login;
-    }
-
+    ImGui::PopStyleVar(2);   
+    ImGui::PopStyleColor(3); 
     ImGui::End();
 }
