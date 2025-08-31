@@ -59,10 +59,15 @@
 \contentsline {subsection}{\numberline {6.4}Borrowing a Book}{26}{subsection.6.4}%
 \contentsline {subsection}{\numberline {6.5}Returning a Book}{27}{subsection.6.5}%
 \contentsline {subsection}{\numberline {6.6}User Interface Showcase}{28}{subsection.6.6}%
-\contentsline {section}{\numberline {7}Conclusion}{29}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Challenges Faced During Development}{29}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Future Enhancements}{29}{subsection.7.2}%
-\contentsline {section}{\numberline {8}Project Summary and Team Evaluation}{31}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Member Contributions and Task Allocation}{31}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}Development Workflow and Collaboration}{32}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}Key Challenges and Resolutions}{32}{subsection.8.3}%
+\contentsline {subsubsection}{\numberline {6.6.1}Authentication and Registration}{28}{subsubsection.6.6.1}%
+\contentsline {subsubsection}{\numberline {6.6.2}Member Interface}{29}{subsubsection.6.6.2}%
+\contentsline {subsubsection}{\numberline {6.6.3}Librarian Dashboard and Administration}{30}{subsubsection.6.6.3}%
+\contentsline {subsubsection}{\numberline {6.6.4}Loan Management and Operations}{32}{subsubsection.6.6.4}%
+\contentsline {subsubsection}{\numberline {6.6.5}Member Management and System Administration}{33}{subsubsection.6.6.5}%
+\contentsline {section}{\numberline {7}Conclusion}{36}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Challenges Faced During Development}{36}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Future Enhancements}{36}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Project Summary and Team Evaluation}{38}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Member Contributions and Task Allocation}{38}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Development Workflow and Collaboration}{39}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Key Challenges and Resolutions}{39}{subsection.8.3}%

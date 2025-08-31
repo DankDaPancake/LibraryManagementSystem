@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.12.18)  31 AUG 2025 03:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.12.18)  31 AUG 2025 10:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1349,7 +1349,7 @@ Package biblatex Info: Reference segment=0 on input line 49.
 \openout2 = `cover_page.aux'.
 
  (cover_page.tex
-<logo KHTN.png, id=274, 2491.3075pt x 2491.3075pt>
+<logo KHTN.png, id=294, 2491.3075pt x 2491.3075pt>
 File: logo KHTN.png Graphic file (type png)
 <use logo KHTN.png>
 Package pdftex.def Info: logo KHTN.png  used on input line 20.
@@ -1458,7 +1458,7 @@ Package csquotes Warning: No space factor codes for 'T5' encoding.
 
 
 ]
-<figures/class_diagram.png, id=408, 852.786pt x 796.1745pt>
+<figures/class_diagram.png, id=433, 852.786pt x 796.1745pt>
 File: figures/class_diagram.png Graphic file (type png)
 <use figures/class_diagram.png>
 Package pdftex.def Info: figures/class_diagram.png  used on input line 35.
@@ -1475,27 +1475,28 @@ Package csquotes Warning: No space factor codes for 'T5' encoding.
 Package csquotes Warning: No space factor codes for 'T5' encoding.
 (csquotes)                Punctuation tracker may fail on input line 4.
 
-<figures/user_class_encap.png, id=417, 251.13824pt x 283.65974pt>
+<figures/user_class_encap.png, id=442, 251.13824pt x 283.65974pt>
 File: figures/user_class_encap.png Graphic file (type png)
 <use figures/user_class_encap.png>
 Package pdftex.def Info: figures/user_class_encap.png  used on input line 13.
 (pdftex.def)             Requested size: 241.84842pt x 273.18024pt.
-<figures/inheritance.png, id=418, 638.98724pt x 784.73175pt>
+<figures/inheritance.png, id=443, 646.21425pt x 543.2295pt>
 File: figures/inheritance.png Graphic file (type png)
 <use figures/inheritance.png>
 Package pdftex.def Info: figures/inheritance.png  used on input line 25.
-(pdftex.def)             Requested size: 483.69684pt x 594.03146pt.
+(pdftex.def)             Requested size: 483.69684pt x 406.62537pt.
 [9
 
 
 
- <./figures/user_class_encap.png>] [10 <./figures/inheritance.png>]
-<figures/polymorphism.png, id=433, 627.5445pt x 241.50224pt>
+ <./figures/user_class_encap.png>]
+<figures/polymorphism.png, id=451, 627.5445pt x 241.50224pt>
 File: figures/polymorphism.png Graphic file (type png)
 <use figures/polymorphism.png>
 Package pdftex.def Info: figures/polymorphism.png  used on input line 37.
 (pdftex.def)             Requested size: 483.69684pt x 186.14522pt.
-<figures/abstraction.png, id=434, 627.5445pt x 277.035pt>
+ [10 <./figures/inheritance.png>]
+<figures/abstraction.png, id=459, 627.5445pt x 277.035pt>
 File: figures/abstraction.png Graphic file (type png)
 <use figures/abstraction.png>
 Package pdftex.def Info: figures/abstraction.png  used on input line 49.
@@ -1513,13 +1514,13 @@ Package csquotes Warning: No space factor codes for 'T5' encoding.
 
 
 ]
-<figures/singleton_pattern.png, id=448, 1211.727pt x 838.93425pt>
+<figures/singleton_pattern.png, id=473, 1211.727pt x 838.93425pt>
 File: figures/singleton_pattern.png Graphic file (type png)
 <use figures/singleton_pattern.png>
 Package pdftex.def Info: figures/singleton_pattern.png  used on input line 27.
 (pdftex.def)             Requested size: 483.69684pt x 334.8765pt.
  [13 <./figures/singleton_pattern.png>]
-<figures/observer_pattern.png, id=455, 853.38824pt x 738.96075pt>
+<figures/observer_pattern.png, id=480, 853.38824pt x 738.96075pt>
 File: figures/observer_pattern.png Graphic file (type png)
 <use figures/observer_pattern.png>
 Package pdftex.def Info: figures/observer_pattern.png  used on input line 43.
@@ -1529,13 +1530,13 @@ Overfull \hbox (8.7495pt too wide) in paragraph at lines 59--60
 \T5/cmr/m/n/12 for cal-cu-lat-ing fines and penal-ties. Con-crete im-ple-men-ta-tions such as \T5/cmtt/m/n/12 StandardPenaltyStrategy\T5/cmr/m/n/12 ,
  []
 
-<figures/strategy_pattern.png, id=462, 1392.402pt x 592.01175pt>
+<figures/strategy_pattern.png, id=487, 1392.402pt x 592.01175pt>
 File: figures/strategy_pattern.png Graphic file (type png)
 <use figures/strategy_pattern.png>
 Package pdftex.def Info: figures/strategy_pattern.png  used on input line 65.
 (pdftex.def)             Requested size: 483.69684pt x 205.65347pt.
 [15 <./figures/strategy_pattern.png>]
-<figures/decorator_pattern.png, id=469, 681.747pt x 668.4975pt>
+<figures/decorator_pattern.png, id=494, 681.747pt x 668.4975pt>
 File: figures/decorator_pattern.png Graphic file (type png)
 <use figures/decorator_pattern.png>
 Package pdftex.def Info: figures/decorator_pattern.png  used on input line 81.
@@ -1553,19 +1554,19 @@ Overfull \hbox (0.21533pt too wide) in paragraph at lines 46--47
 
 
 ]
-<figures/authenticate.png, id=485, 504.08325pt x 835.32076pt>
+<figures/authenticate.png, id=510, 504.08325pt x 835.32076pt>
 File: figures/authenticate.png Graphic file (type png)
 <use figures/authenticate.png>
 Package pdftex.def Info: figures/authenticate.png  used on input line 82.
 (pdftex.def)             Requested size: 241.84842pt x 400.77097pt.
  [19 <./figures/authenticate.png>]
-<figures/notification_service.png, id=492, 641.9985pt x 510.10574pt>
+<figures/notification_service.png, id=517, 641.9985pt x 510.10574pt>
 File: figures/notification_service.png Graphic file (type png)
 <use figures/notification_service.png>
 Package pdftex.def Info: figures/notification_service.png  used on input line 110.
 (pdftex.def)             Requested size: 386.95894pt x 307.47462pt.
  [20 <./figures/notification_service.png>]
-<figures/string_handler.png, id=499, 500.46976pt x 554.07pt>
+<figures/string_handler.png, id=524, 500.46976pt x 554.07pt>
 File: figures/string_handler.png Graphic file (type png)
 <use figures/string_handler.png>
 Package pdftex.def Info: figures/string_handler.png  used on input line 137.
@@ -1574,7 +1575,7 @@ Package pdftex.def Info: figures/string_handler.png  used on input line 137.
 \openout2 = `CHAPTER/walkthrough.aux'.
 
  (CHAPTER/walkthrough.tex
-<figures/member_workflow.png, id=512, 714.87074pt x 748.59676pt>
+<figures/member_workflow.png, id=537, 714.87074pt x 748.59676pt>
 File: figures/member_workflow.png Graphic file (type png)
 <use figures/member_workflow.png>
 Package pdftex.def Info: figures/member_workflow.png  used on input line 8.
@@ -1584,51 +1585,128 @@ Package pdftex.def Info: figures/member_workflow.png  used on input line 8.
 
 
  <./figures/member_workflow.png>]
-<figures/librarian_workflow.png, id=520, 1319.52975pt x 800.9925pt>
+<figures/librarian_workflow.png, id=545, 1319.52975pt x 800.9925pt>
 File: figures/librarian_workflow.png Graphic file (type png)
 <use figures/librarian_workflow.png>
 Package pdftex.def Info: figures/librarian_workflow.png  used on input line 20.
 (pdftex.def)             Requested size: 483.69684pt x 293.6126pt.
  [24 <./figures/librarian_workflow.png>]
-<figures/sequence_register.png, id=528, 861.81975pt x 501.072pt>
+<figures/sequence_register.png, id=553, 861.81975pt x 501.072pt>
 File: figures/sequence_register.png Graphic file (type png)
 <use figures/sequence_register.png>
 Package pdftex.def Info: figures/sequence_register.png  used on input line 32.
 (pdftex.def)             Requested size: 483.69684pt x 281.22536pt.
  [25 <./figures/sequence_register.png>]
-<figures/sequence_borrow.png, id=536, 1000.9395pt x 853.38824pt>
+<figures/sequence_borrow.png, id=561, 1000.9395pt x 853.38824pt>
 File: figures/sequence_borrow.png Graphic file (type png)
 <use figures/sequence_borrow.png>
 Package pdftex.def Info: figures/sequence_borrow.png  used on input line 44.
 (pdftex.def)             Requested size: 483.69684pt x 412.39531pt.
  [26 <./figures/sequence_borrow.png>]
-<figures/sequence_return.png, id=544, 1150.2975pt x 859.41075pt>
+<figures/sequence_return.png, id=569, 1150.2975pt x 859.41075pt>
 File: figures/sequence_return.png Graphic file (type png)
 <use figures/sequence_return.png>
 Package pdftex.def Info: figures/sequence_return.png  used on input line 56.
 (pdftex.def)             Requested size: 483.69684pt x 361.3828pt.
  [27 <./figures/sequence_return.png>]
-<figures/screenshot_main_menu.png, id=551, 722.7pt x 433.62pt>
-File: figures/screenshot_main_menu.png Graphic file (type png)
-<use figures/screenshot_main_menu.png>
-Package pdftex.def Info: figures/screenshot_main_menu.png  used on input line 68.
-(pdftex.def)             Requested size: 435.32419pt x 261.19295pt.
-<figures/screenshot_search_result.png, id=552, 722.7pt x 433.62pt>
-File: figures/screenshot_search_result.png Graphic file (type png)
-<use figures/screenshot_search_result.png>
-Package pdftex.def Info: figures/screenshot_search_result.png  used on input line 75.
-(pdftex.def)             Requested size: 435.32419pt x 261.19295pt.
-) [28 <./figures/screenshot_main_menu.png> <./figures/screenshot_search_result.png>]
+<figures/screenshot_login.png, id=576, 953.36176pt x 597.432pt>
+File: figures/screenshot_login.png Graphic file (type png)
+<use figures/screenshot_login.png>
+Package pdftex.def Info: figures/screenshot_login.png  used on input line 71.
+(pdftex.def)             Requested size: 386.95894pt x 242.48737pt.
+<figures/screenshot_register.png, id=577, 953.36176pt x 597.432pt>
+File: figures/screenshot_register.png Graphic file (type png)
+<use figures/screenshot_register.png>
+Package pdftex.def Info: figures/screenshot_register.png  used on input line 78.
+(pdftex.def)             Requested size: 386.95894pt x 242.48737pt.
+<figures/screenshot_member_browse.png, id=578, 953.36176pt x 597.432pt>
+File: figures/screenshot_member_browse.png Graphic file (type png)
+<use figures/screenshot_member_browse.png>
+Package pdftex.def Info: figures/screenshot_member_browse.png  used on input line 88.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [28 <./figures/screenshot_login.png> <./figures/screenshot_register.png>]
+<figures/screenshot_member_myloanmanage.png, id=588, 953.36176pt x 597.432pt>
+File: figures/screenshot_member_myloanmanage.png Graphic file (type png)
+<use figures/screenshot_member_myloanmanage.png>
+Package pdftex.def Info: figures/screenshot_member_myloanmanage.png  used on input line 95.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+<figures/screenshot_member_noti.png, id=589, 953.36176pt x 597.432pt>
+File: figures/screenshot_member_noti.png Graphic file (type png)
+<use figures/screenshot_member_noti.png>
+Package pdftex.def Info: figures/screenshot_member_noti.png  used on input line 102.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [29 <./figures/screenshot_member_browse.png> <./figures/screenshot_member_myloanmanage.png>]
+<figures/screenshot_librarian_dashboard.png, id=598, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_dashboard.png Graphic file (type png)
+<use figures/screenshot_librarian_dashboard.png>
+Package pdftex.def Info: figures/screenshot_librarian_dashboard.png  used on input line 112.
+(pdftex.def)             Requested size: 483.69684pt x 303.1092pt.
+<figures/screenshot_librarian_bookmanage.png, id=599, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_bookmanage.png Graphic file (type png)
+<use figures/screenshot_librarian_bookmanage.png>
+Package pdftex.def Info: figures/screenshot_librarian_bookmanage.png  used on input line 119.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [30 <./figures/screenshot_member_noti.png> <./figures/screenshot_librarian_dashboard.png>]
+<figures/screenshot_librarian_addbook.png, id=608, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_addbook.png Graphic file (type png)
+<use figures/screenshot_librarian_addbook.png>
+Package pdftex.def Info: figures/screenshot_librarian_addbook.png  used on input line 126.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+<figures/screenshot_librarian_removebook.png, id=609, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_removebook.png Graphic file (type png)
+<use figures/screenshot_librarian_removebook.png>
+Package pdftex.def Info: figures/screenshot_librarian_removebook.png  used on input line 133.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [31 <./figures/screenshot_librarian_bookmanage.png> <./figures/screenshot_librarian_addbook.png>]
+<figures/screenshot_librarian_loanmanage.png, id=618, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_loanmanage.png Graphic file (type png)
+<use figures/screenshot_librarian_loanmanage.png>
+Package pdftex.def Info: figures/screenshot_librarian_loanmanage.png  used on input line 143.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+<figures/screenshot_librarian_borrow.png, id=619, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_borrow.png Graphic file (type png)
+<use figures/screenshot_librarian_borrow.png>
+Package pdftex.def Info: figures/screenshot_librarian_borrow.png  used on input line 150.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [32 <./figures/screenshot_librarian_removebook.png> <./figures/screenshot_librarian_loanmanage.png>]
+<figures/screenshot_librarian_return.png, id=628, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_return.png Graphic file (type png)
+<use figures/screenshot_librarian_return.png>
+Package pdftex.def Info: figures/screenshot_librarian_return.png  used on input line 157.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+<figures/screenshot_librarian_memmanage.png, id=629, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_memmanage.png Graphic file (type png)
+<use figures/screenshot_librarian_memmanage.png>
+Package pdftex.def Info: figures/screenshot_librarian_memmanage.png  used on input line 167.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [33 <./figures/screenshot_librarian_borrow.png> <./figures/screenshot_librarian_return.png>]
+<figures/screenshot_librarian_penalty.png, id=638, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_penalty.png Graphic file (type png)
+<use figures/screenshot_librarian_penalty.png>
+Package pdftex.def Info: figures/screenshot_librarian_penalty.png  used on input line 174.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+<figures/screenshot_librarian_noti.png, id=639, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_noti.png Graphic file (type png)
+<use figures/screenshot_librarian_noti.png>
+Package pdftex.def Info: figures/screenshot_librarian_noti.png  used on input line 181.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+ [34 <./figures/screenshot_librarian_memmanage.png> <./figures/screenshot_librarian_penalty.png>]
+<figures/screenshot_librarian_browse.png, id=649, 953.36176pt x 597.432pt>
+File: figures/screenshot_librarian_browse.png Graphic file (type png)
+<use figures/screenshot_librarian_browse.png>
+Package pdftex.def Info: figures/screenshot_librarian_browse.png  used on input line 188.
+(pdftex.def)             Requested size: 435.32419pt x 272.79828pt.
+) [35 <./figures/screenshot_librarian_noti.png> <./figures/screenshot_librarian_browse.png>]
 \openout2 = `CHAPTER/conclusion.aux'.
 
- (CHAPTER/conclusion.tex) [29
+ (CHAPTER/conclusion.tex) [36
 
 
 
-] [30]
+] [37]
 \openout2 = `CHAPTER/team_evaluation.aux'.
 
- (CHAPTER/team_evaluation.tex [31
+ (CHAPTER/team_evaluation.tex [38
 
 
 
@@ -1649,16 +1727,16 @@ Package csquotes Warning: No space factor codes for 'T5' encoding.
 Package csquotes Warning: No space factor codes for 'T5' encoding.
 (csquotes)                Punctuation tracker may fail on input line 122.
 
-[32]) [33]
+[39]) [40]
 
 Package csquotes Warning: No space factor codes for 'T5' encoding.
 (csquotes)                Punctuation tracker may fail on input line 82.
 
-[34
+[41
 
 
 ]
-runsystem(latexminted cleantemp  --timestamp 20250831030114 FAD58DE7366495DB4650CFEFAC2FCD61)...disabled (restricted).
+runsystem(latexminted cleantemp  --timestamp 20250831103404 FAD58DE7366495DB4650CFEFAC2FCD61)...disabled (restricted).
 
  (main.aux (cover_page.aux) (header_footer.aux) (CHAPTER/information.aux) (CHAPTER/introduction.aux) (CHAPTER/system_design.aux) (CHAPTER/implementation_oop.aux) (CHAPTER/design_patterns.aux) (CHAPTER/service_layer.aux) (CHAPTER/walkthrough.aux) (CHAPTER/conclusion.aux) (CHAPTER/team_evaluation.aux))
  ***********
@@ -1670,23 +1748,23 @@ L3 programming layer <2024-01-04>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 946580C8836B384AFBD7E4B058A1AE7F;11856.
+(rerunfilecheck)             Checksum: 1683AA9FF920971AB6C5D565E9513CF0;13025.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 37898 strings out of 474486
- 748843 string characters out of 5753569
- 1945542 words of memory out of 5000000
- 59394 multiletter control sequences out of 15000+600000
+ 38041 strings out of 474486
+ 754094 string characters out of 5753569
+ 1946542 words of memory out of 5000000
+ 59511 multiletter control sequences out of 15000+600000
  571742 words of font info for 60 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,18n,87p,1192b,2320s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi600\vnti12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi600\vntt12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi657\vnr10.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi600\vnbx12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi864\vnbx12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi720\vnr12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi720\vnbx12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi1244\vnbx12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi1037\vnbx12.pk> <C:\Users\Duhoa\AppData\Local\MiKTeX\fonts/pk/ljfour/vntex/vnr/dpi600\vnr12.pk>
-Output written on main.pdf (37 pages, 1917252 bytes).
+Output written on main.pdf (44 pages, 2973926 bytes).
 PDF statistics:
- 1084 PDF objects out of 1200 (max. 8388607)
- 134 named destinations out of 1000 (max. 500000)
- 649 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1185 PDF objects out of 1200 (max. 8388607)
+ 160 named destinations out of 1000 (max. 500000)
+ 759 words of extra memory for PDF output out of 10000 (max. 10000000)
 

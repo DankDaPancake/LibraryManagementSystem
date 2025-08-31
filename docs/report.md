@@ -1269,66 +1269,65 @@ classDiagram
 
 ```mermaid
 classDiagram
+    class Role {
+        <<enumeration>>
+        LIBRARIAN = 0
+        MEMBER = 1
+    }
+    
     class User {
         <<abstract>>
-        #string userID
-        #string name
-        #string email
-        #string phoneNumber
-        #string hashedPassword
-        +User(userID : string, userName : string, password : string)
+        -string userID
+        -string userName
+        -string password
+        -Role role
+        +User()
+        +User(name : string, r : Role)
+        +User(userID : string, userName : string, password : string, role : Role)
+        +virtual ~User()
         +getUserID() string
-        +getName() string
-        +authenticate(password : string) bool
-        +getUserType()* string
+        +getUserName() string
+        +getRole() Role
+        +viewProfile() void
     }
     
     class Member {
-        -vector~Loan*~ currentLoans
-        -double fineAmount
+        -Date membershipDate
+        -vector~Book*~ borrowedBooks
+        -int warningCount = 0
+        -bool suspended = false
+        -time_t suspensionEndDate = 0
+        -double totalFines = 0.0
         +Member(userID : string, userName : string, password : string)
-        +getUserType() string
+        +~Member()
+        +getMembershipDate() Date
+        +getBorrowedBooks() vector~Book*~
         +borrowBook(ISBN : string) bool
+        +returnBook(ISBN : string) bool
+        +addWarning() void
+        +getWarningCount() int
+        +resetWarnings() void
+        +suspendAccount(days : int) void
+        +isSuspended() bool
+        +removeSuspension() void
+        +addFine(amount : double) void
+        +getTotalFines() double
         +payFine(amount : double) void
-        +getCurrentLoans() vector~Loan*~
-        +getFineAmount() double
     }
     
     class Librarian {
-        -string employeeID
-        -string department
         +Librarian(userID : string, userName : string, password : string)
-        +getUserType() string
         +addBook(book : Book*) void
         +removeBook(ISBN : string) void
+        +updateBookInfo(book : Book*) void
+        +manageMemberInfo(member : Member*) void
         +viewAllLoans() vector~Loan*~
-        +generateReport() void
-    }
-    
-    class Loan {
-        -string loanID
-        -string memberID
-        -string bookISBN
-        -Date borrowDate
-        -Date dueDate
-        +isOverdue() bool
-        +getDaysOverdue() int
-    }
-    
-    class Book {
-        -string ISBN
-        -string title
-        +getTitle() string
-        +getISBN() string
     }
     
     %% Inheritance relationships
     User <|-- Member : inherits
     User <|-- Librarian : inherits
-    
-    %% Associations
-    Member "1" --o "0..*" Loan : has
-    Loan --> Book : references
+    User --> Role : has
 ```
 
 **Benefits Achieved:**
