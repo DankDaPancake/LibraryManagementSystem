@@ -1,314 +1,469 @@
-## Phân tích và Định hướng Chi tiết Hệ thống Quản Lý Thư Viện Điện Tử
+# Electronic Library Management System
 
-### I. Cấu trúc Thư mục Dự án (Gợi ý)
+A desktop Library Management System built with **C++17**, featuring a graphical user interface powered by **Dear ImGui** (DirectX 9 backend on Windows). The application demonstrates core Object-Oriented Programming principles and implements three well-known software design patterns: **Observer**, **Strategy**, and **Decorator**.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Class Design](#class-design)
+  - [Core Classes](#a-core-classes-core)
+  - [Design Patterns](#b-design-patterns-patterns)
+  - [Service Classes](#c-service-classes-services)
+  - [Utility Classes](#d-utility-classes-utils)
+- [Application Flow](#application-flow)
+- [Building & Running](#building--running)
+- [Important Notes](#important-notes)
+
+---
+
+## Features
+
+- **User Authentication** — Register and log in as a Member or Librarian with CSV-backed credential storage.
+- **Book Management** — Add, remove, update, and search books in the library catalog.
+- **Borrowing & Returning** — Members can borrow available books and return them; the system tracks copies and availability.
+- **Loan Tracking** — View all active, returned, and overdue loans with automatic overdue detection.
+- **Flexible Search** — Search books by title, author, or category using interchangeable search strategies (Strategy Pattern).
+- **Overdue Penalties** — Automatically apply tiered penalties (warning, fine, account suspension) based on days overdue (Strategy Pattern).
+- **Real-time Notifications** — Observers are notified of book status changes and approaching/overdue loan due dates (Observer Pattern).
+- **Extended Book Descriptions** — Dynamically layer additional information (difficulty labels, special tags, extra details) onto books without modifying the base class (Decorator Pattern).
+- **Background Loan Monitoring** — A dedicated timer thread periodically scans loans for overdue items and applies penalties automatically.
+- **Notification Logging** — Observer notifications are logged to the `librarylog/` directory for audit purposes.
+- **GUI** — Full graphical interface with screens for login, registration, main menu, book search, borrowing, member management, loan listing, book addition, and notifications.
+
+---
+
+## Project Structure
 
 ```
-ElectronicLibrary/
-├── data/                   # Contains data files (e.g., books.csv, members.csv, loans.csv)
-├── include/                # Contains header files (.h, .hpp)
-│   ├── core/               # Core classes (Book, Member, Loan, Author, Category)
-│   ├── patterns/           # Interfaces and classes related to Design Patterns
-│   │   ├── observer/
-│   │   ├── strategy/
-│   │   └── decorator/
-│   ├── services/           # Business logic management classes (LibraryManager, AuthManager, NotificationService)
-│   └── utils/              # Utility classes (DateUtils, Validator)
-├── src/                    # Contains source files (.cpp)
+LibraryManagementSystem/
+├── data/                       # CSV data files (books, authors, categories, members, librarians, loans)
+├── include/                    # Header files (.hpp)
+│   ├── core/                   # Core domain classes
+│   │   ├── Author.hpp
+│   │   ├── Book.hpp
+│   │   ├── Category.hpp
+│   │   ├── Librarian.hpp
+│   │   ├── Loan.hpp
+│   │   ├── Member.hpp
+│   │   └── User.hpp
+│   ├── patterns/               # Design pattern interfaces and implementations
+│   │   ├── decorator/          # Decorator Pattern
+│   │   │   ├── BookDecorator.hpp
+│   │   │   ├── DifficultyLabelDecorator.hpp
+│   │   │   ├── SpecialTagDecorator.hpp
+│   │   │   └── AdditionalInfoDecorator.hpp
+│   │   ├── observer/           # Observer Pattern
+│   │   │   ├── IObserver.hpp
+│   │   │   ├── ISubject.hpp
+│   │   │   ├── BookSubject.hpp
+│   │   │   ├── LoanSubject.hpp
+│   │   │   ├── MemberObserver.hpp
+│   │   │   ├── LibrarianObserver.hpp
+│   │   │   └── NotificationService.hpp
+│   │   └── strategy/           # Strategy Pattern
+│   │       ├── ISearchStrategy.hpp
+│   │       ├── TitleSearchStrategy.hpp
+│   │       ├── AuthorSearchStrategy.hpp
+│   │       ├── CategorySearchStrategy.hpp
+│   │       ├── IPenaltyStrategy.hpp
+│   │       ├── FinePenaltyStrategy.hpp
+│   │       ├── SuspendPenaltyStrategy.hpp
+│   │       └── WarningPenaltyStrategy.hpp
+│   ├── services/               # Business logic / service layer
+│   │   ├── AuthenticateManager.hpp
+│   │   └── LibraryManager.hpp
+│   └── utils/                  # Utility / helper classes
+│       ├── CSVHandler.hpp
+│       └── StringHandler.hpp
+├── src/                        # Source files (.cpp) — mirrors include/ structure
 │   ├── core/
 │   ├── patterns/
+│   │   ├── decorator/
 │   │   ├── observer/
-│   │   ├── strategy/
-│   │   └── decorator/
+│   │   └── strategy/
 │   ├── services/
 │   └── utils/
-├── .gitignore              # Hide build files during compilation
-├── build.bat               # Program initialization file
-├── CMakeLists.txt          # Or Makefile, used to build the project
-├── main.cpp                # Program entry point, handles console UI
-└── README.md               # Project tracking notes
+├── MainUI/                     # ImGui screen implementations
+│   ├── AppState.hpp            # Application state enum
+│   ├── Context.hpp             # Shared UI context
+│   ├── Router.hpp              # Screen routing logic
+│   ├── Screens.hpp             # Screen function declarations
+│   ├── LoginUI.cpp
+│   ├── RegisterUI.cpp
+│   ├── MainMenuUI.cpp
+│   ├── SearchBookUI.cpp
+│   ├── BorrowBook.cpp
+│   ├── AddBookUI.cpp
+│   ├── ListMemberUI.cpp
+│   ├── ListLoanUI.cpp
+│   ├── MemberManageUI.cpp
+│   └── NotificationUI.cpp
+├── ui/                         # Dear ImGui library source & backends (DirectX 9, Win32)
+├── UML/                        # UML diagrams (placeholder)
+├── docs/                       # Documentation, report, demo script
+├── librarylog/                 # Observer notification log files
+├── main.cpp                    # Application entry point
+├── CMakeLists.txt              # CMake build configuration
+├── build.bat                   # Windows build script (MinGW)
+├── requirements.md             # Course project requirements
+├── imgui.ini                   # ImGui layout persistence
+├── .gitignore
+└── README.md                   # This file
 ```
 
-### II. Phân tích và Thiết kế Lớp (Class Design)
+---
 
-#### A. Các Lớp Cốt Lõi (`core/`)
+## Class Design
 
-1.  **`User` (Lớp cơ sở hoặc trừu tượng)**
-    - Thuộc tính: `userID`, `username`, `password` (nên mã hóa), `role` (Member, Librarian)
-    - Phương thức: `login()`, `register()`, `viewProfile()`
-2.  **`Member : public User`**
-    - Thuộc tính: `membershipDate`, `borrowedBooks` (danh sách các `Loan*` hoặc `Book*`)
-    - Phương thức: `borrowBook()`, `returnBook()`, `viewBorrowedBooks()`
-3.  **`Librarian : public User`**
-    - Phương thức: `addBook()`, `removeBook()`, `updateBookInfo()`, `manageMember()`, `viewAllLoans()`
-4.  **`Book` (Lớp cơ sở cho Decorator)**
-    - Thuộc tính: `isbn` (string, unique), `title` (string), `authorIDs` (vector<string>), `categoryID` (string), `publicationYear` (int), `publisher` (string), `totalCopies` (int), `availableCopies` (int), `status` (enum: AVAILABLE, BORROWED, RESERVED, UNDER_MAINTENANCE)
-    - Phương thức: `virtual string getFullDescription() const`, `displayBasicInfo() const`, `isAvailable() const`
-5.  **`Author`**
-    - Thuộc tính: `authorID` (string, unique), `name` (string), `biography` (string)
-6.  **`Category`**
-    - Thuộc tính: `categoryID` (string, unique), `name` (string), `description` (string)
-7.  **`Loan`**
-    - Thuộc tính: `loanID` (string, unique), `bookISBN` (string), `memberID` (string), `borrowDate` (Date), `dueDate` (Date), `returnDate` (Date, có thể null), `status` (enum: ACTIVE, RETURNED, OVERDUE)
-    - Phương thức: `isOverdue() const`, `calculateFine()` (có thể là một phần của Strategy xử lý vi phạm)
+### A. Core Classes (`core/`)
 
-#### B. Design Patterns (`patterns/`)
+#### 1. `User` (Base class)
 
-1.  **Observer Pattern (`patterns/observer/`)**
+| Attribute   | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| `userID`    | `string` | Unique user identifier               |
+| `userName`  | `string` | Display name                         |
+| `password`  | `string` | User password                        |
+| `role`      | `Role`   | Enum — `LIBRARIAN` or `MEMBER`       |
 
-    - **`ISubject` (Interface)**
-      - Phương thức: `virtual void attach(IObserver* observer) = 0;`
-      - `virtual void detach(IObserver* observer) = 0;`
-      - `virtual void notify() = 0;`
-    - **`IObserver` (Interface)**
-      - Phương thức: `virtual void update(const string& message, const Book* bookContext = nullptr, Loan* loanContext = nullptr) = 0;`
-    - **`BookSubject : public Book, public ISubject`** (Hoặc `Book` có một thành viên `ISubject*`)
-      - Quản lý danh sách `vector<IObserver*> observers`.
-      - `notify()` khi trạng thái sách thay đổi, sách được đặt trước.
-    - **`LoanSubject : public Loan, public ISubject`** (Hoặc `Loan` có một thành viên `ISubject*`)
-      - Quản lý danh sách `vector<IObserver*> observers`.
-      - `notify()` khi sách sắp đến hạn trả.
-    - **`MemberObserver : public IObserver`** (Thành viên nhận thông báo)
-      - `update()`: Xử lý thông báo, ví dụ hiển thị ra console cho member đó.
-    - **`LibrarianObserver : public IObserver`** (Thủ thư nhận thông báo)
-      - `update()`: Xử lý thông báo, ví dụ hiển thị cảnh báo cho thủ thư.
-    - **`NotificationService` (`services/`)**
-      - Có thể đóng vai trò trung gian, quản lý việc đăng ký observers vào subjects cụ thể.
-      - Hoặc các `Subject` tự quản lý. `NotificationService` sẽ chứa các `BookSubject`, `LoanSubject`.
-      - Phương thức: `sendDueSoonNotifications()`, `sendReservationAvailableNotifications()`, `checkAndNotifyDueLoans()`.
+| Method          | Return   | Description                                  |
+|-----------------|----------|----------------------------------------------|
+| `getUserID()`   | `string` | Returns the user's ID                        |
+| `getUserName()` | `string` | Returns the user's display name              |
+| `getRole()`     | `Role`   | Returns the user's role                      |
+| `viewProfile()` | `void`   | Prints the user's profile information        |
 
-2.  **Strategy Pattern (`patterns/strategy/`)**
+#### 2. `Member : public User`
 
-    - **Tìm kiếm sách:**
-      - **`ISearchStrategy` (Interface)**
-        - Phương thức: `virtual vector<Book*> search(const vector<Book*>& allBooks, const string& query) const = 0;`
-      - **`TitleSearchStrategy : public ISearchStrategy`**
-      - **`AuthorSearchStrategy : public ISearchStrategy`** (cần join với thông tin Author)
-      - **`CategorySearchStrategy : public ISearchStrategy`** (cần join với thông tin Category)
-      - Lớp Context (ví dụ trong `LibraryManager`):
-        - `ISearchStrategy* currentSearchStrategy;`
-        - `setSearchStrategy(ISearchStrategy* strategy);`
-        - `vector<Book*> performSearch(const string& query);`
-    - **Xử lý vi phạm:**
-      - **`IPenaltyStrategy` (Interface)**
-        - Phương thức: `virtual void applyPenalty(Member* member, Loan* loan, double overdueDays) = 0;`
-      - **`FinePenaltyStrategy : public IPenaltyStrategy`** (Phạt tiền)
-      - **`SuspendAccessPenaltyStrategy : public IPenaltyStrategy`** (Tạm ngừng quyền mượn)
-      - **`WarningPenaltyStrategy : public IPenaltyStrategy`** (Cảnh cáo)
-      - Lớp Context (ví dụ trong `LibraryManager` hoặc `LoanService`):
-        - `IPenaltyStrategy* currentPenaltyStrategy;`
-        - `setPenaltyStrategy(IPenaltyStrategy* strategy);`
-        - `void handleOverdueLoan(Member* member, Loan* loan);` // Sẽ gọi `currentPenaltyStrategy->applyPenalty()`
+| Attribute          | Type              | Description                               |
+|--------------------|-------------------|-------------------------------------------|
+| `membershipDate`   | `Date`            | Date the member joined                    |
+| `borrowedBooks`    | `vector<Book*>`   | List of currently borrowed books          |
+| `warningCount`     | `int`             | Number of penalty warnings received       |
+| `suspended`        | `bool`            | Whether the account is currently suspended|
+| `suspensionEndDate`| `time_t`          | When the suspension expires               |
+| `totalFines`       | `double`          | Accumulated unpaid fines                  |
 
-3.  **Decorator Pattern (`patterns/decorator/`)**
-    - **`BookDecorator : public Book` (Lớp trừu tượng)**
-      - Thuộc tính: `Book* decoratedBook;` (con trỏ tới đối tượng `Book` hoặc `BookDecorator` khác)
-      - Constructor: `BookDecorator(Book* book)`
-      - Phương thức: `string getFullDescription() const override { return decoratedBook->getFullDescription(); }` (ví dụ, các phương thức khác cũng ủy quyền)
-    - **`DifficultyLabelDecorator : public BookDecorator`**
-      - Thuộc tính: `string difficultyLabel;` (VD: "Beginner", "Intermediate", "Advanced")
-      - `getFullDescription() const override { return decoratedBook->getFullDescription() + "\nDifficulty: " + difficultyLabel; }`
-    - **`SpecialTagDecorator : public BookDecorator`**
-      - Thuộc tính: `vector<string> tags;` (VD: "Bestseller", "New Arrival", "Award Winning")
-      - `getFullDescription() const override { /* ... thêm tags ... */ }`
-    - **`AdditionalInfoDecorator : public BookDecorator`**
-      - Thuộc tính: `string detailedInfo;`
-      - `getFullDescription() const override { /* ... thêm detailedInfo ... */ }`
-    - **Sử dụng:**
-      ```cpp
-      Book* coreBook = new Book(...);
-      Book* bookWithDifficulty = new DifficultyLabelDecorator(coreBook, "Advanced");
-      Book* bookWithDifficultyAndTags = new SpecialTagDecorator(bookWithDifficulty, {"Bestseller"});
-      cout << bookWithDifficultyAndTags->getFullDescription();
-      // Quan trọng: quản lý bộ nhớ cho các decorator và coreBook (dùng smart pointers)
-      ```
+| Method                | Return          | Description                                        |
+|-----------------------|-----------------|----------------------------------------------------|
+| `borrowBook(ISBN)`    | `bool`          | Attempts to borrow a book; returns success status  |
+| `returnBook(ISBN)`    | `bool`          | Returns a borrowed book; returns success status    |
+| `getBorrowedBooks()`  | `vector<Book*>` | Lists all books currently borrowed by this member  |
+| `addWarning()`        | `void`          | Increments the warning counter                     |
+| `suspendAccount(days)`| `void`          | Suspends borrowing privileges for N days           |
+| `isSuspended()`       | `bool`          | Checks whether the member is currently suspended   |
+| `addFine(amount)`     | `void`          | Adds a monetary fine to the member's account       |
+| `payFine(amount)`     | `void`          | Pays off part or all of the outstanding fine       |
 
-#### C. Lớp Dịch vụ (`services/`)
+#### 3. `Librarian : public User`
 
-1.  **`LibraryManager` (Singleton hoặc đối tượng chính)**
-    - Thuộc tính:
-      - `vector<Book*> allBooks;` (Sau khi decorate, có thể là `vector<Book*>`, nơi `Book*` có thể trỏ tới `BookDecorator`)
-      - `vector<Member*> allMembers;`
-      - `vector<Librarian*> allLibrarians;`
-      - `vector<Loan*> allLoans;`
-      - `vector<Author*> allAuthors;`
-      - `vector<Category*> allCategories;`
-      - `ISearchStrategy* searchStrategy;`
-      - `IPenaltyStrategy* penaltyStrategy;`
-      - `NotificationService* notificationService;` (Nếu có)
-    - Phương thức:
-      - Quản lý sách: `addBook(Book* book)`, `removeBook(const string& isbn)`, `updateBook(Book* book)`, `findBookByISBN(const string& isbn)`
-      - Quản lý thành viên: `addMember(Member* member)`, `findMemberByID(const string& memberID)`
-      - Mượn/trả: `borrowBook(const string& memberID, const string& isbn)`, `returnBook(const string& memberID, const string& isbn)`
-      - Tìm kiếm: `setSearchStrategy()`, `searchBooks(const string& query)`
-      - Xử lý vi phạm: `setPenaltyStrategy()`, `processOverdueLoans()` (duyệt `allLoans`, kiểm tra quá hạn, áp dụng `penaltyStrategy`)
-      - Thống kê: `generateBookStatistics()`, `generateMemberActivityReport()`
-      - Tải/Lưu dữ liệu: `loadData()`, `saveData()`
-2.  **`AuthManager` (Quản lý Đăng nhập/Đăng ký)**
-    - Phương thức: `registerUser(const string& username, const string& password, Role role)`, `loginUser(const string& username, const string& password)` (trả về `User*` hoặc null), `logoutUser()`
-    - Lưu trữ thông tin người dùng (có thể là một phần của `LibraryManager` hoặc file riêng).
-3.  **`NotificationService` (Nếu tách riêng khỏi các Subject)**
-    - Quản lý các `Subject` (Sách, Giao dịch mượn).
-    - Đăng ký `Observer` (Thành viên, Thủ thư) vào các `Subject` tương ứng.
-    - Kích hoạt `notify()` trên các `Subject` khi có sự kiện.
-    - Ví dụ: `checkAndNotifyDueLoans()`: Duyệt qua các khoản vay, nếu sắp đến hạn, kích hoạt `notify()` trên `LoanSubject` tương ứng.
+| Method                     | Return          | Description                                          |
+|----------------------------|-----------------|------------------------------------------------------|
+| `addBook(book)`            | `void`          | Adds a new book to the library catalog               |
+| `removeBook(ISBN)`         | `void`          | Removes a book by ISBN                               |
+| `updateBookInfo(book)`     | `void`          | Updates an existing book's information               |
+| `manageMemberInfo(member)` | `void`          | Manages (view/edit) a member's information           |
+| `viewAllLoans()`           | `vector<Loan*>` | Retrieves a list of all loan records                 |
 
-#### D. Lớp Tiện ích (`utils/`)
+#### 4. `Book` (Base class for Decorator)
 
-1.  **`DateUtils`**
-    - Phương thức tĩnh: `getCurrentDate()`, `addDaysToDate(Date d, int days)`, `dateToString(Date d)`, `stringToDate(string s)`, `compareDates(Date d1, Date d2)`.
-2.  **`Validator`**
-    - Phương thức tĩnh: `isValidEmail(const string& email)`, `isValidISBN(const string& isbn)`, `isStrongPassword(const string& password)`.
-3.  **`InputHelper`**
-    - Phương thức tĩnh: `getIntInput(const string& prompt)`, `getStringInput(const string& prompt)`.
+| Attribute        | Type         | Description                                          |
+|------------------|--------------|------------------------------------------------------|
+| `ISBN`           | `string`     | Unique book identifier                               |
+| `title`          | `string`     | Book title                                           |
+| `author`         | `Author`     | Author object (ID, name, biography)                  |
+| `category`       | `Category`   | Category object (ID, name, description)              |
+| `status`         | `BookStatus` | Enum — `AVAILABLE` or `UNAVAILABLE`                  |
+| `totalCopies`    | `int`        | Total number of copies owned                         |
+| `availableCopies`| `int`        | Number of copies currently available for borrowing   |
 
-### III. Luồng Chức năng Chính và Sự Tương tác của Patterns
+| Method                 | Return   | Description                                             |
+|------------------------|----------|---------------------------------------------------------|
+| `getFullDescription()` | `string` | Returns a CSV-formatted full description (virtual, overridden by decorators) |
+| `displayBasicInfo()`   | `void`   | Prints basic book info to the terminal                  |
+| `isAvailable()`        | `bool`   | Returns `true` if `availableCopies > 0`                 |
 
-1.  **Đăng ký/Đăng nhập:** `main.cpp` -> `AuthManager`.
-2.  **Thêm sách mới (có thể kèm decorator):**
-    - Librarian (UI) -> `LibraryManager::addBook()`
-    - Trong `addBook()`, có thể tạo `Book` cơ sở, sau đó bọc bằng các `Decorator` nếu thủ thư chọn.
-    - Sách mới được thêm vào `allBooks`.
-3.  **Tìm kiếm sách:**
-    - User (UI) chọn chiến lược tìm kiếm -> `LibraryManager::setSearchStrategy(new ConcreteSearchStrategy())`.
-    - User (UI) nhập query -> `LibraryManager::performSearch(query)` -> `currentSearchStrategy->search()`.
-4.  **Mượn sách:**
-    - Member (UI) -> `LibraryManager::borrowBook()`.
-    - `LibraryManager` tạo `Loan`, cập nhật `availableCopies` của `Book`.
-    - `Book` (nếu là `BookSubject`) có thể `notify()` về thay đổi trạng thái.
-    - `Loan` (nếu là `LoanSubject`) sẽ được `NotificationService` hoặc `LibraryManager` theo dõi để gửi thông báo sắp đến hạn.
-5.  **Thông báo sách sắp đến hạn:**
-    - `LibraryManager` (hoặc `NotificationService` chạy định kỳ/khi đăng nhập) kiểm tra các `Loan`.
-    - Nếu `Loan` sắp đến hạn, `LoanSubject::notify()` được gọi.
-    - `MemberObserver` (đã đăng ký với `LoanSubject` đó) nhận `update()` và hiển thị thông báo cho member.
-6.  **Xử lý sách quá hạn:**
-    - `LibraryManager` xác định sách quá hạn.
-    - `LibraryManager` chọn/thiết lập `IPenaltyStrategy` (có thể dựa trên quy định hoặc cấu hình).
-    - `LibraryManager::handleOverdueLoan()` -> `currentPenaltyStrategy->applyPenalty()`.
-7.  **Xem thông tin chi tiết sách:**
-    - User (UI) -> `LibraryManager::findBookByISBN()` -> lấy `Book*`.
-    - Gọi `book->getFullDescription()`. Nếu sách đã được decorate, thông tin mở rộng sẽ được hiển thị.
+#### 5. `Author`
 
-### IV. Chức năng của từng phương thức trong từng UML
+| Attribute   | Type     | Description                |
+|-------------|----------|----------------------------|
+| `authorID`  | `string` | Unique author identifier   |
+| `authorName`| `string` | Author's full name         |
+| `biography` | `string` | Short biography            |
 
-#### A. Các Lớp Cốt Lõi (`core/`)
+#### 6. `Category`
 
-1.  **`User`**
-    - login(): bool : kiếm tra xem người dùng đã đăng nhập thành công không
-    - register(): bool: kiểm tra xem người dùng đã đăng kí thành công không
-    - viewProfile(): void: xem thông tin của người dùng
-2.  **`Member : public User`**
-    - borrowBook(isbn: string): bool: cuốn sách đó có được người dùng thuê không
-    - returnBook(isbn : string): bool: cuốn sách đó đã được người dùng trả về chưa
-    - viewBorrowedBooks(): vector<Book\*>: những cuốn sách người dùng đã mượn
-3.  **`Librarian : public User`**
-    - addBook(book: Book\*): void: thêm sách vào thư viện
-    - removeBook(isbn: string): bool: kiểm tra xem cuốn sách đó đã được loại bỏ chưa
-    - updateBookInfo(book: Book): void: cập nhật thông tin của sách
-    - managerMemeber(member: Member\*): void: quản lý thành viên thuộc thư viện
-    - viewAllLoans(): vector<Loans\*>: kiểm tra những khoản nợ sách của thành viên
-4.  **`Book` (Lớp cơ sở cho Decorator)**
-    - getFullDescription(): string: đưa mô tả cho cuốn sách
-    - displayBasicInfo(): void: trình bày những thông tin cơ bản về cuốn sách
-    - isAvaliable(): bool: kiểm tra xem sách còn trống không
-5.  **`Author`**
-6.  **`Category`**
-7.  **`Loan`**
-    - isOverdue(): bool: kiểm tra xem đã quá hạn chưa
-    - calculateFine(): double: tính xem bao giờ hết hạn
+| Attribute    | Type     | Description                  |
+|--------------|----------|------------------------------|
+| `categoryID` | `string` | Unique category identifier   |
+| `name`       | `string` | Category name                |
+| `description`| `string` | Category description         |
 
-#### B. Design Patterns (`patterns/`)
+#### 7. `Loan`
 
-1.  **Observer Pattern (`patterns/observer/`)**
+| Attribute    | Type         | Description                                     |
+|--------------|--------------|-------------------------------------------------|
+| `loanID`     | `string`     | Unique loan identifier                          |
+| `bookISBN`   | `string`     | ISBN of the borrowed book                       |
+| `memberID`   | `string`     | ID of the borrowing member                      |
+| `borrowDate` | `Date`       | Date the book was borrowed                      |
+| `dueDate`    | `Date`       | Date the book is due for return                 |
+| `returnDate` | `Date`       | Actual return date (empty if not yet returned)  |
+| `status`     | `LoanStatus` | Enum — `ACTIVE`, `RETURNED`, or `OVERDUE`       |
 
-    - **`ISubject` (Interface)**
-      - attach(observer: IObserver\*): thêm observer vào danh sách theo dõi
-      - detach(observer: IObserver\*): void: gỡ observer khỏi danh sách
-      - notify(): void: thông báo đến tất cả observer khi có thay đổi
-    - **`IObserver` (Interface)**
-      - update(message: string, book: Book*, loan: Loan*): void: nhận thông báo và xử lý tương ứng
-    - **`BookSubject : public Book, public ISubject`**
-      - notify(): để thông báo khi sách được đặt trước, mượn, hoặc thay đổi trạng thái
-      - setStatus(status: BookStatus): cài đặt trạng thái của sách
-    - **`LoanSubject : public Loan, public ISubject`**
-      - notify(): thông báo khi khoản vay sắp đến hạn hoặc quá hạn
-      - checkDueDate(): kiểm tra hạn của sách
-    - **`MemberObserver : public IObserver`**
-      - update(): nhận thông báo liên quan đến sách mượn, nhắc nhở hạn trả
-    - **`LibrarianObserver : public IObserver`**
-      - update(): nhận thông báo để xử lý quá hạn, thống kê
-    - **`NotificationService` (`services/`)**
-      - sendDueSoonNotifications(): gửi thông báo đến các thành viên có sách sắp đến hạn.
-      - sendReservationAvailableNotifications(): thông báo sách đã sẵn sàng cho người đặt
-      - checkAndNotifyDueLoans(): kiểm tra tất cả các khoản mượn và gọi notify() nếu cần
+| Method             | Return   | Description                                                  |
+|--------------------|----------|--------------------------------------------------------------|
+| `isOverdue()`      | `bool`   | Checks whether the loan has passed its due date              |
+| `getDaysOverdue()` | `int`    | Returns the number of days the loan is overdue               |
+| `calculateFine()`  | `int`    | Calculates the fine based on overdue duration                |
+| `loanCSVFormat()`  | `string` | Serializes the loan to CSV format for persistence            |
+| `dateToString()`   | `string` | Static — converts a `Date` to a string                       |
+| `stringToDate()`   | `Date`   | Static — parses a string into a `Date`                       |
 
-2.  **Strategy Pattern (`patterns/strategy/`)**
+---
 
-    - **Tìm kiếm sách:**
-      - **`ISearchStrategy` (Interface)**
-        - search(books, query): vector<Book\*>: interface tìm kiếm sách theo các tiêu chí khác nhau
-      - **`TitleSearchStrategy : public ISearchStrategy`**
-        - search(books: vector<Book\*>, query: string) để thực hiện tìm kiếm theo tiêu đề / tác giả / thể loại
-      - **`AuthorSearchStrategy : public ISearchStrategy`**
-        - applyPenalty(member, loan, overdueDays): giao diện áp dụng xử phạt khi trễ hạn
-    - **Xử lý vi phạm:**
-      - **`IPenaltyStrategy` (Interface)**
-        - applyPenalty(member, loan, overdueDays): giao diện áp dụng xử phạt khi trễ hạn
-      - **`FinePenaltyStrategy : public IPenaltyStrategy`**
-        - applyPenalty(): phạt tiền thành viên
-      - **`SuspendAccessPenaltyStrategy : public IPenaltyStrategy`**
-        - applyPenalty(): tạm khóa quyền mượn
-      - **`WarningPenaltyStrategy : public IPenaltyStrategy`**
-        - applyPenalty(): chỉ cảnh báo
+### B. Design Patterns (`patterns/`)
 
-3.  **Decorator Pattern (`patterns/decorator/`)**
-    - **`BookDecorator : public Book` (Lớp trừu tượng)**
-      - getFullDescription(): mở rộng thông tin của sách bằng cách bọc ngoài một Book khác
-    - **`DifficultyLabelDecorator : public BookDecorator`**
-      - thêm thông tin về độ khó
-    - **`SpecialTagDecorator : public BookDecorator`**
-      - thêm các tag như "Bestseller", "New"
-    - **`AdditionalInfoDecorator : public BookDecorator`**
-      - thêm mô tả chi tiết từ người quản lý
+#### 1. Observer Pattern (`patterns/observer/`)
 
-#### C. Lớp Dịch vụ (`services/`)
+Used to notify members and librarians about book status changes and loan due-date events.
 
-1.  **`LibraryManager` (Singleton hoặc đối tượng chính)**
-    - Thuộc tính:
-      - `vector<Book*> allBooks;`
-      - `vector<Member*> allMembers;`
-      - `vector<Librarian*> allLibrarians;`
-      - `vector<Loan*> allLoans;`
-      - `vector<Author*> allAuthors;`
-      - `vector<Category*> allCategories;`
-      - `ISearchStrategy* searchStrategy;`
-      - `IPenaltyStrategy* penaltyStrategy;`
-      - `NotificationService* notificationService;`
-    - Phương thức:
-      - addBook(book): thêm sách mới vào thư viện
-      - removeBook(isbn): xóa sách khỏi thư viện nếu tồn tại
-      - updateBook(book): cập nhật thông tin sách
-      - findBookByISBN(isbn): Book\*: tìm sách theo mã ISBN
-      - addMember(member): thêm thành viên mới
-      - findMemberByID(memberID): Member\*: tìm thành viên theo ID
-      - borrowBook(memberID, isbn): bool: xử lý yêu cầu mượn sách
-      - returnBook(memberID, isbn): bool: xử lý yêu cầu trả sách
-      - setSearchStrategy(strategy): thiết lập chiến lược tìm kiếm hiện tại
-      - searchBooks(query): vector<Book\*>: thực hiện tìm kiếm sách
-      - setPenaltyStrategy(strategy): thiết lập chiến lược xử phạt quá hạn
-      - handleOverdueLoan(member, loan): xử lý mượn quá hạn (gọi applyPenalty())
-      - getInstance(): LibraryManager\*: lấy singleton instance (nếu dùng singleton)
-2.  **`AuthManager` (Quản lý Đăng nhập/Đăng ký)**
-    - registerUser(username, password, role): bool: đăng ký người dùng mới
-    - loginUser(username, password): User\*: xác thực và trả về đối tượng User
-    - logoutUser(): void: đăng xuất người dùng hiện tại
-3.  **`NotificationService` (Nếu tách riêng khỏi các Subject)**
-    - sendDueSoonNotifications(): kiểm tra khoản mượn gần đến hạn và gửi thông báo
-    - sendReservationAvailableNotifications(): thông báo sách đã có sẵn
-    - checkAndNotifyDueLoans(): duyệt toàn bộ khoản vay, phát hiện sách đến hạn hoặc quá hạn và gửi thông báo
+**`IObserver` (Interface)**
 
-### V. Lưu ý Quan trọng
+| Method                                    | Description                                                       |
+|-------------------------------------------|-------------------------------------------------------------------|
+| `update(message, book, loan)`             | Pure virtual — called when an observed subject's state changes    |
+| `logNotification(message, book, loan)`    | Pure virtual — logs the notification to a persistent log file     |
 
-- **Quản lý bộ nhớ:** Sử dụng smart pointers (`std::unique_ptr`, `std::shared_ptr`) để tránh memory leak, đặc biệt với các đối tượng được tạo động và trong Decorator Pattern.
-- **Xử lý lỗi:** Sử dụng exception handling (`try-catch`) cho các tình huống lỗi (ví dụ: file không tìm thấy, input không hợp lệ).
-- **Tính nhất quán dữ liệu:** Đảm bảo khi một hành động xảy ra (ví dụ mượn sách), tất cả các đối tượng liên quan (Book, Member, Loan) được cập nhật.
-- **Hằng số và Enum:** Sử dụng `const` cho các giá trị không đổi và `enum class` cho các trạng thái, vai trò để code dễ đọc và bảo trì.
+**`ISubject` (Interface)**
+
+| Method              | Description                                              |
+|---------------------|----------------------------------------------------------|
+| `attach(observer)`  | Registers an observer to this subject                    |
+| `detach(observer)`  | Removes an observer from this subject                    |
+| `notify()`          | Notifies all attached observers of a state change        |
+
+**`BookSubject : public Book, public ISubject`**
+- Wraps a `Book` and manages a list of observers.
+- Calls `notify()` when the book is borrowed, returned, reserved, or its status changes.
+
+**`LoanSubject : public Loan, public ISubject`**
+- Wraps a `Loan` and manages a list of observers.
+- Calls `notify()` when the loan is approaching its due date or becomes overdue.
+
+**`MemberObserver : public IObserver`**
+- Receives notifications relevant to a member (e.g., due-date reminders, book availability).
+- Logs notifications to `librarylog/member_notifications.log`.
+
+**`LibrarianObserver : public IObserver`**
+- Receives notifications relevant to a librarian (e.g., overdue alerts, system-level events).
+- Logs notifications to `librarylog/librarian_notifications.log`.
+
+**`NotificationService`**
+- Orchestrates notification delivery across all book and loan subjects.
+- Methods: `sendDueSoonNotifications()`, `sendReservationAvailableNotifications()`, `checkAndNotifyDueLoans()`.
+
+---
+
+#### 2. Strategy Pattern (`patterns/strategy/`)
+
+Used for **book searching** and **overdue penalty handling**, allowing the algorithm to be swapped at runtime.
+
+##### Book Search Strategies
+
+**`ISearchStrategy` (Interface)**
+
+| Method                        | Description                                                          |
+|-------------------------------|----------------------------------------------------------------------|
+| `search(books, query)`        | Pure virtual — searches a book collection and returns matching books |
+
+| Concrete Strategy             | Description                                      |
+|-------------------------------|--------------------------------------------------|
+| `TitleSearchStrategy`         | Searches books by title (fuzzy matching)         |
+| `AuthorSearchStrategy`        | Searches books by author name                    |
+| `CategorySearchStrategy`      | Searches books by category name                  |
+
+##### Overdue Penalty Strategies
+
+**`IPenaltyStrategy` (Interface)**
+
+| Method                                 | Description                                                    |
+|----------------------------------------|----------------------------------------------------------------|
+| `applyPenalty(member, loan, daysOverdue)` | Pure virtual — applies a penalty to the member for an overdue loan |
+
+| Concrete Strategy             | Description                                                            |
+|-------------------------------|------------------------------------------------------------------------|
+| `WarningPenaltyStrategy`      | Issues a warning to the member                                         |
+| `FinePenaltyStrategy`         | Charges a monetary fine proportional to overdue days                    |
+| `SuspendPenaltyStrategy`      | Temporarily suspends the member's borrowing privileges                 |
+
+The `LibraryManager` automatically selects the appropriate penalty strategy based on the number of days overdue.
+
+---
+
+#### 3. Decorator Pattern (`patterns/decorator/`)
+
+Used to dynamically extend a `Book`'s description without modifying the `Book` class itself.
+
+**`BookDecorator : public Book`** (Abstract base decorator)
+- Holds a `shared_ptr<Book>` to the decorated book.
+- Delegates `getFullDescription()` to the wrapped book.
+
+| Concrete Decorator             | Description                                                      |
+|--------------------------------|------------------------------------------------------------------|
+| `DifficultyLabelDecorator`     | Appends a difficulty label (e.g., "Beginner", "Advanced")        |
+| `SpecialTagDecorator`          | Appends special tags (e.g., "Bestseller", "New Arrival")         |
+| `AdditionalInfoDecorator`      | Appends arbitrary extra information from the librarian           |
+
+**Usage example:**
+```cpp
+auto coreBook = make_shared<Book>(...);
+auto withDifficulty = make_shared<DifficultyLabelDecorator>(coreBook, "Advanced");
+auto withTags = make_shared<SpecialTagDecorator>(withDifficulty, {"Bestseller"});
+cout << withTags->getFullDescription();
+```
+
+---
+
+### C. Service Classes (`services/`)
+
+#### 1. `LibraryManager` (Singleton)
+
+The central orchestrator of the application. Manages all books, members, loans, observers, and strategies.
+
+| Key Method                    | Description                                                             |
+|-------------------------------|-------------------------------------------------------------------------|
+| `getInstance()`               | Returns the singleton instance                                          |
+| `addBook(ISBN, title, ...)`   | Adds a new book to the system                                           |
+| `addBookToSystem(book)`       | Registers a `Book*` in the internal catalog                             |
+| `addMemberToSystem(member)`   | Registers a `Member*` in the system                                     |
+| `findBook(ISBN)`              | Looks up a book by ISBN                                                 |
+| `findMember(memberID)`        | Looks up a member by ID                                                 |
+| `borrowBook(memberID, ISBN)`  | Processes a borrow request — creates a loan and updates availability    |
+| `returnBook(memberID, ISBN)`  | Processes a return — closes the loan and restores availability          |
+| `setSearchStrategy(strategy)` | Sets the active search algorithm                                        |
+| `searchBooks(query)`          | Searches the catalog using the current strategy                         |
+| `setObserver(observer)`       | Sets the observer to attach to subjects                                 |
+| `addObserverToAllBooks()`     | Attaches the current observer to every `BookSubject`                    |
+| `addObserverToAllLoans()`     | Attaches the current observer to every `LoanSubject`                    |
+| `startLoanCheckTimer()`       | Starts a background thread that periodically checks for overdue loans   |
+| `stopLoanCheckTimer()`        | Stops the background loan-check thread                                  |
+| `loadBooksIntoLibrary()`      | Loads books, authors, and categories from CSV files                     |
+| `loadMembersFromCSV(path)`    | Loads member data from a CSV file                                       |
+| `loadLoansFromCSV(path)`      | Loads loan records from a CSV file                                      |
+| `saveBooksNewInfo()`          | Persists updated book data back to CSV                                  |
+| `systemLogout()`              | Cleans up observers and stops the timer on shutdown                     |
+
+#### 2. `AuthenticateManager`
+
+Handles user registration and authentication.
+
+| Method                              | Return  | Description                                              |
+|-------------------------------------|---------|----------------------------------------------------------|
+| `registerUser(userName, pwd, role)` | `bool`  | Registers a new user; returns success status             |
+| `loginUser(userName, pwd)`          | `User*` | Authenticates and returns the `User` object, or `nullptr`|
+| `logoutUser()`                      | `void`  | Logs out the current user                                |
+
+---
+
+### D. Utility Classes (`utils/`)
+
+#### 1. `CSVHandler`
+
+Static helper for CSV file operations.
+
+| Method                            | Description                                             |
+|-----------------------------------|---------------------------------------------------------|
+| `parseCSVLine(line)`              | Splits a CSV line into a vector of field strings        |
+| `userExists(userID, fileName)`    | Checks if a user ID exists in the given CSV file        |
+| `validateCredentials(user, pwd, file)` | Validates login credentials against the CSV        |
+| `addUser(id, name, pwd, file)`    | Appends a new user record to the CSV file               |
+| `generateUserID(prefix)`         | Generates a unique user ID with the given prefix        |
+
+#### 2. `StringHandler`
+
+String processing utilities for fuzzy search.
+
+| Method                                    | Description                                                      |
+|-------------------------------------------|------------------------------------------------------------------|
+| `getLowercase(s)`                         | Converts a string to lowercase                                   |
+| `findTopMatches(patterns, query, topN)`   | Returns the top-N best-matching books using Levenshtein distance |
+
+---
+
+## Application Flow
+
+### GUI Screens
+
+The application uses a simple **state-machine router** (`AppState` enum) to navigate between screens:
+
+| Screen             | Description                                        | Access         |
+|--------------------|----------------------------------------------------|----------------|
+| **Login**          | Username/password login form                       | All users      |
+| **Register**       | New user registration (Member or Librarian)        | All users      |
+| **Main Menu**      | Dashboard with navigation to all features          | Authenticated  |
+| **Search Book**    | Search by title, author, or category               | All roles      |
+| **Borrow Book**    | Browse and borrow available books                  | Members        |
+| **Add Book**       | Add a new book to the catalog                      | Librarians     |
+| **List Members**   | View all registered members                        | Librarians     |
+| **List Loans**     | View all loan records                              | Librarians     |
+| **Member Manage**  | Edit member details                                | Librarians     |
+| **Notifications**  | View system notifications                          | Authenticated  |
+
+### Key Workflows
+
+1. **Registration / Login** — `main.cpp` → `AuthenticateManager` → CSV credential store.
+2. **Adding a Book** — Librarian navigates to Add Book screen → `LibraryManager::addBook()` → CSV persistence.
+3. **Searching Books** — User selects a search strategy (title/author/category) → `LibraryManager::setSearchStrategy()` → `searchBooks(query)`.
+4. **Borrowing a Book** — Member selects a book → `LibraryManager::borrowBook()` → creates a `Loan`, decrements `availableCopies`, notifies observers.
+5. **Overdue Detection & Penalties** — Background timer thread → `checkLoansAndApplyPenalties()` → selects penalty strategy based on overdue days → applies warning / fine / suspension.
+6. **Notifications** — `BookSubject` / `LoanSubject` call `notify()` → attached `MemberObserver` / `LibrarianObserver` receive `update()` → log to file.
+
+---
+
+## Building & Running
+
+### Prerequisites
+
+- **C++17** compatible compiler (MinGW-w64 recommended on Windows)
+- **CMake** ≥ 3.10
+- **DirectX 9 SDK** (included with Windows SDK)
+
+### Build Steps
+
+**Option 1: Using the build script**
+```bash
+build.bat
+```
+This will clean, configure (MinGW Makefiles), and build the project. The executable is output to `build/LMS.exe`.
+
+**Option 2: Manual CMake**
+```bash
+mkdir build
+cd build
+cmake -G "MinGW Makefiles" ..
+cmake --build . --config Release
+```
+
+### Running
+
+```bash
+cd build
+LMS.exe
+```
+
+> **Note:** The application expects the `data/` directory to be located at `../data/` relative to the executable (i.e., one level up from `build/`). Run the executable from inside the `build/` directory.
+
+---
+
+## Important Notes
+
+- **Memory Management:** The Decorator pattern uses `std::shared_ptr` to manage decorated book lifetimes and prevent memory leaks.
+- **Thread Safety:** The background loan-check timer uses `std::mutex` to protect shared loan data from race conditions.
+- **Error Handling:** CSV parsing includes basic validation; invalid records are skipped gracefully.
+- **Data Persistence:** All data is stored in CSV files under `data/`. Changes to books and loans are saved back to CSV on relevant operations.
+- **Enumerations:** `BookStatus`, `LoanStatus`, and `Role` are implemented as `enum class` for type safety and readability.
+- **Platform:** Currently Windows-only due to the DirectX 9 / Win32 ImGui backend.
